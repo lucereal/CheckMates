@@ -1,0 +1,46 @@
+{
+    "receiptId": null,
+    "items": [
+        {
+            "itemId": 0,
+            "description": "Espresso Martini",
+            "price": 34,
+            "quantity": 2,
+            "claims": []
+        },
+        {
+            "itemId": 1,
+            "description": "Texas Mule",
+            "price": 12,
+            "quantity": 1,
+            "claims": []
+        },
+        {
+            "itemId": 2,
+            "description": "Tijuana Taxi",
+            "price": 16,
+            "quantity": 1,
+            "claims": []
+        },
+        {
+            "itemId": 3,
+            "description": "Tuna Tartine",
+            "price": 24,
+            "quantity": 1,
+            "claims": []
+        },
+        {
+            "itemId": 4,
+            "description": "Soup Du Jour",
+            "price": 9,
+            "quantity": 1,
+            "claims": []
+        }
+    ],
+    "total": 101.76,
+    "tip": 0,
+    "users": [],
+    "transactionDate": "2023-02-26T00:00:00+00:00",
+    "merchantName": "SINFUL COCKTAILS\nCUISINE",
+    "_id": null
+}

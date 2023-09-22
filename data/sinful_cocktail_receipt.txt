@@ -1,0 +1,40 @@
+{
+    "receiptId": null,
+    "items": [
+        {
+            "itemId": 0,
+            "description": "Espresso Martini",
+            "price": 34,
+            "quantity": 2
+        },
+        {
+            "itemId": 0,
+            "description": "Texas Mule",
+            "price": 12,
+            "quantity": 1
+        },
+        {
+            "itemId": 0,
+            "description": "Tijuana Taxi",
+            "price": 16,
+            "quantity": 1
+        },
+        {
+            "itemId": 0,
+            "description": "Tuna Tartine",
+            "price": 24,
+            "quantity": 1
+        },
+        {
+            "itemId": 0,
+            "description": "Soup Du Jour",
+            "price": 9,
+            "quantity": 1
+        }
+    ],
+    "total": 101.76,
+    "tip": 0,
+    "users": [],
+    "transactionDate": "0001-01-01T00:00:00+00:00",
+    "merchantName": "SINFUL COCKTAILS\nCUISINE"
+}
