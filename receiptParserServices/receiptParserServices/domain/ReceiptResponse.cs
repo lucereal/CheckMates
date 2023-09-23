@@ -1,4 +1,5 @@
-﻿using System;
+﻿using receiptParserServices.util.error;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,8 @@ namespace receiptParserServices.domain
         public bool isSuccess { get; set; }
 
         public string message { get; set; }
-        public Receipt receipt { get; set; }
+        public ReceiptDto receipt { get; set; }
+
+        public HandleReceiptFailureReason? failureReason { get; set; }
     }
 }

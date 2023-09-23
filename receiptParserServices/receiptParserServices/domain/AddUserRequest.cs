@@ -8,7 +8,7 @@ namespace receiptParserServices.domain
 {
     internal class AddUserRequest
     {
-        public string receiptId { get; set; }
-        public User user { get; set; }
+        public string id { get; set; }
+        public string userName { get; set; }
     }
 }

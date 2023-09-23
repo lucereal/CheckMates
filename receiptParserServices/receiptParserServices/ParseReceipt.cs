@@ -43,7 +43,7 @@ namespace receiptParserServices
             Nullable<DateTimeOffset> transactionDate = null;
             double total = 0;
             double tip = 0;
-            List<Item> items = new List<Item>();
+            List<ItemDto> items = new List<ItemDto>();
 
             foreach (AnalyzedDocument receipt in receipts.Documents)
             {
@@ -122,14 +122,18 @@ namespace receiptParserServices
                                     }
                                 }
 
-                                Item item = new Item();
+                                ItemDto item = new ItemDto();
                                 if (itemDescription != null && itemTotalPrice != null)
                                 {
                                     item.description = itemDescription;
                                     item.price = itemTotalPrice;
 
                                 }
-                                if(itemQuantity != 0)
+                                if(itemQuantity < 1)
+                                {
+                                    item.quantity = 1;
+                                }
+                                else
                                 {
                                     item.quantity = itemQuantity;
                                 }
@@ -145,7 +149,7 @@ namespace receiptParserServices
             {
                 items[i].itemId = i;
             }
-            Receipt receiptResult = new Receipt();
+            ReceiptDto receiptResult = new ReceiptDto();
             receiptResult.items = items;
             receiptResult.total = total;
             receiptResult.tip = tip;
