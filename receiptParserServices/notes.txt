@@ -1,0 +1,3 @@
+add repository layer 
+add service layer
+user function classes as controllers
