@@ -19,6 +19,9 @@ using Receipt = receiptParserServices.repository.model.Receipt;
 using receiptParserServices.util.error;
 using System.Runtime.CompilerServices;
 using receiptParserServices.repository.mappers;
+using receiptParserServices.service.inter;
+using MongoDB.Bson.IO;
+using Newtonsoft.Json.Linq;
 
 namespace receiptParserServices
 {
@@ -27,11 +30,13 @@ namespace receiptParserServices
         private readonly ILogger _logger;
 
         private readonly IReceiptRepository _receiptRepository;
+        private readonly IUserReceiptService _userReceiptService;
 
-        public HandleReceipt(ILoggerFactory loggerFactory, IReceiptRepository receiptRepository)
+        public HandleReceipt(ILoggerFactory loggerFactory, IReceiptRepository receiptRepository, IUserReceiptService userReceiptService)
         {
             _logger = loggerFactory.CreateLogger<ParseReceipt>();
             _receiptRepository = receiptRepository;
+            _userReceiptService = userReceiptService;
         }
 
         [Function("CreateReceipt")]
@@ -93,6 +98,82 @@ namespace receiptParserServices
 
 
             HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
+            response.Headers.Add("Content-Type", "application/json; charset=utf-8");
+
+            response.WriteString(responseString);
+
+            return response;
+        }
+
+        [Function("GetReceipt")]
+        public async Task<HttpResponseData> GetReceipt([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
+        {
+            _logger.LogInformation("C# HTTP trigger function processed a request.");
+
+            HttpStatusCode resultStatusCode = HttpStatusCode.OK;
+            ReceiptResponse receiptResponse = new ReceiptResponse();
+            receiptResponse.isSuccess = false;
+            try
+            {
+
+                string? model = await req.ReadAsStringAsync();
+
+
+                if (model != null)
+                {
+                    
+                    JObject modelObj = JObject.Parse(model);
+                    string? id = (string)modelObj["id"];
+
+                    if(id != null)
+                    {
+
+                        Receipt resultReceipt = await _receiptRepository.getReceiptById(id);
+
+                        ReceiptDto receiptDto = ReceiptMapper.MapReceiptToReceiptDto(resultReceipt);
+
+                        receiptResponse.isSuccess = true;
+                        receiptResponse.message = "Receipt created.";
+
+                        receiptResponse.receipt = receiptDto;
+                    }
+                    else
+                    {
+                        receiptResponse.isSuccess = false;
+                        receiptResponse.failureReason = HandleReceiptFailureReason.CouldNotFindReceipt;
+                        resultStatusCode = HttpStatusCode.BadRequest;
+
+                    }
+                    
+                   
+                }
+                else
+                {
+                    receiptResponse.isSuccess = false;
+                    receiptResponse.failureReason = HandleReceiptFailureReason.ModelParsingIssue;
+                    receiptResponse.message = "";
+
+                }
+            }
+            catch (HandleReceiptException e)
+            {
+                receiptResponse.isSuccess = false;
+                receiptResponse.failureReason = e.failureReason;
+                receiptResponse.message = e.Message;
+            }
+            catch (Exception e)
+            {
+                receiptResponse.isSuccess = false;
+                receiptResponse.message = e.Message;
+                receiptResponse.failureReason = HandleReceiptFailureReason.Unknown;
+
+            }
+
+
+            string responseString = JsonSerializer.Serialize(receiptResponse);
+
+
+            HttpResponseData response = req.CreateResponse(resultStatusCode);
             response.Headers.Add("Content-Type", "application/json; charset=utf-8");
 
             response.WriteString(responseString);
@@ -195,114 +276,58 @@ namespace receiptParserServices
             return response;
         }
 
-        //[Function("UpdateUserItem")]
-        //public async Task<HttpResponseData> UpdateUserItem([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
-        //{
-        //    _logger.LogInformation("C# HTTP trigger function processed a request.");
-        //    HttpStatusCode resultStatusCode = HttpStatusCode.OK;
-        //    ReceiptResponse receiptResponse = new ReceiptResponse();
-        //    receiptResponse.isSuccess = false;
-        //    try
-        //    {
-        //        var mongoClient = new MongoClient(settings);
-
-        //        var db = mongoClient.GetDatabase("receiptStorage");
-        //        var _receipts = db.GetCollection<Receipt>("receipts");
+        [Function("UpdateUserItem")]
+        public async Task<HttpResponseData> UpdateUserItem([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
+        {
+            _logger.LogInformation("C# HTTP trigger function processed a request.");
+            HttpStatusCode resultStatusCode = HttpStatusCode.OK;
+            ReceiptResponse receiptResponse = new ReceiptResponse();
+            receiptResponse.isSuccess = false;
+            try
+            {
+                
+                AddUserItemRequest? model = await req.ReadFromJsonAsync<AddUserItemRequest>();
 
 
-        //        AddUserItemRequest? model = await req.ReadFromJsonAsync<AddUserItemRequest>();
+                if (model != null)
+                {
+                    Receipt resultReceipt = await _userReceiptService.UpdateUserClaim(model.id, model.userId, model.itemId, model.quantity);
+                    receiptResponse.isSuccess = true;
+                    receiptResponse.message = "Receipt created.";
+
+                    receiptResponse.receipt = ReceiptMapper.MapReceiptToReceiptDto(resultReceipt);
+                }
+                else
+                {
+                    receiptResponse.isSuccess = false;
+                    receiptResponse.message = "could not parse request object";
+                    resultStatusCode = HttpStatusCode.BadRequest;
+                }
+            }
+            catch(HandleReceiptException e)
+            {
+                receiptResponse.isSuccess = false;
+                receiptResponse.failureReason = e.failureReason;
+                resultStatusCode = HttpStatusCode.InternalServerError;
+            }
+            catch (Exception e)
+            {
+                receiptResponse.isSuccess = false;
+                resultStatusCode = HttpStatusCode.InternalServerError;
+            }
 
 
-        //        if (model != null)
-        //        {
-        //            Receipt receipt = _receipts.Find(x => x.receiptId == model.receiptId).First();
-        //            if (receipt != null)
-        //            {
-        //                User? user = receipt.users.Find(x => x.userId == model.userId);
-
-        //                if (user != null)
-        //                {
+            string responseString = JsonSerializer.Serialize(receiptResponse);
 
 
+            HttpResponseData response = req.CreateResponse(resultStatusCode);
+            response.Headers.Add("Content-Type", "application/json; charset=utf-8");
 
-        //                    Item? receiptItem = receipt.items.Find(x => x.itemId == model.itemId);
+            response.WriteString(responseString);
 
-        //                    if (receiptItem != null)
-        //                    {
+            return response;
+        }
 
-
-        //                        Claim? claim = receiptItem.claims.Find(x => x.userId == model.userId);
-        //                        if(claim != null)
-        //                        {
-        //                            claim.quantity = model.quantity;
-
-
-        //                            var filter = Builders<Receipt>.Filter.Eq(x => x.receiptId, receipt.receiptId) & Builders<Receipt>.Filter.ElemMatch(x => x.items, Builders<Item>.Filter.Eq(x => x.itemId, receiptItem.itemId));
-
-        //                            var update = Builders<Receipt>.Update.Set(x => x.items.FirstMatchingElement().claims, receiptItem.claims);
-
-
-        //                            var updateReceipt = await _receipts.UpdateOneAsync(filter, update);
-
-        //                            receiptResponse.isSuccess = true;
-        //                            receiptResponse.receipt = receipt;
-        //                        }
-        //                        else
-        //                        {
-        //                            receiptResponse.isSuccess = false;
-        //                            receiptResponse.message = "Could not find claim in receipt item for user";
-        //                            resultStatusCode = HttpStatusCode.InternalServerError;
-        //                        }
-
-        //                    }
-        //                    else
-        //                    {
-        //                        receiptResponse.isSuccess = false;
-        //                        receiptResponse.message = "Could not find receipt item in receipt";
-        //                        resultStatusCode = HttpStatusCode.InternalServerError;
-        //                    }
-
-
-        //                }
-        //                else
-        //                {
-        //                    receiptResponse.isSuccess = false;
-        //                    receiptResponse.message = "Could not find userId in receipt";
-        //                    resultStatusCode = HttpStatusCode.InternalServerError;
-        //                }
-
-        //            }
-        //            else
-        //            {
-        //                receiptResponse.isSuccess = false;
-        //                receiptResponse.message = "Could not find receiptId";
-        //                resultStatusCode = HttpStatusCode.InternalServerError;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            receiptResponse.isSuccess = false;
-        //            receiptResponse.message = "could not parse request object";
-        //            resultStatusCode = HttpStatusCode.BadRequest;
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        receiptResponse.isSuccess = false;
-        //        resultStatusCode = HttpStatusCode.InternalServerError;
-        //    }
-
-
-        //    string responseString = JsonSerializer.Serialize(receiptResponse);
-
-
-        //    HttpResponseData response = req.CreateResponse(resultStatusCode);
-        //    response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-
-        //    response.WriteString(responseString);
-
-        //    return response;
-        //}
 
         //[Function("GetUserTotals")]
         //public async Task<HttpResponseData> GetUserTotals([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
