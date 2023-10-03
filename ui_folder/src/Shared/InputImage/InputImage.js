@@ -1,6 +1,6 @@
 import React from 'react';
 
-const InputImage = () => {
+const InputImage = (props) => {
 
     return(
         <div className='input-container'>
@@ -8,7 +8,7 @@ const InputImage = () => {
                 type="file"
                 name="myImage"
                 onChange={(event) => {
-                    console.log(event.target.files[0]);
+                    props.setReceiptImg(event.target.files[0]);
                 }}
             />
         </div>

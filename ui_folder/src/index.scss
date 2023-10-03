@@ -1,6 +1,7 @@
 body {
     height:100%;
-    background-color: #303846;
+    background-color: #303846; /* For browsers that do not support gradients */
+    background-image: linear-gradient(to right, #13161c -30%, #303846 10%, #303846 90%,#13161c 130%);
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -12,6 +13,7 @@ body {
 p, h1 {
     font-family: "Inter",sans-serif;
     color: #E7E9EC;
+    text-align: center;
 }
 
 
@@ -21,3 +23,4 @@ code {
 }
 @import './App.scss';
 @import './Components/InputComponents.scss';
+@import 'bootstrap/dist/css/bootstrap.min.css';
