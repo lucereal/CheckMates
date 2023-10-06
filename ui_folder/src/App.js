@@ -13,13 +13,11 @@ const routes = createBrowserRouter([
         path: "/receipt",
         element: <div><h1>NEW</h1></div>,
     },
-
   ]);
 
 function App() {
     return (
         <div className="app-container">
-            <h1>HOME</h1>
             <RouterProvider router={routes} />
         </div>
     );
