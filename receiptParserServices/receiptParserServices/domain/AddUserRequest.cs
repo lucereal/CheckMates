@@ -9,6 +9,6 @@ namespace receiptParserServices.domain
     internal class AddUserRequest
     {
         public string id { get; set; }
-        public string userName { get; set; }
+        public List<string> userNames { get; set; }
     }
 }

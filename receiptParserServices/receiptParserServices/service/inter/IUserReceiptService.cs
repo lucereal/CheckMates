@@ -10,5 +10,6 @@ namespace receiptParserServices.service.inter
     internal interface IUserReceiptService
     {
         Task<Receipt> UpdateUserClaim(string id, string userId, int itemId, int quantity);
+        Task<Receipt> AddUsersToReceipt(string id, List<string> users);
     }
 }

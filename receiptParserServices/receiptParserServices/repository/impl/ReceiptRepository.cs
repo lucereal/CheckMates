@@ -83,6 +83,32 @@ namespace receiptParserServices.repository.impl
             return receipt;
         }
 
+        public async Task<Receipt> addUsersToReceipt(string id, List<string> users)
+        {
+            List<User> userList = new List<User>();
+
+            users.ForEach(x =>
+            {
+                var generateOptions = new shortid.Configuration.GenerationOptions(true, false, 8);
+                string userId = ShortId.Generate(generateOptions);
+
+                User user = new User();
+                user.name = x;
+                user.userId = userId;
+                userList.Add(user);
+            });
+            
+
+            var filter = Builders<Receipt>.Filter.Eq(x => x.Id, id);
+            var update = Builders<Receipt>.Update.AddToSetEach(x => x.users, userList);
+
+
+            var options = new FindOneAndUpdateOptions<Receipt> { ReturnDocument = ReturnDocument.After };
+
+            Receipt receipt = await _dbCollection.FindOneAndUpdateAsync(filter, update, options);
+            return receipt;
+        }
+
 
         //todo: handle same user inserting new claim
         public async Task<Receipt> addUserClaimToReceipt(string id, string userId, int itemId, int quantity, double? price)

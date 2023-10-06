@@ -181,8 +181,8 @@ namespace receiptParserServices
             return response;
         }
 
-        [Function("AddUser")]
-        public async Task<HttpResponseData> AddUser([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
+        [Function("AddUsers")]
+        public async Task<HttpResponseData> AddUsers([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
 
@@ -199,7 +199,7 @@ namespace receiptParserServices
 
                 if (model != null)
                 {
-                    Receipt resultReceipt = await _receiptRepository.addUserToReceipt(model.id, model.userName);
+                    Receipt resultReceipt = await _userReceiptService.AddUsersToReceipt(model.id, model.userNames);
                     receiptResponse.isSuccess = true;
                     receiptResponse.message = "Receipt created.";
 

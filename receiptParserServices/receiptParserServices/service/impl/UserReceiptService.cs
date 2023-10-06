@@ -3,6 +3,7 @@ using receiptParserServices.repository.inter;
 using receiptParserServices.repository.model;
 using receiptParserServices.service.inter;
 using receiptParserServices.util.error;
+using shortid;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -67,6 +68,39 @@ namespace receiptParserServices.service.impl
 
             return resultReceipt;
 
+        }
+
+        public async Task<Receipt> AddUsersToReceipt(string id, List<string> users)
+        {
+            Receipt resultReceipt;
+
+            Receipt receipt = await _receiptRepository.getReceiptById(id);
+
+            resultReceipt = receipt;
+
+            if (receipt == null)
+            {
+                throw new HandleReceiptException("Could not find receipt while trying to update.", HandleReceiptFailureReason.CouldNotFindReceipt);
+            }
+
+            List<User> userList = new List<User>();
+
+            var generateOptions = new shortid.Configuration.GenerationOptions(true, false, 8);
+
+            foreach (var uName in users)
+            {
+                string userId = ShortId.Generate(generateOptions);
+                User nUser = new User();
+                nUser.userId = userId;
+                nUser.name = uName;
+                userList.Add(nUser);
+            }
+
+            receipt.users.AddRange(userList);
+
+            resultReceipt = await _receiptRepository.updateReceipt(receipt);
+
+            return resultReceipt;
         }
     }
 }
