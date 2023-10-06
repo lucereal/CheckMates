@@ -55,21 +55,21 @@ namespace receiptParserServices
                 if (model != null)
                 {
                     Guid receiptId = Guid.NewGuid();
-                    Receipt receipt = new Receipt();
-                    receipt.total = model.total;
-                    receipt.tip = model.tip;
-                    receipt.items = ReceiptMapper.MapItemDtosToItems(model.items);
-                    receipt.merchantName = model.merchantName;
-                    receipt.receiptId = receiptId.ToString();
+                    ReceiptDto receiptDto = new ReceiptDto();
+                    receiptDto.total = model.total;
+                    receiptDto.tip = model.tip;
+                    receiptDto.items = model.items;
+                    receiptDto.merchantName = model.merchantName;
+                    receiptDto.receiptId = receiptId.ToString();
 
-                    Receipt resultReceipt = await _receiptRepository.createReceipt(receipt);
+                    Receipt resultReceipt = await _userReceiptService.CreateReceipt(receiptDto);
 
-                    ReceiptDto receiptDto = ReceiptMapper.MapReceiptToReceiptDto(resultReceipt);
+                    ReceiptDto resultReceiptDto = ReceiptMapper.MapReceiptToReceiptDto(resultReceipt);
                     
                     receiptResponse.isSuccess = true;
                     receiptResponse.message = "Receipt created.";
                     
-                    receiptResponse.receipt = receiptDto;
+                    receiptResponse.receipt = resultReceiptDto;
                 }
                 else
                 {

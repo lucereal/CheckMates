@@ -1,4 +1,5 @@
-﻿using receiptParserServices.repository.model;
+﻿using receiptParserServices.domain;
+using receiptParserServices.repository.model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,7 @@ namespace receiptParserServices.service.inter
     {
         Task<Receipt> UpdateUserClaim(string id, string userId, int itemId, int quantity);
         Task<Receipt> AddUsersToReceipt(string id, List<string> users);
+
+        Task<Receipt> CreateReceipt(ReceiptDto receiptDto);
     }
 }

@@ -1,4 +1,5 @@
-﻿using receiptParserServices.domain;
+﻿using MongoDB.Bson;
+using receiptParserServices.domain;
 using receiptParserServices.repository.model;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace receiptParserServices.repository.mappers
 
             ReceiptDto receiptDto = new ReceiptDto();
             receiptDto.receiptId = receipt.receiptId;
-            receiptDto._id = receipt.Id;
+            receiptDto._id = receipt.Id.ToString();
             receiptDto.total = receipt.total;
             receiptDto.tip = receipt.tip;
 
@@ -54,7 +55,7 @@ namespace receiptParserServices.repository.mappers
             receipt.tip = receiptDto.tip;
             receipt.total = receiptDto.total;
             receipt.receiptId = receiptDto.receiptId;
-            receipt.Id = receiptDto._id;
+            receipt.Id = receiptDto._id != null ? ObjectId.Parse(receiptDto._id) : ObjectId.Empty;
             receiptDto.users.ForEach(x =>
             {
                 User user = new User();

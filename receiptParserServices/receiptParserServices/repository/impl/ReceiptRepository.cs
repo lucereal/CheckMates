@@ -74,7 +74,7 @@ namespace receiptParserServices.repository.impl
             user.name = userName;
             user.userId = userId;
 
-            var filter = Builders<Receipt>.Filter.Eq(x => x.Id, id);
+            var filter = Builders<Receipt>.Filter.Eq(x => x.Id, ObjectId.Parse(id));
             var update = Builders<Receipt>.Update.AddToSet(x => x.users, user);
 
             var options = new FindOneAndUpdateOptions<Receipt> { ReturnDocument = ReturnDocument.After };
@@ -99,7 +99,7 @@ namespace receiptParserServices.repository.impl
             });
             
 
-            var filter = Builders<Receipt>.Filter.Eq(x => x.Id, id);
+            var filter = Builders<Receipt>.Filter.Eq(x => x.Id, ObjectId.Parse(id));
             var update = Builders<Receipt>.Update.AddToSetEach(x => x.users, userList);
 
 

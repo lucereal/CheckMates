@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using receiptParserServices.domain;
 using receiptParserServices.repository.inter;
+using receiptParserServices.repository.mappers;
 using receiptParserServices.repository.model;
 using receiptParserServices.service.inter;
 using receiptParserServices.util.error;
@@ -18,11 +20,13 @@ namespace receiptParserServices.service.impl
         private readonly ILogger _logger;
 
         private readonly IReceiptRepository _receiptRepository;
+        private readonly IMongoRepository<Receipt> _userReceiptRepository;
 
-        public UserReceiptService(ILoggerFactory loggerFactory, IReceiptRepository receiptRepository)
+        public UserReceiptService(ILoggerFactory loggerFactory, IReceiptRepository receiptRepository, IMongoRepository<Receipt> userReceiptRepository)
         {
             _logger = loggerFactory.CreateLogger<ParseReceipt>();
             _receiptRepository = receiptRepository;
+            _userReceiptRepository = userReceiptRepository;
         }
 
         public async Task<Receipt> UpdateUserClaim(string id, string userId, int itemId, int quantity)
@@ -99,6 +103,16 @@ namespace receiptParserServices.service.impl
             receipt.users.AddRange(userList);
 
             resultReceipt = await _receiptRepository.updateReceipt(receipt);
+
+            return resultReceipt;
+        }
+
+        public async Task<Receipt> CreateReceipt(ReceiptDto receiptDto)
+        {
+            Receipt resultReceipt = ReceiptMapper.MapReceiptDtoToReceipt(receiptDto);
+
+            await _userReceiptRepository.InsertOneAsync(resultReceipt);
+
 
             return resultReceipt;
         }
