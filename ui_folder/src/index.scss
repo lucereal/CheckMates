@@ -10,7 +10,7 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-p, h1 {
+p, h1, label {
     font-family: "Inter",sans-serif;
     color: #E7E9EC;
     text-align: center;
@@ -24,3 +24,4 @@ code {
 @import './App.scss';
 @import './Components/InputComponents.scss';
 @import 'bootstrap/dist/css/bootstrap.min.css';
+@import './Shared/SharedComponents.scss';
