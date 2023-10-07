@@ -1,5 +1,6 @@
 ﻿using receiptParserServices.domain;
 using receiptParserServices.repository.model;
+using shortid;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -129,6 +130,38 @@ namespace receiptParserServices.repository.mappers
                 itemDtos.Add(itemDto);
             });
             return itemDtos;
+        }
+
+        public static List<UserDto> MapUserNamesToUserDtos(List<string> userNames)
+        {
+            List<UserDto> userDtosList = new List<UserDto>();
+            var generateOptions = new shortid.Configuration.GenerationOptions(true, false, 8);
+
+            foreach (var uName in userNames)
+            {
+                string userId = ShortId.Generate(generateOptions);
+                UserDto nUser = new UserDto();
+                nUser.userId = userId;
+                nUser.name = uName;
+                userDtosList.Add(nUser);
+            }
+            return userDtosList;
+        }
+
+        public static List<User> MapUserNamesToUsers(List<string> userNames)
+        {
+            List<User> users = new List<User>();
+            var generateOptions = new shortid.Configuration.GenerationOptions(true, false, 8);
+
+            foreach (var uName in userNames)
+            {
+                string userId = ShortId.Generate(generateOptions);
+                User nUser = new User();
+                nUser.userId = userId;
+                nUser.name = uName;
+                users.Add(nUser);
+            }
+            return users;
         }
     }
 }

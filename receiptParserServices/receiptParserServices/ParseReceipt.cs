@@ -2,11 +2,12 @@ using System.Net;
 using Azure.AI.FormRecognizer.DocumentAnalysis;
 using Azure;
 using HttpMultipartParser;
-using System.Text.Json;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using receiptParserServices.domain;
+using Newtonsoft.Json;
+using receiptParserServices.repository.mappers;
 
 namespace receiptParserServices
 {
@@ -29,8 +30,14 @@ namespace receiptParserServices
             var client = new DocumentAnalysisClient(new Uri(endpoint), credential);
 
             // Parse the form data
-            var parsedFormBody = MultipartFormDataParser.ParseAsync(req.Body);
-            var file = parsedFormBody.Result.Files[0];
+            var parsedFormBody = MultipartFormDataParser.ParseAsync(req.Body).Result;
+            var usersStr = parsedFormBody.GetParameterValue("users");
+            var usersObj = JsonConvert.DeserializeObject<List<string>>(usersStr);
+            List<string> users =  usersObj != null ? usersObj : new List<string>();
+
+
+
+            FilePart file = parsedFormBody.Files[0];
             var stream = file.Data;
 
 
@@ -149,11 +156,14 @@ namespace receiptParserServices
             {
                 items[i].itemId = i;
             }
+            List<UserDto> userDtos = ReceiptMapper.MapUserNamesToUserDtos(users);
+         
             ReceiptDto receiptResult = new ReceiptDto();
             receiptResult.items = items;
             receiptResult.total = total;
             receiptResult.tip = tip;
             receiptResult.merchantName = merchantName;
+            receiptResult.users = userDtos;
             if(transactionDate != null)
             {
                 receiptResult.transactionDate = transactionDate.Value;
@@ -162,7 +172,8 @@ namespace receiptParserServices
             ReceiptResponse responseReceipt = new ReceiptResponse();
             responseReceipt.isSuccess = true;
             responseReceipt.receipt = receiptResult;
-            string jsonResult = JsonSerializer.Serialize(receiptResult);
+            
+            string jsonResult = JsonConvert.SerializeObject(receiptResult);
 
             // Create an HTTP response with the JSON data
             var response = req.CreateResponse(HttpStatusCode.OK);

@@ -16,5 +16,7 @@ namespace receiptParserServices.domain
         public ReceiptDto receipt { get; set; }
 
         public HandleReceiptFailureReason? failureReason { get; set; }
+
+
     }
 }
