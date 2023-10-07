@@ -20,7 +20,7 @@ export const mock = {
             "description": "Berry Van Crepe Bfst",
             "price": 12.79,
             "quantity": 1,
-            "claims": []
+            "claims": ["Alec"]
         },
         {
             "itemId": 3,
@@ -34,7 +34,7 @@ export const mock = {
             "description": "Chococana Pncks",
             "price": 4.59,
             "quantity": 1,
-            "claims": []
+            "claims": ["Andres", "Bree"]
         },
         {
             "itemId": 5,

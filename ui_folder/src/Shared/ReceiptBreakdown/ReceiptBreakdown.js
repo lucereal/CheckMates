@@ -1,9 +1,32 @@
 import React, { useState, useRef } from 'react';
 import { Col } from 'react-bootstrap';
+import NameToggles from '../NameThings/NameToggles';
 
+function parseData (data) {
+    if (!data?.length) return;
+
+    const temp = {};
+    for (let item of data) {
+        console.log('-- ReceiptBreakdown.js|7 >> data', item);
+        // claimed by to be used for multiple people. Split price by size of it and add it to those in the array.
+        // instead of adding the entire total to just one person. Allows us to split an item by multiple people.
+        temp[item.description] = item;
+    }
+
+    console.log('-- ReceiptBreakdown.js|15 >> temp', temp);
+    return temp;
+}
+/** IF ITEM ID IN THE RESPONSE STAYS IN AN ORDER, THEN THAT WILL KEEP THINGS EASY
+ *  SINCE I DO NOT HAVE TO ITERATE THROUGH THINGS.
+ * 
+ * @param {*} props 
+ * @returns 
+ */
 const ReceiptBreakdown = (props) => {
     // const [userName, setUserName] = useState("");
     const [selected, setSelected] = useState(-1);
+    const [selectedName, setSelectedName] = useState("");
+    const [itemData, setItemData] = useState(props.data);
     const selectedRef = useRef();
 
     // const inputChangeHandler = (evt) => {
@@ -12,9 +35,21 @@ const ReceiptBreakdown = (props) => {
 
     const selectItem = (index, item) => {
         // if (!userName) return;
-        if (selectedRef.current === index) {
-            // submit it!
-            console.log("SUBMIT!");
+
+        // item is selected with a name selection.
+        if (selectedRef.current === index && selectedName !== "") {
+            const tempItem = { ...item };
+            const tempData = [ ...itemData.items ];
+            tempItem.claims.push(selectedName.toString());
+
+            // Use item ID to grab that item from the array since they're just id's in chronological order
+            // This is handy because we dont have to iterate.
+            tempData[tempItem.id] = tempItem;
+
+            // Get a temp data to modify it with the new additions.
+            const tempMainData = { ...itemData};
+            tempMainData.items = tempData;
+            setItemData(tempMainData);
             return;
         }
 
@@ -24,7 +59,7 @@ const ReceiptBreakdown = (props) => {
     }
 
     const receiptItems = () => {
-        return props.data?.items?.map((item, index) => {
+        return itemData.items?.map((item, index) => {
             return (
                 <div 
                     key={index}
@@ -41,12 +76,22 @@ const ReceiptBreakdown = (props) => {
                         </span>
                     </div>
                     <div className='bottom-row'>
-                        <span>
-                            { selectedRef.current === index ?
+                        <span id='tap-instruction'>
+                            {/* Let the user know to select a name if they haven't, otherwise continue. */}
+                            { selectedName !== "" ? 
+                                (selected === index ?
                                 "Tap again to confirm"  :
-                                "Tap to claim"
+                                "Tap to claim")
+                                : "Select a name"
                             }
                         </span>
+                        {
+                            item.claims?.length ? 
+                            <span id='claimed-by'>
+                                <i>{"Claimed by: " + item.claims.join(', ')}</i>
+                            </span>
+                            : null
+                        }
                     </div>
                 </div>
             )
@@ -56,6 +101,11 @@ const ReceiptBreakdown = (props) => {
     return(
         <Col id='receipt-grid'>
             {/* make buttons to filter out selected ones or have all shown */}
+            <NameToggles 
+                selected={selectedName}
+                setSelected={setSelectedName}
+                names={props.data.users}
+            />
             {/* <input
                 className='input-name'
                 onChange={(e) => inputChangeHandler(e)} 

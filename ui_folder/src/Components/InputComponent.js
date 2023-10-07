@@ -5,12 +5,12 @@ import axios from 'axios';
 import { mock } from './mockReceipt';
 import ReceiptBreakdown from '../Shared/ReceiptBreakdown/ReceiptBreakdown';
 import InputNames from '../Shared/InputNames/InputNames';
-import NameTags from '../Shared/NameTags/NameTags';
+import NameTags from '../Shared/NameThings/NameTags';
 import { Spinner } from 'react-bootstrap';
 
 const InputComponent = () => {
     const [receiptImg, setReceiptImg] = useState(null);
-    const [receiptData, setReceiptData] = useState(null);
+    const [receiptData, setReceiptData] = useState(mock);
     const [participants, setParticipants] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
