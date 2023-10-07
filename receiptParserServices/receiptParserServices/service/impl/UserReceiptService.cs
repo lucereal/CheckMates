@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Amazon.SecurityToken.SAML;
+using Microsoft.Extensions.Logging;
 using receiptParserServices.domain;
 using receiptParserServices.repository.inter;
 using receiptParserServices.repository.mappers;
@@ -19,23 +20,18 @@ namespace receiptParserServices.service.impl
 
         private readonly ILogger _logger;
 
-        private readonly IReceiptRepository _receiptRepository;
+
         private readonly IMongoRepository<Receipt> _userReceiptRepository;
 
-        public UserReceiptService(ILoggerFactory loggerFactory, IReceiptRepository receiptRepository, IMongoRepository<Receipt> userReceiptRepository)
+        public UserReceiptService(ILoggerFactory loggerFactory, IMongoRepository<Receipt> userReceiptRepository)
         {
-            _logger = loggerFactory.CreateLogger<ParseReceipt>();
-            _receiptRepository = receiptRepository;
+            _logger = loggerFactory.CreateLogger<ParseReceipt>();        
             _userReceiptRepository = userReceiptRepository;
         }
 
-        public async Task<Receipt> UpdateUserClaim(string id, string userId, int itemId, int quantity)
+        public async Task<ReceiptDto> UpdateUserClaim(string id, string userId, int itemId, int quantity)
         {
-            Receipt resultReceipt;
-
-            Receipt receipt = await _receiptRepository.getReceiptById(id);
-
-            resultReceipt = receipt;
+            Receipt receipt = await _userReceiptRepository.FindByIdAsync(id);
 
             if(receipt == null)
             {
@@ -67,54 +63,88 @@ namespace receiptParserServices.service.impl
             else
             {
                 claim.quantity = quantity;
-                resultReceipt = await _receiptRepository.updateReceipt(receipt);
+                await _userReceiptRepository.ReplaceOneAsync(receipt);
             }
 
-            return resultReceipt;
+            return ReceiptMapper.MapReceiptToReceiptDto(receipt);
 
         }
 
-        public async Task<ReceiptDto> AddUsersToReceipt(string id, List<string> users)
+        public async Task<ReceiptDto> AddUserClaim(string id, string userId, int itemId, int quantity)
         {
-            Receipt resultReceipt;
-
-            Receipt receipt = await _receiptRepository.getReceiptById(id);
-
-            resultReceipt = receipt;
+            Receipt receipt = await _userReceiptRepository.FindByIdAsync(id);
 
             if (receipt == null)
             {
                 throw new HandleReceiptException("Could not find receipt while trying to update.", HandleReceiptFailureReason.CouldNotFindReceipt);
             }
 
-            List<User> userList = new List<User>();
+            Item? item = receipt.items.Where(x => x.itemId == itemId).FirstOrDefault();
 
-            var generateOptions = new shortid.Configuration.GenerationOptions(true, false, 8);
+            if (item == null) { throw new HandleReceiptException("Could not find item in receipt while trying to add claim.", HandleReceiptFailureReason.CouldNotFindUserOrItem); }
 
-            foreach (var uName in users)
+            List<Claim> otherUserClaims = item.claims.Where(x => x.userId != userId).ToList();
+
+            int otherUserClaimsQuantity = otherUserClaims.Sum(x => x.quantity);
+
+            Claim? claim = item.claims.Where(x => x.userId == userId).FirstOrDefault();
+          
+            if (otherUserClaimsQuantity + quantity > item.quantity)
             {
-                string userId = ShortId.Generate(generateOptions);
-                User nUser = new User();
-                nUser.userId = userId;
-                nUser.name = uName;
-                userList.Add(nUser);
+                //cannot add this quantity bc it surpases item quantity
+                throw new HandleReceiptException("Could not update user claim because of invalid quantity.", HandleReceiptFailureReason.CouldNotAddClaim);
+            }     
+            if (claim == null)
+            {
+                Claim nClaim = new Claim();
+                nClaim.quantity = quantity;
+                nClaim.userId = userId;
+                item.claims.Add(nClaim);
             }
+            else
+            {
+                if (otherUserClaimsQuantity + claim.quantity > item.quantity)
+                {
+                    throw new HandleReceiptException("Could not update user claim because of invalid quantity.", HandleReceiptFailureReason.CouldNotAddClaim);
+                    //quantity is full
+                }
+                claim.quantity = quantity;
+                
+            
+            }
+            await _userReceiptRepository.ReplaceOneAsync(receipt);
+            return ReceiptMapper.MapReceiptToReceiptDto(receipt);
 
-            receipt.users.AddRange(userList);
-
-            resultReceipt = await _receiptRepository.updateReceipt(receipt);
-
-            return ReceiptMapper.MapReceiptToReceiptDto(resultReceipt);
         }
 
-        public async Task<Receipt> CreateReceipt(ReceiptDto receiptDto)
+        public async Task<ReceiptDto> AddUsersToReceipt(string id, List<string> users)
         {
-            Receipt resultReceipt = ReceiptMapper.MapReceiptDtoToReceipt(receiptDto);
+            Receipt receipt = await _userReceiptRepository.FindByIdAsync(id);    
 
-            await _userReceiptRepository.InsertOneAsync(resultReceipt);
+            if (receipt == null)
+            {
+                throw new HandleReceiptException("Could not find receipt while trying to update.", HandleReceiptFailureReason.CouldNotFindReceipt);
+            }
+
+            List<User> userList = ReceiptMapper.MapUserNamesToUsers(users);
+       
+            receipt.users.AddRange(userList);
+
+            await _userReceiptRepository.ReplaceOneAsync(receipt);
+
+            return ReceiptMapper.MapReceiptToReceiptDto(receipt);
+        }
+
+      
+
+        public async Task<ReceiptDto> CreateReceipt(ReceiptDto receiptDto)
+        {
+            Receipt receipt = ReceiptMapper.MapReceiptDtoToReceipt(receiptDto);
+
+            await _userReceiptRepository.InsertOneAsync(receipt);
 
 
-            return resultReceipt;
+            return ReceiptMapper.MapReceiptToReceiptDto(receipt);
         }
         public async Task<ReceiptDto> GetReceipt(string id)
         {

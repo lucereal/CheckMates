@@ -15,7 +15,6 @@ var host = new HostBuilder()
     .ConfigureServices(s =>
     {
         s.AddSingleton<IMongoDBContext>(new MongoDBContext(MongoClientSettings.FromUrl(new MongoUrl(connectionString))));
-        s.AddSingleton<IReceiptRepository,ReceiptRepository>();
         s.AddSingleton<IUserReceiptService, UserReceiptService>();
         s.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
     })

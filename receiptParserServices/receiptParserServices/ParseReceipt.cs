@@ -8,17 +8,20 @@ using Microsoft.Extensions.Logging;
 using receiptParserServices.domain;
 using Newtonsoft.Json;
 using receiptParserServices.repository.mappers;
+using receiptParserServices.service.inter;
 
 namespace receiptParserServices
 {
-    public class ParseReceipt
+    internal class ParseReceipt
     {
         private readonly ILogger _logger;
+        private readonly IUserReceiptService _userReceiptService;
         string endpoint = "https://muonreceiptparser.cognitiveservices.azure.com/";
         string apiKey = "de3591828f28412fa6c0ed24499a6c8e";
-        public ParseReceipt(ILoggerFactory loggerFactory)
+        public ParseReceipt(ILoggerFactory loggerFactory, IUserReceiptService userReceiptService)
         {
             _logger = loggerFactory.CreateLogger<ParseReceipt>();
+            _userReceiptService = userReceiptService;
         }
 
         [Function("ParseReceipt")]
@@ -157,23 +160,26 @@ namespace receiptParserServices
                 items[i].itemId = i;
             }
             List<UserDto> userDtos = ReceiptMapper.MapUserNamesToUserDtos(users);
-         
-            ReceiptDto receiptResult = new ReceiptDto();
-            receiptResult.items = items;
-            receiptResult.total = total;
-            receiptResult.tip = tip;
-            receiptResult.merchantName = merchantName;
-            receiptResult.users = userDtos;
+            Guid receiptId = Guid.NewGuid();
+            ReceiptDto receiptDto = new ReceiptDto();
+            receiptDto.items = items;
+            receiptDto.total = total;
+            receiptDto.tip = tip;
+            receiptDto.merchantName = merchantName;
+            receiptDto.users = userDtos;
+            receiptDto.receiptId = receiptId.ToString();
             if(transactionDate != null)
             {
-                receiptResult.transactionDate = transactionDate.Value;
+                receiptDto.transactionDate = transactionDate.Value;
             }
+
+            ReceiptDto resultReceiptDto = await _userReceiptService.CreateReceipt(receiptDto);
 
             ReceiptResponse responseReceipt = new ReceiptResponse();
             responseReceipt.isSuccess = true;
-            responseReceipt.receipt = receiptResult;
+            responseReceipt.receipt = resultReceiptDto;
             
-            string jsonResult = JsonConvert.SerializeObject(receiptResult);
+            string jsonResult = JsonConvert.SerializeObject(responseReceipt);
 
             // Create an HTTP response with the JSON data
             var response = req.CreateResponse(HttpStatusCode.OK);

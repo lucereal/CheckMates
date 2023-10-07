@@ -29,82 +29,13 @@ namespace receiptParserServices
     {
         private readonly ILogger _logger;
 
-        private readonly IReceiptRepository _receiptRepository;
         private readonly IUserReceiptService _userReceiptService;
 
-        public HandleReceipt(ILoggerFactory loggerFactory, IReceiptRepository receiptRepository, IUserReceiptService userReceiptService)
+        public HandleReceipt(ILoggerFactory loggerFactory, IUserReceiptService userReceiptService)
         {
             _logger = loggerFactory.CreateLogger<ParseReceipt>();
-            _receiptRepository = receiptRepository;
             _userReceiptService = userReceiptService;
-        }
-
-        [Function("CreateReceipt")]
-        public async Task<HttpResponseData> CreateReceipt([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
-        {
-            _logger.LogInformation("C# HTTP trigger function processed a request.");
-
-            ReceiptResponse receiptResponse = new ReceiptResponse();
-            receiptResponse.isSuccess = false;
-            try
-            {
-
-                ReceiptRequest? model = await req.ReadFromJsonAsync<ReceiptRequest>();
-
-
-                if (model != null)
-                {
-                    Guid receiptId = Guid.NewGuid();
-                    ReceiptDto receiptDto = new ReceiptDto();
-                    receiptDto.total = model.total;
-                    receiptDto.tip = model.tip;
-                    receiptDto.items = model.items;
-                    receiptDto.merchantName = model.merchantName;
-                    receiptDto.receiptId = receiptId.ToString();
-                    receiptDto.users = model.users;
-
-                    Receipt resultReceipt = await _userReceiptService.CreateReceipt(receiptDto);
-
-                    ReceiptDto resultReceiptDto = ReceiptMapper.MapReceiptToReceiptDto(resultReceipt);
-                    
-                    receiptResponse.isSuccess = true;
-                    receiptResponse.message = "Receipt created.";
-                    
-                    receiptResponse.receipt = resultReceiptDto;
-                }
-                else
-                {
-                    receiptResponse.isSuccess = false;
-                    receiptResponse.failureReason = HandleReceiptFailureReason.ModelParsingIssue;
-                    receiptResponse.message = "";
-                    
-                }
-            }
-            catch(HandleReceiptException e)
-            {
-                receiptResponse.isSuccess = false;
-                receiptResponse.failureReason = e.failureReason;
-                receiptResponse.message = e.Message;
-            }
-            catch(Exception e)
-            {
-                receiptResponse.isSuccess = false;
-                receiptResponse.message = e.Message;
-                receiptResponse.failureReason = HandleReceiptFailureReason.Unknown;
-                
-            }
-
-
-            string responseString = JsonSerializer.Serialize(receiptResponse);
-
-
-            HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
-            response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-
-            response.WriteString(responseString);
-
-            return response;
-        }
+        }      
 
         [Function("GetReceipt")]
         public async Task<HttpResponseData> GetReceipt([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
@@ -210,6 +141,7 @@ namespace receiptParserServices
             return response;
         }
 
+
         [Function("AddUserItem")]
         public async Task<HttpResponseData> AddUserItem([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
         {
@@ -225,11 +157,11 @@ namespace receiptParserServices
 
                 if (model != null)
                 {
-                    Receipt resultReceipt = await _receiptRepository.addUserClaimToReceipt(model.id, model.userId, model.itemId, model.quantity, null);
+                    ReceiptDto resultReceiptDto = await _userReceiptService.AddUserClaim(model.id, model.userId, model.itemId, model.quantity);
                     receiptResponse.isSuccess = true;
                     receiptResponse.message = "Receipt created.";
 
-                    receiptResponse.receipt = ReceiptMapper.MapReceiptToReceiptDto(resultReceipt);
+                    receiptResponse.receipt = resultReceiptDto;
                 }
                 else
                 {
@@ -256,6 +188,7 @@ namespace receiptParserServices
             return response;
         }
 
+   
         [Function("UpdateUserItem")]
         public async Task<HttpResponseData> UpdateUserItem([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
         {
@@ -271,11 +204,11 @@ namespace receiptParserServices
 
                 if (model != null)
                 {
-                    Receipt resultReceipt = await _userReceiptService.UpdateUserClaim(model.id, model.userId, model.itemId, model.quantity);
+                    ReceiptDto resultReceiptDto = await _userReceiptService.UpdateUserClaim(model.id, model.userId, model.itemId, model.quantity);
                     receiptResponse.isSuccess = true;
                     receiptResponse.message = "Success";
 
-                    receiptResponse.receipt = ReceiptMapper.MapReceiptToReceiptDto(resultReceipt);
+                    receiptResponse.receipt = resultReceiptDto;
                 }
                 else
                 {

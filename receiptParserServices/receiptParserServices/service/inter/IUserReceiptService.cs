@@ -10,9 +10,10 @@ namespace receiptParserServices.service.inter
 {
     internal interface IUserReceiptService
     {
-        Task<Receipt> UpdateUserClaim(string id, string userId, int itemId, int quantity);
+        Task<ReceiptDto> AddUserClaim(string id, string userId, int itemId, int quantity);
+        Task<ReceiptDto> UpdateUserClaim(string id, string userId, int itemId, int quantity);
         Task<ReceiptDto> AddUsersToReceipt(string id, List<string> users);
-        Task<Receipt> CreateReceipt(ReceiptDto receiptDto);
+        Task<ReceiptDto> CreateReceipt(ReceiptDto receiptDto);
         Task<ReceiptDto> GetReceipt(string id);
     }
 }
