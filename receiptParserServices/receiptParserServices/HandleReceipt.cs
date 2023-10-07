@@ -116,36 +116,15 @@ namespace receiptParserServices
             try
             {
 
-                string? model = await req.ReadAsStringAsync();
+                ReceiptRequest? model = await req.ReadFromJsonAsync<ReceiptRequest>();
 
 
-                if (model != null)
+                if (model != null && model.id != null)
                 {
-                    
-                    JObject modelObj = JObject.Parse(model);
-                    string? id = (string)modelObj["id"];
-
-                    if(id != null)
-                    {
-
-                        Receipt resultReceipt = await _receiptRepository.getReceiptById(id);
-
-                        ReceiptDto receiptDto = ReceiptMapper.MapReceiptToReceiptDto(resultReceipt);
-
-                        receiptResponse.isSuccess = true;
-                        receiptResponse.message = "Receipt created.";
-
-                        receiptResponse.receipt = receiptDto;
-                    }
-                    else
-                    {
-                        receiptResponse.isSuccess = false;
-                        receiptResponse.failureReason = HandleReceiptFailureReason.CouldNotFindReceipt;
-                        resultStatusCode = HttpStatusCode.BadRequest;
-
-                    }
-                    
-                   
+                    ReceiptDto receiptDto = await _userReceiptService.GetReceipt(model.id);
+                    receiptResponse.isSuccess = true;
+                    receiptResponse.message = "Receipt created.";
+                    receiptResponse.receipt = receiptDto;
                 }
                 else
                 {
@@ -199,11 +178,11 @@ namespace receiptParserServices
 
                 if (model != null)
                 {
-                    Receipt resultReceipt = await _userReceiptService.AddUsersToReceipt(model.id, model.userNames);
+                    ReceiptDto resultReceiptDto = await _userReceiptService.AddUsersToReceipt(model.id, model.userNames);
                     receiptResponse.isSuccess = true;
                     receiptResponse.message = "Receipt created.";
 
-                    receiptResponse.receipt = ReceiptMapper.MapReceiptToReceiptDto(resultReceipt);
+                    receiptResponse.receipt = resultReceiptDto;
                 }
                 else
                 {
@@ -293,7 +272,7 @@ namespace receiptParserServices
                 {
                     Receipt resultReceipt = await _userReceiptService.UpdateUserClaim(model.id, model.userId, model.itemId, model.quantity);
                     receiptResponse.isSuccess = true;
-                    receiptResponse.message = "Receipt created.";
+                    receiptResponse.message = "Success";
 
                     receiptResponse.receipt = ReceiptMapper.MapReceiptToReceiptDto(resultReceipt);
                 }
@@ -308,7 +287,7 @@ namespace receiptParserServices
             {
                 receiptResponse.isSuccess = false;
                 receiptResponse.failureReason = e.failureReason;
-                resultStatusCode = HttpStatusCode.InternalServerError;
+                resultStatusCode = GetResponseStatusCodeByFailureReason(e.failureReason);
             }
             catch (Exception e)
             {
@@ -328,6 +307,14 @@ namespace receiptParserServices
             return response;
         }
 
+        private HttpStatusCode GetResponseStatusCodeByFailureReason(HandleReceiptFailureReason failureReason)
+        {
+            switch(failureReason)
+            {
+                case HandleReceiptFailureReason.CouldNotFindReceipt: return HttpStatusCode.NotFound;
+                default: return HttpStatusCode.InternalServerError;
+            }
+        }
 
         //[Function("GetUserTotals")]
         //public async Task<HttpResponseData> GetUserTotals([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)

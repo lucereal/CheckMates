@@ -74,7 +74,7 @@ namespace receiptParserServices.service.impl
 
         }
 
-        public async Task<Receipt> AddUsersToReceipt(string id, List<string> users)
+        public async Task<ReceiptDto> AddUsersToReceipt(string id, List<string> users)
         {
             Receipt resultReceipt;
 
@@ -104,7 +104,7 @@ namespace receiptParserServices.service.impl
 
             resultReceipt = await _receiptRepository.updateReceipt(receipt);
 
-            return resultReceipt;
+            return ReceiptMapper.MapReceiptToReceiptDto(resultReceipt);
         }
 
         public async Task<Receipt> CreateReceipt(ReceiptDto receiptDto)
@@ -115,6 +115,12 @@ namespace receiptParserServices.service.impl
 
 
             return resultReceipt;
+        }
+        public async Task<ReceiptDto> GetReceipt(string id)
+        {
+            var receipt = await _userReceiptRepository.FindByIdAsync(id);
+            if (receipt == null) throw new HandleReceiptException("Could not find receipt in UserReceiptService.GetReceipt id: " + id, HandleReceiptFailureReason.CouldNotFindReceipt);
+            return ReceiptMapper.MapReceiptToReceiptDto(receipt);
         }
     }
 }
