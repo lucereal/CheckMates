@@ -11,7 +11,6 @@ const NameTags = (props) => {
             temp.splice(index, 1); // 2nd parameter means remove one item only
         }
 
-        console.log('-- NameTags.js|14 >> new', temp);
         setNames(temp);
     }
 
