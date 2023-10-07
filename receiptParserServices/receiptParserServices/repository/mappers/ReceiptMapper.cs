@@ -1,4 +1,5 @@
-﻿using receiptParserServices.domain;
+﻿using MongoDB.Bson;
+using receiptParserServices.domain;
 using receiptParserServices.repository.model;
 using shortid;
 using System;
@@ -13,75 +14,78 @@ namespace receiptParserServices.repository.mappers
     {
         public static ReceiptDto MapReceiptToReceiptDto(Receipt receipt)
         {
-
             ReceiptDto receiptDto = new ReceiptDto();
-            receiptDto.receiptId = receipt.receiptId;
-            receiptDto._id = receipt.Id;
-            receiptDto.total = receipt.total;
-            receiptDto.tip = receipt.tip;
-
-            receipt.items.ForEach(x =>
+            if (receipt !=  null)
             {
-                ItemDto itemDto = new ItemDto();
-                itemDto.price = x.price;
-                itemDto.quantity = x.quantity;
-                itemDto.description = x.description;
-                itemDto.itemId = x.itemId;
-                x.claims.ForEach(c =>
+                receiptDto.receiptId = receipt.receiptId;
+                receiptDto._id = receipt.Id.ToString();
+                receiptDto.total = receipt.total;
+                receiptDto.tip = receipt.tip;
+
+                receipt.items.ForEach(x =>
                 {
-                    ClaimDto claimDto = new ClaimDto();
-                    claimDto.quantity = c.quantity;
-                    claimDto.userId = c.userId;
-                    claimDto.total = c.total;
-                    itemDto.claims.Add(claimDto);
+                    ItemDto itemDto = new ItemDto();
+                    itemDto.price = x.price;
+                    itemDto.quantity = x.quantity;
+                    itemDto.description = x.description;
+                    itemDto.itemId = x.itemId;
+                    x.claims.ForEach(c =>
+                    {
+                        ClaimDto claimDto = new ClaimDto();
+                        claimDto.quantity = c.quantity;
+                        claimDto.userId = c.userId;
+                        claimDto.total = c.total;
+                        itemDto.claims.Add(claimDto);
+                    });
+                    receiptDto.items.Add(itemDto);
                 });
-                receiptDto.items.Add(itemDto);
-            });
-            receiptDto.merchantName = receipt.merchantName;
-            receipt.users.ForEach(x =>
-            {
-                UserDto userDto = new UserDto();
-                userDto.userId = x.userId;
-                userDto.name = x.name;
-                receiptDto.users.Add(userDto);
-            });
-
+                receiptDto.merchantName = receipt.merchantName;
+                receipt.users.ForEach(x =>
+                {
+                    UserDto userDto = new UserDto();
+                    userDto.userId = x.userId;
+                    userDto.name = x.name;
+                    receiptDto.users.Add(userDto);
+                });
+            }
             return receiptDto;
         }
 
         public static Receipt MapReceiptDtoToReceipt(ReceiptDto receiptDto)
         {
             Receipt receipt = new Receipt();
-            receipt.tip = receiptDto.tip;
-            receipt.total = receiptDto.total;
-            receipt.receiptId = receiptDto.receiptId;
-            receipt.Id = receiptDto._id;
-            receiptDto.users.ForEach(x =>
+            if(receiptDto != null)
             {
-                User user = new User();
-                user.userId = x.userId;
-                user.name = x.name;
-                receipt.users.Add(user);
-            });
-
-            receiptDto.items.ForEach(x =>
-            {
-                Item item = new Item();
-                item.description = x.description;
-                item.price = x.price;
-                item.quantity = x.quantity;
-                item.itemId = x.itemId;
-                x.claims.ForEach(c =>
+                receipt.tip = receiptDto.tip;
+                receipt.total = receiptDto.total;
+                receipt.receiptId = receiptDto.receiptId;
+                receipt.Id = receiptDto._id != null ? ObjectId.Parse(receiptDto._id) : ObjectId.Empty;
+                receiptDto.users.ForEach(x =>
                 {
-                    Claim claim = new Claim();
-                    claim.total = c.total;
-                    claim.quantity = c.quantity;
-                    claim.userId = c.userId;
-                    item.claims.Add(claim);
+                    User user = new User();
+                    user.userId = x.userId;
+                    user.name = x.name;
+                    receipt.users.Add(user);
                 });
-                receipt.items.Add(item);
-            });
 
+                receiptDto.items.ForEach(x =>
+                {
+                    Item item = new Item();
+                    item.description = x.description;
+                    item.price = x.price;
+                    item.quantity = x.quantity;
+                    item.itemId = x.itemId;
+                    x.claims.ForEach(c =>
+                    {
+                        Claim claim = new Claim();
+                        claim.total = c.total;
+                        claim.quantity = c.quantity;
+                        claim.userId = c.userId;
+                        item.claims.Add(claim);
+                    });
+                    receipt.items.Add(item);
+                });
+            }
             return receipt;
 
         }
@@ -89,46 +93,52 @@ namespace receiptParserServices.repository.mappers
         public static List<Item> MapItemDtosToItems(List<ItemDto> itemsDtos)
         {
             List<Item> items = new List<Item>();
-            itemsDtos.ForEach(x =>
+            if (itemsDtos != null && itemsDtos.Count > 0)
             {
-                Item item = new Item();
-                item.description = x.description;
-                item.price = x.price;
-                item.quantity = x.quantity;
-                item.itemId = x.itemId;
-                x.claims.ForEach(c =>
+                itemsDtos.ForEach(x =>
                 {
-                    Claim claim = new Claim();
-                    claim.total = c.total;
-                    claim.quantity = c.quantity;
-                    claim.userId = c.userId;
-                    item.claims.Add(claim);
+                    Item item = new Item();
+                    item.description = x.description;
+                    item.price = x.price;
+                    item.quantity = x.quantity;
+                    item.itemId = x.itemId;
+                    x.claims.ForEach(c =>
+                    {
+                        Claim claim = new Claim();
+                        claim.total = c.total;
+                        claim.quantity = c.quantity;
+                        claim.userId = c.userId;
+                        item.claims.Add(claim);
+                    });
+                    items.Add(item);
                 });
-                items.Add(item);
-            });
+            }            
             return items;
         }
 
         public static List<ItemDto> MapItemsToItemDtos(List<Item> items)
         {
             List<ItemDto> itemDtos = new List<ItemDto>();
-            items.ForEach(x =>
+            if(items != null && items.Count > 0)
             {
-                ItemDto itemDto = new ItemDto();
-                itemDto.price = x.price;
-                itemDto.quantity = x.quantity;
-                itemDto.description = x.description;
-                itemDto.itemId = x.itemId;
-                x.claims.ForEach(c =>
+                items.ForEach(x =>
                 {
-                    ClaimDto claimDto = new ClaimDto();
-                    claimDto.quantity = c.quantity;
-                    claimDto.userId = c.userId;
-                    claimDto.total = c.total;
-                    itemDto.claims.Add(claimDto);
+                    ItemDto itemDto = new ItemDto();
+                    itemDto.price = x.price;
+                    itemDto.quantity = x.quantity;
+                    itemDto.description = x.description;
+                    itemDto.itemId = x.itemId;
+                    x.claims.ForEach(c =>
+                    {
+                        ClaimDto claimDto = new ClaimDto();
+                        claimDto.quantity = c.quantity;
+                        claimDto.userId = c.userId;
+                        claimDto.total = c.total;
+                        itemDto.claims.Add(claimDto);
+                    });
+                    itemDtos.Add(itemDto);
                 });
-                itemDtos.Add(itemDto);
-            });
+            }            
             return itemDtos;
         }
 

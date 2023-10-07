@@ -1,4 +1,5 @@
-﻿using receiptParserServices.repository.model;
+﻿using MongoDB.Bson;
+using receiptParserServices.repository.model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
