@@ -44,7 +44,8 @@ const ReceiptBreakdown = (props) => {
 
             // Use item ID to grab that item from the array since they're just id's in chronological order
             // This is handy because we dont have to iterate.
-            tempData[tempItem.id] = tempItem;
+            if (tempData[tempItem.id] !== undefined)
+                tempData[tempItem.id] = tempItem;
 
             // Get a temp data to modify it with the new additions.
             const tempMainData = { ...itemData};
@@ -55,10 +56,10 @@ const ReceiptBreakdown = (props) => {
 
         selectedRef.current = index;
         setSelected(index);
-        console.log("-- ITEM: ", item);
     }
 
     const receiptItems = () => {
+        console.log('-- ReceiptBreakdown.js|61 >> ', itemData.items);
         return itemData.items?.map((item, index) => {
             return (
                 <div 

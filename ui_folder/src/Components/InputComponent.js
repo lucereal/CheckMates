@@ -10,7 +10,7 @@ import { Spinner } from 'react-bootstrap';
 
 const InputComponent = () => {
     const [receiptImg, setReceiptImg] = useState(null);
-    const [receiptData, setReceiptData] = useState(mock);
+    const [receiptData, setReceiptData] = useState(null);
     const [participants, setParticipants] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -19,10 +19,14 @@ const InputComponent = () => {
             console.log("-- no image selected"); // TODO SHOW VISUAL ERROR OR DISABLE IT
             return;
         }
-
         setIsLoading(true);
+        
+        // Must pass the array while preserving quotes
+        const names = "['" + participants.join("','") + "']";
+        
         var formData = new FormData();
         formData.append('file', receiptImg);
+        formData.append('users', names);
 
         const url = 'https://receiptparserservices20230928182301.azurewebsites.net/api/ParseReceipt?name=Functions';
 
@@ -32,7 +36,7 @@ const InputComponent = () => {
             }
         }).then((res) => {
             console.log("-- RES: ", res);
-            setReceiptData(res);
+            setReceiptData(res?.data?.receipt);
             setIsLoading(false);
         }).catch((err) => {
             console.log("-- ERR: ", err)
@@ -40,11 +44,10 @@ const InputComponent = () => {
         })
     }
 
-    console.log('-- InputComponent.js|38 >> receiptData', receiptData);
     if (receiptData !== null && receiptData !== undefined) {
         return (
             <div id="receipt-breakdown-container">
-                <ReceiptBreakdown data={mock} />
+                <ReceiptBreakdown data={receiptData} />
             </div>
         )
     } else {
@@ -75,7 +78,7 @@ const InputComponent = () => {
                     variant="primary"
                     onClick={() => sendReceipt()}
                     disabled={ 
-                        participants.length === 0 || (receiptImg == null || receiptImg == undefined) ||
+                        participants.length === 0 || (receiptImg === null || receiptImg === undefined) ||
                         isLoading
                     }
                 >
