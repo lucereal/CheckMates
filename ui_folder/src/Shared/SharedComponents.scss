@@ -49,7 +49,48 @@
     }
 }
 
+.modal-content {
+    .modal-body {
+        #summary-row {
+            margin-bottom: .75rem;
+
+            .summary-top-row {
+                display: flex;
+                justify-content: space-between;
+
+            }
+            #claimed-summary-container {
+                .item-row {
+                    display: flex;
+                    justify-content: space-between;
+                }
+            }
+            #tip-row {
+                display: flex;
+                justify-content: space-between;
+            }
+        }
+
+        #final-row {
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+}
+
 // SECOND SCREEN COMPONENTS
+#nav-container {
+    .container {
+
+        #remaining-text {
+            margin-right: .75rem;
+        }
+    }
+    #summary-button {
+        margin-right: .75rem;
+    }
+}
+
 #receipt-grid {
     display: flex;
     flex-direction: column;
@@ -63,6 +104,7 @@
 
     // Styling for the name buttons
     .name-buttons-container {
+        margin-top: 1rem;
         display: flex;
         flex-wrap: wrap;
         .toggle-button {

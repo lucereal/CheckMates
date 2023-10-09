@@ -1,21 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { Col } from 'react-bootstrap';
+import { Button, Col, Container, Navbar } from 'react-bootstrap';
 import NameToggles from '../NameThings/NameToggles';
+import { getClaimedTotal } from '../HelperFunctions';
+import SummaryModal from '../Modals/SummaryModal';
 
-function parseData (data) {
-    if (!data?.length) return;
-
-    const temp = {};
-    for (let item of data) {
-        console.log('-- ReceiptBreakdown.js|7 >> data', item);
-        // claimed by to be used for multiple people. Split price by size of it and add it to those in the array.
-        // instead of adding the entire total to just one person. Allows us to split an item by multiple people.
-        temp[item.description] = item;
-    }
-
-    console.log('-- ReceiptBreakdown.js|15 >> temp', temp);
-    return temp;
-}
 /** IF ITEM ID IN THE RESPONSE STAYS IN AN ORDER, THEN THAT WILL KEEP THINGS EASY
  *  SINCE I DO NOT HAVE TO ITERATE THROUGH THINGS.
  * 
@@ -23,19 +11,17 @@ function parseData (data) {
  * @returns 
  */
 const ReceiptBreakdown = (props) => {
-    // const [userName, setUserName] = useState("");
-    const [selected, setSelected] = useState(-1);
-    const [selectedName, setSelectedName] = useState("");
-    const [itemData, setItemData] = useState(props.data);
+    const data = props.data;
+    const claimedTotal = getClaimedTotal(data.items);
     const selectedRef = useRef();
 
-    // const inputChangeHandler = (evt) => {
-    //     setUserName(evt.target.value);
-    // }
+    const [selected, setSelected] = useState(-1);
+    const [selectedName, setSelectedName] = useState("");
+    const [itemData, setItemData] = useState(data);
+    const [showModal, setShowModal] = useState(false);
+    
 
     const selectItem = (index, item) => {
-        // if (!userName) return;
-
         // item is selected with a name selection.
         if (selectedRef.current === index && selectedName !== "") {
             const tempItem = { ...item };
@@ -59,7 +45,6 @@ const ReceiptBreakdown = (props) => {
     }
 
     const receiptItems = () => {
-        console.log('-- ReceiptBreakdown.js|61 >> ', itemData.items);
         return itemData.items?.map((item, index) => {
             return (
                 <div 
@@ -100,20 +85,39 @@ const ReceiptBreakdown = (props) => {
     }
 
     return(
-        <Col id='receipt-grid'>
-            {/* make buttons to filter out selected ones or have all shown */}
-            <NameToggles 
-                selected={selectedName}
-                setSelected={setSelectedName}
-                names={props.data.users}
+        <>
+            <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
+                <Container>
+                    <Navbar.Text id='total-text'>{"Total: $" + data.total.toFixed(2)}</Navbar.Text>
+                    <Navbar.Text id='remaining-text'>{"Claimed: $" + claimedTotal.toFixed(2)}</Navbar.Text>
+                </Container>
+                <Button id='summary-button' onClick={() => setShowModal(true)}>
+                    Summary
+                </Button>
+            </Navbar>
+            <SummaryModal 
+                show={showModal}
+                setShow={setShowModal}
+                total={data.total}
+                claimedTotal={claimedTotal}
+                data={data}
             />
-            {/* <input
-                className='input-name'
-                onChange={(e) => inputChangeHandler(e)} 
-                placeholder='Enter your name'
-            /> */}
-            {receiptItems()}
-        </Col>
+
+            <Col id='receipt-grid'>
+                {/* make buttons to filter out selected ones or have all shown */}
+                <NameToggles 
+                    selected={selectedName}
+                    setSelected={setSelectedName}
+                    names={data.users}
+                />
+                {/* <input
+                    className='input-name'
+                    onChange={(e) => inputChangeHandler(e)} 
+                    placeholder='Enter your name'
+                /> */}
+                {receiptItems()}
+            </Col>
+        </>
     );
 }
 
