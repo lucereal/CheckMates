@@ -20,6 +20,15 @@ const ReceiptBreakdown = (props) => {
     const [itemData, setItemData] = useState(data);
     const [showModal, setShowModal] = useState(false);
     
+    const resetClaims = () => {
+        const tempMainData = { ...itemData}
+
+        for (let ind in tempMainData.items) {
+            tempMainData.items[ind].claims = [];
+        }
+
+        setItemData(tempMainData);
+    }
 
     const selectItem = (index, item) => {
         // item is selected with a name selection.
@@ -126,6 +135,9 @@ const ReceiptBreakdown = (props) => {
                 /> */}
                 {receiptItems()}
             </Col>
+            <Button id='reset-button' variant="danger" onClick={() => resetClaims()}>
+                Reset
+            </Button>
         </>
     );
 }
