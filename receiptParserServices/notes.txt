@@ -5,3 +5,26 @@ user function classes as controllers
 improve repository layer: 
 	https://medium.com/@marekzyla95/mongo-repository-pattern-700986454a0e
 	https://www.thecodebuzz.com/mongodb-repository-implementation-unit-testing-net-core-example/
+	
+	
+	
+SplitPic
+ReciSplit
+SnapSplit
+ReceiptReckon
+BillBuddy
+ItemizeIt
+ShareSnap
+ReceiptRoster
+DivvyPic
+PickPay
+SnapSettle
+TagATab
+BillBreaker
+SnapShare
+TabTagger
+ReciShare
+GroupGrab
+TallyTab
+DivideSnap
+ReceiptRoundup
