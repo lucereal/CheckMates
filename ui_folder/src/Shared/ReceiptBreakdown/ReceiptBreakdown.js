@@ -26,7 +26,14 @@ const ReceiptBreakdown = (props) => {
         if (selectedRef.current === index && selectedName !== "") {
             const tempItem = { ...item };
             const tempData = [ ...itemData.items ];
-            tempItem.claims.push(selectedName.toString());
+
+            // If the user has already claimed this item, then remove it instead of pushing.
+            var tempIndex = item.claims.indexOf(selectedName);
+            if (tempIndex > -1) {
+                tempItem.claims.splice(tempIndex, 1); // 2nd parameter means remove one item only
+            } else {
+                tempItem.claims.push(selectedName.toString());
+            }
 
             // Use item ID to grab that item from the array since they're just id's in chronological order
             // This is handy because we dont have to iterate.
@@ -63,11 +70,13 @@ const ReceiptBreakdown = (props) => {
                     </div>
                     <div className='bottom-row'>
                         <span id='tap-instruction'>
-                            {/* Let the user know to select a name if they haven't, otherwise continue. */}
+                            {/* Let the user know to select a name if they haven't, otherwise check if they have claimed yet. */}
                             { selectedName !== "" ? 
                                 (selected === index ?
-                                "Tap again to confirm"  :
-                                "Tap to claim")
+                                (item.claims.indexOf(selectedName) >= 0 ? 
+                                "Tap again to remove"
+                                : "Tap again to confirm")  
+                                : "Tap to claim")
                                 : "Select a name"
                             }
                         </span>
