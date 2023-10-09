@@ -27,7 +27,7 @@ export const mock = {
             "description": "Chickn/Bisc Bowl",
             "price": 10.19,
             "quantity": 1,
-            "claims": []
+            "claims": ["David"]
         },
         {
             "itemId": 4,
@@ -41,28 +41,28 @@ export const mock = {
             "description": "Berry Van Crepe (2)",
             "price": 7.19,
             "quantity": 1,
-            "claims": []
+            "claims": ["Bree"]
         },
         {
             "itemId": 6,
             "description": "Coffee",
             "price": 2.69,
             "quantity": 1,
-            "claims": []
+            "claims": ["Andres"]
         },
         {
             "itemId": 7,
             "description": "Coffee",
             "price": 2.69,
             "quantity": 1,
-            "claims": []
+            "claims": ["David"]
         },
         {
             "itemId": 8,
             "description": "Orange Ju",
             "price": 2.99,
             "quantity": 1,
-            "claims": []
+            "claims": ["Andres"]
         },
         {
             "itemId": 9,

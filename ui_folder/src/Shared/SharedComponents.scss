@@ -49,79 +49,130 @@
     }
 }
 
-// SECOND SCREEN COMPONENTS
-#receipt-grid {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: 900px;
+.modal-content {
+    .modal-body {
+        #summary-row {
+            margin-bottom: .75rem;
 
-    span {
-        font-family: "Inter",sans-serif;
-        color: #E7E9EC;
-    }
+            .summary-top-row {
+                display: flex;
+                justify-content: space-between;
 
-    // Styling for the name buttons
-    .name-buttons-container {
-        display: flex;
-        flex-wrap: wrap;
-        .toggle-button {
-            padding: .15rem .45rem .35rem .45rem;
-            margin-right: .8rem;
-            margin-bottom: .5rem;
-            border: 2px solid #cccfd3;
-            border-radius: 5px;
-            background-color: #E7E9EC;
-            cursor: pointer;
-            font-family: "Inter",sans-serif;
-            color: black;
-        }
-
-        .selected {
-            background-color: #a7a9ac;
-            outline: 2px solid #cccfd3;
-            transition: .15s;
-        }
-    }
-
-    // Styling for the receipt items
-    .receipt-item {
-        width: 85%;
-        margin: .35rem 3rem;
-
-        padding: .25rem .75rem;
-        border: 2px solid ;
-        border-radius: 8px;
-        cursor: pointer;
-
-        .top-row {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-        }
-
-        .bottom-row {
-            display: flex;
-            justify-content: space-between;
-
-
-            #claimed-by {
-                i {
-                    font-size: xx-small;
+            }
+            #claimed-summary-container {
+                .item-row {
+                    display: flex;
+                    justify-content: space-between;
                 }
+            }
+            #tip-row {
+                display: flex;
+                justify-content: space-between;
             }
         }
 
-        .item-name {
+        #final-row {
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+}
+
+// SECOND SCREEN COMPONENTS
+#nav-container {
+    .container {
+
+        #remaining-text {
+            margin-right: .75rem;
+        }
+    }
+    #summary-button {
+        margin-right: .75rem;
+    }
+}
+
+#receipt-breakdown-container {
+    display: flex;
+    flex-direction: column;
+
+    #receipt-grid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 900px;
+    
+        span {
+            font-family: "Inter",sans-serif;
+            color: #E7E9EC;
+        }
+    
+        // Styling for the name buttons
+        .name-buttons-container {
+            margin-top: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            .toggle-button {
+                padding: .15rem .45rem .35rem .45rem;
+                margin-right: .8rem;
+                margin-bottom: .5rem;
+                border: 2px solid #cccfd3;
+                border-radius: 5px;
+                background-color: #E7E9EC;
+                cursor: pointer;
+                font-family: "Inter",sans-serif;
+                color: black;
+            }
+    
+            .selected {
+                background-color: #a7a9ac;
+                outline: 2px solid #cccfd3;
+                transition: .15s;
+            }
+        }
+    
+        // Styling for the receipt items
+        .receipt-item {
+            width: 85%;
+            margin: .35rem 3rem;
+    
+            padding: .25rem .75rem;
+            border: 2px solid ;
+            border-radius: 8px;
+            cursor: pointer;
+    
+            .top-row {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+    
+            .bottom-row {
+                display: flex;
+                justify-content: space-between;
+    
+    
+                #claimed-by {
+                    i {
+                        font-size: xx-small;
+                    }
+                }
+            }
+    
+            .item-name {
+            }
+    
+            .item-grow {
+                font-weight: 600;
+            }
         }
 
-        .item-grow {
-            font-weight: 600;
+        .selected {
+            outline: 3px solid ;
+            transition: 0.15s;
         }
     }
 
-    .selected {
-        outline: 3px solid ;
-        transition: 0.15s;
+    #reset-button {
+        margin: 2.5rem 2.5rem;
     }
 }

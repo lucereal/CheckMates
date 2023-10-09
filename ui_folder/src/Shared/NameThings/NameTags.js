@@ -5,7 +5,6 @@ const NameTags = (props) => {
 
     const removeMe = (name) => {
         const temp = [...names];
-        console.log('-- NameTags.js|7 >> names before', names);
         const index = temp.indexOf(name);
         if (index > -1) { // only splice array when item is found
             temp.splice(index, 1); // 2nd parameter means remove one item only
