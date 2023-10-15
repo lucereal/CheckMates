@@ -8,7 +8,7 @@ const SummaryModal = (props) => {
     const users = data.users;
 
     const getClaimedItemData = (summary, currentUser) => {
-        return summary[currentUser].claimedItems.map((item, index) => {
+        return summary[currentUser]?.claimedItems?.map((item, index) => {
             return (
                 <div key={index} id={currentUser + '-item-' + index} className='item-row'>
                     <i>{item.name}</i>
@@ -23,7 +23,7 @@ const SummaryModal = (props) => {
 
     const getUserRowSummary = () => {
         const summary = summarize(users, items, data.tip);
-        return data.users.map((user, index) => {
+        return data?.users?.map((user, index) => {
             return (
                 <div key={index} id='summary-row'>
                     <div id={"user-row-" + index} className='summary-top-row'>
