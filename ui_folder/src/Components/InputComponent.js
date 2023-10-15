@@ -7,14 +7,17 @@ import ReceiptBreakdown from '../Shared/ReceiptBreakdown/ReceiptBreakdown';
 import InputNames from '../Shared/InputNames/InputNames';
 import NameTags from '../Shared/NameThings/NameTags';
 import { Spinner } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 const InputComponent = () => {
     const [receiptImg, setReceiptImg] = useState(null);
     const [receiptData, setReceiptData] = useState(null);
     const [participants, setParticipants] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate(); 
 
     const sendReceipt = () => {
+        navigate("/")
         if (receiptImg === null || receiptImg === undefined) {
             console.log("-- no image selected"); // TODO SHOW VISUAL ERROR OR DISABLE IT
             return;

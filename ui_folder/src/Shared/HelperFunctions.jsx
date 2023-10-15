@@ -62,3 +62,12 @@ export const copyToClipboard = (ref, setter) => {
         console.error('Async: Could not copy text: ', err);
     });
 }
+
+export const getUrlId = () => {
+    let id = window.location.search;
+    if (id.indexOf('=') !== -1) {
+        return id.split('=')[1];
+    }
+
+    return "";
+}

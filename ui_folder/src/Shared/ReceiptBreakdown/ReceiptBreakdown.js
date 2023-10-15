@@ -1,9 +1,11 @@
 import React, { useState, useRef } from 'react';
-import { Button, Col, Container, Navbar } from 'react-bootstrap';
+import { Button, Col, Container, Navbar, Spinner } from 'react-bootstrap';
 import NameToggles from '../NameThings/NameToggles';
-import { getClaimedTotal } from '../HelperFunctions';
+import { getClaimedTotal, getUrlId } from '../HelperFunctions';
 import SummaryModal from '../Modals/SummaryModal';
 import ShareModal from '../Modals/ShareModal';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 /** IF ITEM ID IN THE RESPONSE STAYS IN AN ORDER, THEN THAT WILL KEEP THINGS EASY
  *  SINCE I DO NOT HAVE TO ITERATE THROUGH THINGS.
@@ -16,11 +18,14 @@ const ReceiptBreakdown = (props) => {
     const claimedTotal = getClaimedTotal(data.items);
     const selectedRef = useRef();
 
+    const navigate = useNavigate();
     const [selected, setSelected] = useState(-1);
     const [selectedName, setSelectedName] = useState("");
     const [itemData, setItemData] = useState(data);
     const [showModal, setShowModal] = useState(false); // Summary modal
     const [showShare, setShowShare] = useState(false); // Share modal
+    const [shareLoading, setShareLoading] = useState(false);
+    const [receiptId, setReceiptId] = useState(getUrlId());
     
     const resetClaims = () => {
         const tempMainData = { ...itemData}
@@ -105,15 +110,32 @@ const ReceiptBreakdown = (props) => {
     }
 
     const createReceipt = () => {
-        setShowShare(true);
-        // axios.get().then(res => {
-        //     console.log('-- ReceiptBreakdown.js|109 >> res', res);
-        //     if (res) {
-        //         setShowShare(true);
-        //     }
-        // }).catch((err) => {
+        if (receiptId != "") {
+            const id = getUrlId();
+            setReceiptId(id);
+            setShowShare(true);
+            navigate("/?receiptId=" + id);
+            return
+        };
 
-        // })
+        const url = "https://receiptparserservices20230928182301.azurewebsites.net/api/CreateReceipt?name=Functions";
+        setShareLoading(true);
+        const payload = {
+            "receipt": data
+        }
+        axios.post(url, payload).then(res => {
+            console.log('-- ReceiptBreakdown.js|109 >> res', res);
+            setShareLoading(false);
+            setShowShare(true);
+            if (res.status == "200") {
+                const id = res?.data?.receipt?._id;
+                setReceiptId(id);
+                navigate("/?receiptId=" + id);
+            }
+        }).catch((err) => {
+            console.log('-- ERR', err);
+            setShareLoading(false);
+        })
     }
 
     return(
@@ -137,7 +159,7 @@ const ReceiptBreakdown = (props) => {
             <ShareModal 
                 show={showShare}
                 setShow={setShowShare}
-                data={data}
+                receiptId={receiptId}
             />
 
             <Col id='receipt-grid'>
@@ -155,8 +177,13 @@ const ReceiptBreakdown = (props) => {
                 {receiptItems()}
             </Col>
             <div className='bottom-row'>
+                {/* Only show this button if no ID exists in the url */}
                 <Button id='share-button' className='bottom-button' variant="primary" onClick={() => createReceipt()}>
-                    Share
+                    { shareLoading ? 
+                        <Spinner />
+                    :
+                        "Share"
+                    }
                 </Button>
                 <Button id='reset-button' className='bottom-button' variant="danger" onClick={() => resetClaims()}>
                     Reset
