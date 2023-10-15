@@ -10,18 +10,19 @@ namespace receiptParserServices.domain
 {
     internal class ReceiptRequest
     {
-        public List<ItemDto> items {  get; set; } = new List<ItemDto>();
-        
-        public double total { get; set; }
-        public double tip { get; set; }
-        public string merchantName {  get; set; } = string.Empty;
+        //public List<ItemDto> items {  get; set; } = new List<ItemDto>();
 
-        DateTimeOffset transactionDate { get; set; }
+        //public double total { get; set; }
+        //public double tip { get; set; }
+        //public string merchantName {  get; set; } = string.Empty;
+
+        //DateTimeOffset transactionDate { get; set; }
 
         [JsonProperty("id", NullValueHandling = NullValueHandling.Ignore)]
         public string id { get; set; }
 
-        public List<UserDto> users { get; set; } = new List<UserDto>();
+        //public List<UserDto> users { get; set; } = new List<UserDto>();
+        public ReceiptDto receipt { get; set; }
 
     }
 }

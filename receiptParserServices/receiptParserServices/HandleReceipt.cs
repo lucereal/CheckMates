@@ -35,7 +35,68 @@ namespace receiptParserServices
         {
             _logger = loggerFactory.CreateLogger<ParseReceipt>();
             _userReceiptService = userReceiptService;
-        }      
+        }
+
+        [Function("CreateReceipt")]
+        public async Task<HttpResponseData> CreateReceipt([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
+        {
+            _logger.LogInformation("C# HTTP trigger function processed a request.");
+
+            ReceiptResponse receiptResponse = new ReceiptResponse();
+            receiptResponse.isSuccess = false;
+            try
+            {
+
+                ReceiptRequest? model = await req.ReadFromJsonAsync<ReceiptRequest>();
+
+
+                if (model != null)
+                {
+                    Guid receiptId = Guid.NewGuid();
+                    ReceiptDto receiptDto = new ReceiptDto();
+                    receiptDto = model.receipt;
+
+                    ReceiptDto resultReceiptDto = await _userReceiptService.CreateReceipt(receiptDto);
+                
+                    receiptResponse.isSuccess = true;
+                    receiptResponse.message = "Receipt created.";
+
+                    receiptResponse.receipt = resultReceiptDto;
+                }
+                else
+                {
+                    receiptResponse.isSuccess = false;
+                    receiptResponse.failureReason = HandleReceiptFailureReason.ModelParsingIssue;
+                    receiptResponse.message = "";
+
+                }
+            }
+            catch (HandleReceiptException e)
+            {
+                receiptResponse.isSuccess = false;
+                receiptResponse.failureReason = e.failureReason;
+                receiptResponse.message = e.Message;
+            }
+            catch (Exception e)
+            {
+                receiptResponse.isSuccess = false;
+                receiptResponse.message = e.Message;
+                receiptResponse.failureReason = HandleReceiptFailureReason.Unknown;
+
+            }
+
+
+            string responseString = JsonSerializer.Serialize(receiptResponse);
+
+
+            HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
+            response.Headers.Add("Content-Type", "application/json; charset=utf-8");
+
+            response.WriteString(responseString);
+
+            return response;
+        }
+
 
         [Function("GetReceipt")]
         public async Task<HttpResponseData> GetReceipt([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
@@ -103,7 +164,7 @@ namespace receiptParserServices
             receiptResponse.isSuccess = false;
             try
             {
-                
+
 
 
                 AddUserRequest? model = await req.ReadFromJsonAsync<AddUserRequest>();
@@ -151,7 +212,7 @@ namespace receiptParserServices
             receiptResponse.isSuccess = false;
             try
             {
-               
+
                 AddUserItemRequest? model = await req.ReadFromJsonAsync<AddUserItemRequest>();
 
 
@@ -188,7 +249,7 @@ namespace receiptParserServices
             return response;
         }
 
-   
+
         [Function("UpdateUserItem")]
         public async Task<HttpResponseData> UpdateUserItem([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
         {
@@ -198,7 +259,7 @@ namespace receiptParserServices
             receiptResponse.isSuccess = false;
             try
             {
-                
+
                 AddUserItemRequest? model = await req.ReadFromJsonAsync<AddUserItemRequest>();
 
 
@@ -217,7 +278,7 @@ namespace receiptParserServices
                     resultStatusCode = HttpStatusCode.BadRequest;
                 }
             }
-            catch(HandleReceiptException e)
+            catch (HandleReceiptException e)
             {
                 receiptResponse.isSuccess = false;
                 receiptResponse.failureReason = e.failureReason;
@@ -243,7 +304,7 @@ namespace receiptParserServices
 
         private HttpStatusCode GetResponseStatusCodeByFailureReason(HandleReceiptFailureReason failureReason)
         {
-            switch(failureReason)
+            switch (failureReason)
             {
                 case HandleReceiptFailureReason.CouldNotFindReceipt: return HttpStatusCode.NotFound;
                 default: return HttpStatusCode.InternalServerError;

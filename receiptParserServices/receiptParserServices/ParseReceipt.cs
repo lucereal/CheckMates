@@ -173,11 +173,11 @@ namespace receiptParserServices
                 receiptDto.transactionDate = transactionDate.Value;
             }
 
-            ReceiptDto resultReceiptDto = await _userReceiptService.CreateReceipt(receiptDto);
+            //ReceiptDto resultReceiptDto = await _userReceiptService.CreateReceipt(receiptDto);
 
             ReceiptResponse responseReceipt = new ReceiptResponse();
             responseReceipt.isSuccess = true;
-            responseReceipt.receipt = resultReceiptDto;
+            responseReceipt.receipt = receiptDto;
             
             string jsonResult = JsonConvert.SerializeObject(responseReceipt);
 
