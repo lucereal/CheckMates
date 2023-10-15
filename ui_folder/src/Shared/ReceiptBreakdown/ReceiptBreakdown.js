@@ -3,6 +3,7 @@ import { Button, Col, Container, Navbar } from 'react-bootstrap';
 import NameToggles from '../NameThings/NameToggles';
 import { getClaimedTotal } from '../HelperFunctions';
 import SummaryModal from '../Modals/SummaryModal';
+import ShareModal from '../Modals/ShareModal';
 
 /** IF ITEM ID IN THE RESPONSE STAYS IN AN ORDER, THEN THAT WILL KEEP THINGS EASY
  *  SINCE I DO NOT HAVE TO ITERATE THROUGH THINGS.
@@ -18,7 +19,8 @@ const ReceiptBreakdown = (props) => {
     const [selected, setSelected] = useState(-1);
     const [selectedName, setSelectedName] = useState("");
     const [itemData, setItemData] = useState(data);
-    const [showModal, setShowModal] = useState(false);
+    const [showModal, setShowModal] = useState(false); // Summary modal
+    const [showShare, setShowShare] = useState(false); // Share modal
     
     const resetClaims = () => {
         const tempMainData = { ...itemData}
@@ -61,7 +63,7 @@ const ReceiptBreakdown = (props) => {
     }
 
     const receiptItems = () => {
-        return itemData.items?.map((item, index) => {
+        return itemData?.items?.map((item, index) => {
             return (
                 <div 
                     key={index}
@@ -102,6 +104,18 @@ const ReceiptBreakdown = (props) => {
         })
     }
 
+    const createReceipt = () => {
+        setShowShare(true);
+        // axios.get().then(res => {
+        //     console.log('-- ReceiptBreakdown.js|109 >> res', res);
+        //     if (res) {
+        //         setShowShare(true);
+        //     }
+        // }).catch((err) => {
+
+        // })
+    }
+
     return(
         <>
             <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
@@ -109,7 +123,7 @@ const ReceiptBreakdown = (props) => {
                     <Navbar.Text id='total-text'>{"Total: $" + data.total.toFixed(2)}</Navbar.Text>
                     <Navbar.Text id='remaining-text'>{"Claimed: $" + claimedTotal.toFixed(2)}</Navbar.Text>
                 </Container>
-                <Button id='summary-button' onClick={() => setShowModal(true)}>
+                <Button id='summary-button' variant="success" onClick={() => setShowModal(true)}>
                     Summary
                 </Button>
             </Navbar>
@@ -118,6 +132,11 @@ const ReceiptBreakdown = (props) => {
                 setShow={setShowModal}
                 total={data.total}
                 claimedTotal={claimedTotal}
+                data={data}
+            />
+            <ShareModal 
+                show={showShare}
+                setShow={setShowShare}
                 data={data}
             />
 
@@ -135,9 +154,14 @@ const ReceiptBreakdown = (props) => {
                 /> */}
                 {receiptItems()}
             </Col>
-            <Button id='reset-button' variant="danger" onClick={() => resetClaims()}>
-                Reset
-            </Button>
+            <div className='bottom-row'>
+                <Button id='share-button' className='bottom-button' variant="primary" onClick={() => createReceipt()}>
+                    Share
+                </Button>
+                <Button id='reset-button' className='bottom-button' variant="danger" onClick={() => resetClaims()}>
+                    Reset
+                </Button>
+            </div>
         </>
     );
 }

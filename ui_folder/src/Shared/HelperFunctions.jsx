@@ -53,3 +53,12 @@ export function summarize(users, items, tip) {
 
     return summaryDict;
 }
+
+export const copyToClipboard = (ref, setter) => {
+    navigator.clipboard.writeText(ref.current.value).then(function() {
+        console.log('Async: Copying to clipboard was successful!');
+        setter("Copied!");
+    }, function(err) {
+        console.error('Async: Could not copy text: ', err);
+    });
+}
