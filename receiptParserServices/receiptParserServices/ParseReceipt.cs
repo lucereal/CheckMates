@@ -132,22 +132,34 @@ namespace receiptParserServices
                                     }
                                 }
 
-                                ItemDto item = new ItemDto();
-                                if (itemDescription != null && itemTotalPrice != null)
+                                if(itemQuantity > 0)
                                 {
-                                    item.description = itemDescription;
-                                    item.price = itemTotalPrice;
+                                    for(int i = 0; i < itemQuantity; i++)
+                                    {
+                                        ItemDto item = new ItemDto();
+                                        if (itemDescription != null && itemTotalPrice != null)
+                                        {
+                                            item.description = itemDescription;
+                                            item.price = itemTotalPrice;
+                                            item.quantity = 1;
 
-                                }
-                                if(itemQuantity < 1)
-                                {
-                                    item.quantity = 1;
+                                        }
+                                        items.Add(item);
+                                    }
                                 }
                                 else
                                 {
-                                    item.quantity = itemQuantity;
+                                    ItemDto item = new ItemDto();
+                                    if (itemDescription != null && itemTotalPrice != null)
+                                    {
+                                        item.description = itemDescription;
+                                        item.price = itemTotalPrice;
+                                        item.quantity = 1;
+
+                                    } 
+                                    items.Add(item);
                                 }
-                                items.Add(item);
+                                
                             }
                         }
                     }
