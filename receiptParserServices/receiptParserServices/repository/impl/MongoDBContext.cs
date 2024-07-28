@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace receiptParserServices.repository.impl
 {
-    internal class MongoDBContext : IMongoDBContext
+    public class MongoDBContext : IMongoDBContext
     {
         private IMongoDatabase _db { get; set; }
         private MongoClient _mongoClient { get; set; }

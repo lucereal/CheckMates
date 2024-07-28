@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace receiptParserServices.repository.inter
 {
-    internal interface IMongoDBContext
+    public interface IMongoDBContext
     {
         IMongoCollection<Book> GetCollection<Book>(string name);
     }
