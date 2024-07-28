@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace receiptParserServices.repository.model
 {
-    [BsonCollection("receipt")]
+    [BsonCollection("receipts")]
     internal class Receipt : Document
     {
         public Receipt()
