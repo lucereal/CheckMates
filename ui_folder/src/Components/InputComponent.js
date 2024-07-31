@@ -31,8 +31,8 @@ const InputComponent = () => {
         formData.append('file', receiptImg);
         formData.append('users', names);
 
-        const url = 'https://receiptparserservices20230928182301.azurewebsites.net/api/ParseReceipt?name=Functions';
-
+        //const url = 'https://receiptparserservices20230928182301.azurewebsites.net/api/ParseReceipt?name=Functions';
+        const url = 'http://localhost:7257/api/ParseReceipt';
         axios.post(url, formData, {
             headers: {
               'Content-Type': 'multipart/form-data'

@@ -3,6 +3,7 @@
     "receiptParserServices": {
       "commandName": "Project",
       "commandLineArgs": "--port 7257",
+      "applicationUrl": "https://localhost:7257;http://localhost:5197",
       "launchBrowser": false
     }
   }

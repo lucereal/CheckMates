@@ -17,8 +17,17 @@ var host = new HostBuilder()
         s.AddSingleton<IMongoDBContext>(new MongoDBContext(MongoClientSettings.FromUrl(new MongoUrl(connectionString))));
         s.AddSingleton<IUserReceiptService, UserReceiptService>();
         s.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
+        s.AddSignalRCore();
+       
+    }).ConfigureAppConfiguration(a =>
+    {
+        var app = a.Build();
+        
+        
     })
+    
     .Build();
+
 
 
 host.Run();

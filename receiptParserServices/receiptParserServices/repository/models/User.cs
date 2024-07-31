@@ -10,5 +10,7 @@ namespace receiptParserServices.repository.model
     {
         public string userId { get; set; }
         public string name { get; set; }
+
+        public string connectionId { get; set; }
     }
 }

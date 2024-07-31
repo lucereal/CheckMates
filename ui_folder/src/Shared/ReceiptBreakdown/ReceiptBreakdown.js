@@ -6,7 +6,18 @@ import SummaryModal from '../Modals/SummaryModal';
 import ShareModal from '../Modals/ShareModal';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+const signalR = require("@microsoft/signalr");
 
+const options = {
+    accessTokenFactory: () => "eyJhbGciOiJIUzI1NiIsImtpZCI6Ii0xMzUzNzU3MTA4IiwidHlwIjoiSldUIn0.eyJhc3JzLnMudWlkIjoiZGYiLCJuYmYiOjE2OTU4NTgwMjIsImV4cCI6MTY5NTg2MTYyMiwiaWF0IjoxNjk1ODU4MDIyLCJhdWQiOiJodHRwczovL3JlY2VpcHRzaWduYWxyLnNlcnZpY2Uuc2lnbmFsci5uZXQvY2xpZW50Lz9odWI9aHViIn0.WwSCL3sHldiFpm5WU-6dKUzkqK2vjb5_wiE-So0trCc"
+};
+// connection = new signalR.HubConnectionBuilder()
+//     .withUrl(info.url, options)
+//     .configureLogging(signalR.LogLevel.Information)
+//     .build();
+let connection = new signalR.HubConnectionBuilder()
+    .withUrl("http://localhost:7257/api")
+    .build();
 /** IF ITEM ID IN THE RESPONSE STAYS IN AN ORDER, THEN THAT WILL KEEP THINGS EASY
  *  SINCE I DO NOT HAVE TO ITERATE THROUGH THINGS.
  * 
@@ -118,7 +129,8 @@ const ReceiptBreakdown = (props) => {
             return
         };
 
-        const url = "https://receiptparserservices20230928182301.azurewebsites.net/api/CreateReceipt?name=Functions";
+        //const url = "https://receiptparserservices20230928182301.azurewebsites.net/api/CreateReceipt?name=Functions";
+        const url = "http://localhost:7257/api/CreateReceipt";
         setShareLoading(true);
         const payload = {
             "receipt": data
@@ -128,6 +140,16 @@ const ReceiptBreakdown = (props) => {
             setShareLoading(false);
             setShowShare(true);
             if (res.status == "200") {
+
+                connection.start().then(() => {
+                    // Connection to the hub is established
+                    console.log("connection established");
+                    let user = "david";
+                    //connection.invoke("AddUser", user)
+                    
+                    connection.invoke("ConnectUser", user, res?.data?.receipt?.users[0].userId, res?.data?.receipt?.receiptId );
+                });
+                
                 const id = res?.data?.receipt?._id;
                 setReceiptId(id);
                 navigate("/?receiptId=" + id);
