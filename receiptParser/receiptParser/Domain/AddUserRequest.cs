@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace receiptParser.Domain
 {
-    internal class AddUserRequest
+    public class AddUserRequest
     {
         public string id { get; set; }
         public List<string> userNames { get; set; }

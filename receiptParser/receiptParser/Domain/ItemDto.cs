@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace receiptParser.Domain
 {
-    internal class ItemDto
+    public class ItemDto
     {
         public ItemDto()
         {

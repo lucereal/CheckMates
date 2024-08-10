@@ -2,6 +2,10 @@
 using receiptParser.Domain;
 using receiptParser.Repository.mappers;
 using receiptParser.Service.inter;
+using Azure.AI.FormRecognizer.DocumentAnalysis;
+using Azure;
+using HttpMultipartParser;
+using Newtonsoft.Json;
 
 namespace receiptParser.Controllers
 {
@@ -12,10 +16,11 @@ namespace receiptParser.Controllers
         private readonly IUserReceiptService _userReceiptService;
         string endpoint = "https://muonreceiptparser.cognitiveservices.azure.com/";
         string apiKey = "de3591828f28412fa6c0ed24499a6c8e";
+        private readonly ILogger _logger;
 
 
-        [HttpGet(Name = "ParseReceipt")]
-        public HttpResponseData ParseReceipt()
+        [HttpPost(Name = "ParseReceipt")]
+        public async Task<ReceiptResponse> ParseReceipt(HttpRequest req)
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
 
@@ -181,14 +186,14 @@ namespace receiptParser.Controllers
             responseReceipt.isSuccess = true;
             responseReceipt.receipt = receiptDto;
 
-            string jsonResult = JsonConvert.SerializeObject(responseReceipt);
+            //string jsonResult = JsonConvert.SerializeObject(responseReceipt);
 
-            // Create an HTTP response with the JSON data
-            var response = req.CreateResponse(HttpStatusCode.OK);
-            response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-            response.WriteString(jsonResult);
+            //// Create an HTTP response with the JSON data
+            //var response = req.CreateResponse(HttpStatusCode.OK);
+            //response.Headers.Add("Content-Type", "application/json; charset=utf-8");
+            //response.WriteString(jsonResult);
 
-            return response;
+            return responseReceipt;
         }
     }
 }

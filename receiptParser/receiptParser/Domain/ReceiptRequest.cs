@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace receiptParser.Domain
 {
-    internal class ReceiptRequest
+    public class ReceiptRequest
     {
         //public List<ItemDto> items {  get; set; } = new List<ItemDto>();
 

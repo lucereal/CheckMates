@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace receiptParser.Util.error
 {
-    internal enum HandleReceiptFailureReason
+    public enum HandleReceiptFailureReason
     {
         Unknown, ModelParsingIssue, DataRetrievalIssue, CouldNotAddClaim, CouldNotFindUserOrItem, CouldNotFindReceipt
 

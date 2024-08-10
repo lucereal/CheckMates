@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace receiptParser.Domain
 {
-    internal class ReceiptResponse
+    public class ReceiptResponse
     {
         public ReceiptResponse() { }
         public bool isSuccess { get; set; }
