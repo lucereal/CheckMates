@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace receiptParser.Repository.model
 {
-    internal class Claim
+    public class Claim
     {
         public Claim() { }
         public string userId { get; set; }

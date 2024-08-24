@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace receiptParser.Repository.mappers
 {
-    internal static class ReceiptMapper
+    public static class ReceiptMapper
     {
         public static ReceiptDto MapReceiptToReceiptDto(Receipt receipt)
         {

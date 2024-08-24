@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace receiptParser.Service.impl
 {
-    internal class UserReceiptService : IUserReceiptService
+    public class UserReceiptService : IUserReceiptService
     {
 
         private readonly ILogger _logger;

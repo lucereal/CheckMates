@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace receiptParser.Repository.model
 {
     [BsonCollection("receipts")]
-    internal class Receipt : Document
+    public class Receipt : Document
     {
         public Receipt()
         {

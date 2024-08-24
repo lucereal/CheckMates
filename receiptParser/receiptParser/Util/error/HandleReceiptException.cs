@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace receiptParser.Util.error
 {
     [Serializable]
-    internal class HandleReceiptException : Exception
+    public class HandleReceiptException : Exception
     {
         public HandleReceiptFailureReason failureReason;
         public HandleReceiptException() {

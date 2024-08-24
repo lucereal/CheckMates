@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace receiptParser.Repository.model
 {
-    internal class User
+    public class User
     {
         public string userId { get; set; }
         public string name { get; set; }

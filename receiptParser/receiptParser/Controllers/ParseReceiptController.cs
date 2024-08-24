@@ -6,21 +6,44 @@ using Azure.AI.FormRecognizer.DocumentAnalysis;
 using Azure;
 using HttpMultipartParser;
 using Newtonsoft.Json;
+using Azure.AI.FormRecognizer.Models;
 
 namespace receiptParser.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
-    public class ParseReceiptController : Controller
+    [Route("[controller]/[action]")]
+    public class ParseReceiptController : ControllerBase
     {
         private readonly IUserReceiptService _userReceiptService;
         string endpoint = "https://muonreceiptparser.cognitiveservices.azure.com/";
         string apiKey = "de3591828f28412fa6c0ed24499a6c8e";
-        private readonly ILogger _logger;
+        
+
+        private readonly ILogger<ParseReceiptController> _logger;
+
+        public ParseReceiptController(ILogger<ParseReceiptController> logger, IUserReceiptService userReceiptService)
+        {
+            _logger = logger;
+            _userReceiptService = userReceiptService;
+        }
+        public class TestModel
+        {
+            public IList<IFormFile> File { get; set; }
+            public string Name { get; set; }
+
+        }
+
+        [HttpPost]
+        
+        public IActionResult TestMe([FromForm] TestModel testModel)
+        {
+            return Ok();
+        }
 
 
         [HttpPost(Name = "ParseReceipt")]
-        public async Task<ReceiptResponse> ParseReceipt(HttpRequest req)
+        
+        public async Task<ReceiptResponse> ParseReceipt(ParseReceiptRequest request)
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
 
@@ -28,108 +51,135 @@ namespace receiptParser.Controllers
             var client = new DocumentAnalysisClient(new Uri(endpoint), credential);
 
             // Parse the form data
-            var parsedFormBody = MultipartFormDataParser.ParseAsync(req.Body).Result;
-            var usersStr = parsedFormBody.GetParameterValue("users");
-            var usersObj = JsonConvert.DeserializeObject<List<string>>(usersStr);
-            List<string> users = usersObj != null ? usersObj : new List<string>();
+            //var parsedFormBody = MultipartFormDataParser.ParseAsync(req.Body).Result;
+            //var usersStr = parsedFormBody.GetParameterValue("users");
+            //var usersObj = JsonConvert.DeserializeObject<List<string>>(usersStr);
+            //List<string> users = usersObj != null ? usersObj : new List<string>();
+            List<string> users = request.users;
 
+            AnalyzeDocumentOperation? operation = null;
 
-
-            FilePart file = parsedFormBody.Files[0];
-            var stream = file.Data;
-
-
-            AnalyzeDocumentOperation operation = await client.AnalyzeDocumentAsync(WaitUntil.Completed, "prebuilt-receipt", stream);
-
-
-            AnalyzeResult receipts = operation.Value;
-
-            string merchantName = null;
-            Nullable<DateTimeOffset> transactionDate = null;
-            double total = 0;
-            double tip = 0;
-            List<ItemDto> items = new List<ItemDto>();
-
-            foreach (AnalyzedDocument receipt in receipts.Documents)
+            IFormFile file = request.file.First();
+            using (var stream = file.OpenReadStream())
             {
 
-                if (receipt.Fields.TryGetValue("MerchantName", out DocumentField merchantNameField))
+                //Stream streamT = file.OpenReadStream();
+                //file.CopyTo(stream);
+                operation = await client.AnalyzeDocumentAsync(WaitUntil.Completed, "prebuilt-receipt", stream);
+                
+            }
+
+            //FilePart file = parsedFormBody.Files[0];
+            //MultipartFileData file = request.File.FirstOrDefault();
+            //var stream = file.Data;
+            
+
+            ReceiptResponse responseReceipt = new ReceiptResponse();
+            responseReceipt.isSuccess = true;
+            //responseReceipt.receipt = receiptDto;
+
+            if (operation != null) {
+                AnalyzeResult receipts = operation.Value;
+
+                string merchantName = null;
+                Nullable<DateTimeOffset> transactionDate = null;
+                double total = 0;
+                double tip = 0;
+                List<ItemDto> items = new List<ItemDto>();
+
+                foreach (AnalyzedDocument receipt in receipts.Documents)
                 {
-                    if (merchantNameField.FieldType == DocumentFieldType.String)
+
+                    if (receipt.Fields.TryGetValue("MerchantName", out DocumentField merchantNameField))
                     {
-                        merchantName = merchantNameField.Value.AsString();
-
-                    }
-                }
-
-                if (receipt.Fields.TryGetValue("TransactionDate", out DocumentField transactionDateField))
-                {
-                    if (transactionDateField.FieldType == DocumentFieldType.Date)
-                    {
-                        transactionDate = transactionDateField.Value.AsDate();
-
-                    }
-                }
-                if (receipt.Fields.TryGetValue("Total", out DocumentField totalField))
-                {
-                    if (totalField.FieldType == DocumentFieldType.Double)
-                    {
-                        total = totalField.Value.AsDouble();
-
-                    }
-                }
-
-                if (receipt.Fields.TryGetValue("Tip", out DocumentField tipField))
-                {
-                    if (tipField.FieldType == DocumentFieldType.Double)
-                    {
-                        tip = tipField.Value.AsDouble();
-
-                    }
-                }
-
-                if (receipt.Fields.TryGetValue("Items", out DocumentField itemsField))
-                {
-                    if (itemsField.FieldType == DocumentFieldType.List)
-                    {
-                        foreach (DocumentField itemField in itemsField.Value.AsList())
+                        if (merchantNameField.FieldType == DocumentFieldType.String)
                         {
+                            merchantName = merchantNameField.Value.AsString();
 
-                            if (itemField.FieldType == DocumentFieldType.Dictionary)
+                        }
+                    }
+
+                    if (receipt.Fields.TryGetValue("TransactionDate", out DocumentField transactionDateField))
+                    {
+                        if (transactionDateField.FieldType == DocumentFieldType.Date)
+                        {
+                            transactionDate = transactionDateField.Value.AsDate();
+
+                        }
+                    }
+                    if (receipt.Fields.TryGetValue("Total", out DocumentField totalField))
+                    {
+                        if (totalField.FieldType == DocumentFieldType.Double)
+                        {
+                            total = totalField.Value.AsDouble();
+
+                        }
+                    }
+
+                    if (receipt.Fields.TryGetValue("Tip", out DocumentField tipField))
+                    {
+                        if (tipField.FieldType == DocumentFieldType.Double)
+                        {
+                            tip = tipField.Value.AsDouble();
+
+                        }
+                    }
+
+                    if (receipt.Fields.TryGetValue("Items", out DocumentField itemsField))
+                    {
+                        if (itemsField.FieldType == DocumentFieldType.List)
+                        {
+                            foreach (DocumentField itemField in itemsField.Value.AsList())
                             {
-                                IReadOnlyDictionary<string, DocumentField> itemFields = itemField.Value.AsDictionary();
-                                string itemDescription = null;
-                                double itemTotalPrice = 0;
-                                double itemQuantity = 0;
-                                if (itemFields.TryGetValue("Description", out DocumentField itemDescriptionField))
+
+                                if (itemField.FieldType == DocumentFieldType.Dictionary)
                                 {
-                                    if (itemDescriptionField.FieldType == DocumentFieldType.String)
+                                    IReadOnlyDictionary<string, DocumentField> itemFields = itemField.Value.AsDictionary();
+                                    string itemDescription = null;
+                                    double itemTotalPrice = 0;
+                                    double itemQuantity = 0;
+                                    if (itemFields.TryGetValue("Description", out DocumentField itemDescriptionField))
                                     {
-                                        itemDescription = itemDescriptionField.Value.AsString();
+                                        if (itemDescriptionField.FieldType == DocumentFieldType.String)
+                                        {
+                                            itemDescription = itemDescriptionField.Value.AsString();
 
+                                        }
                                     }
-                                }
 
-                                if (itemFields.TryGetValue("TotalPrice", out DocumentField itemTotalPriceField))
-                                {
-                                    if (itemTotalPriceField.FieldType == DocumentFieldType.Double)
+                                    if (itemFields.TryGetValue("TotalPrice", out DocumentField itemTotalPriceField))
                                     {
-                                        itemTotalPrice = itemTotalPriceField.Value.AsDouble();
+                                        if (itemTotalPriceField.FieldType == DocumentFieldType.Double)
+                                        {
+                                            itemTotalPrice = itemTotalPriceField.Value.AsDouble();
 
+                                        }
                                     }
-                                }
-                                if (itemFields.TryGetValue("Quantity", out DocumentField itemQuantityField))
-                                {
-                                    if (itemQuantityField.FieldType == DocumentFieldType.Double)
+                                    if (itemFields.TryGetValue("Quantity", out DocumentField itemQuantityField))
                                     {
-                                        itemQuantity = itemQuantityField.Value.AsDouble();
+                                        if (itemQuantityField.FieldType == DocumentFieldType.Double)
+                                        {
+                                            itemQuantity = itemQuantityField.Value.AsDouble();
 
+                                        }
                                     }
-                                }
 
-                                if (itemQuantity > 0)
-                                {
-                                    for (int i = 0; i < itemQuantity; i++)
+                                    if (itemQuantity > 0)
+                                    {
+                                        for (int i = 0; i < itemQuantity; i++)
+                                        {
+                                            ItemDto item = new ItemDto();
+                                            if (itemDescription != null && itemTotalPrice != null)
+                                            {
+                                                item.description = itemDescription;
+                                                item.price = itemTotalPrice;
+                                                item.quantity = 1;
+
+                                            }
+                                            items.Add(item);
+                                        }
+                                    }
+                                    else
                                     {
                                         ItemDto item = new ItemDto();
                                         if (itemDescription != null && itemTotalPrice != null)
@@ -141,50 +191,40 @@ namespace receiptParser.Controllers
                                         }
                                         items.Add(item);
                                     }
-                                }
-                                else
-                                {
-                                    ItemDto item = new ItemDto();
-                                    if (itemDescription != null && itemTotalPrice != null)
-                                    {
-                                        item.description = itemDescription;
-                                        item.price = itemTotalPrice;
-                                        item.quantity = 1;
 
-                                    }
-                                    items.Add(item);
                                 }
-
                             }
                         }
                     }
+
                 }
 
+                for (int i = 0; i < items.Count; i++)
+                {
+                    items[i].itemId = i;
+                }
+                List<UserDto> userDtos = ReceiptMapper.MapUserNamesToUserDtos(users);
+                Guid receiptId = Guid.NewGuid();
+                ReceiptDto receiptDto = new ReceiptDto();
+                receiptDto.items = items;
+                receiptDto.total = total;
+                receiptDto.tip = tip;
+                receiptDto.merchantName = merchantName;
+                receiptDto.users = userDtos;
+                receiptDto.receiptId = receiptId.ToString();
+                if (transactionDate != null)
+                {
+                    receiptDto.transactionDate = transactionDate.Value;
+                }
+
+                responseReceipt.receipt = receiptDto;
+
             }
 
-            for (int i = 0; i < items.Count; i++)
-            {
-                items[i].itemId = i;
-            }
-            List<UserDto> userDtos = ReceiptMapper.MapUserNamesToUserDtos(users);
-            Guid receiptId = Guid.NewGuid();
-            ReceiptDto receiptDto = new ReceiptDto();
-            receiptDto.items = items;
-            receiptDto.total = total;
-            receiptDto.tip = tip;
-            receiptDto.merchantName = merchantName;
-            receiptDto.users = userDtos;
-            receiptDto.receiptId = receiptId.ToString();
-            if (transactionDate != null)
-            {
-                receiptDto.transactionDate = transactionDate.Value;
-            }
 
             //ReceiptDto resultReceiptDto = await _userReceiptService.CreateReceipt(receiptDto);
 
-            ReceiptResponse responseReceipt = new ReceiptResponse();
-            responseReceipt.isSuccess = true;
-            responseReceipt.receipt = receiptDto;
+            
 
             //string jsonResult = JsonConvert.SerializeObject(responseReceipt);
 

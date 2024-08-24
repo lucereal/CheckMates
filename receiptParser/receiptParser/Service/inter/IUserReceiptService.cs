@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace receiptParser.Service.inter
 {
-    internal interface IUserReceiptService
+    public interface IUserReceiptService
     {
         Task<ReceiptDto> AddUserClaim(string id, string userId, int itemId, int quantity);
         Task<ReceiptDto> UpdateUserClaim(string id, string userId, int itemId, int quantity);
