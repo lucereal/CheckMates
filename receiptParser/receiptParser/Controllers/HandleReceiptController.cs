@@ -17,6 +17,12 @@ namespace receiptParser.Controllers
         private readonly ILogger _logger;
 
 
+        public HandleReceiptController(ILogger<HandleReceiptController> logger, IUserReceiptService userReceiptService)
+        {
+            _logger = logger;
+            _userReceiptService = userReceiptService;
+        }
+
 
         [HttpPost(Name = "CreateReceipt")]
         public async Task<ReceiptResponse> CreateReceipt(ReceiptRequest req)
@@ -79,8 +85,8 @@ namespace receiptParser.Controllers
             return receiptResponse;
         }
 
-        [HttpPost(Name = "GetReceipt")]
-        public async Task<ReceiptResponse> GetReceipt(ReceiptRequest req)
+        [HttpGet("{id}")]
+        public async Task<ReceiptResponse> GetReceipt(string id)
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
 
@@ -90,12 +96,12 @@ namespace receiptParser.Controllers
             try
             {
 
-                ReceiptRequest? model = req;//await req.ReadFromJsonAsync<ReceiptRequest>();
+                //ReceiptRequest? model = req;//await req.ReadFromJsonAsync<ReceiptRequest>();
 
 
-                if (model != null && model.id != null)
+                if (id != null)
                 {
-                    ReceiptDto receiptDto = await _userReceiptService.GetReceipt(model.id);
+                    ReceiptDto receiptDto = await _userReceiptService.GetReceipt(id);
                     receiptResponse.isSuccess = true;
                     receiptResponse.message = "Receipt created.";
                     receiptResponse.receipt = receiptDto;
@@ -122,16 +128,6 @@ namespace receiptParser.Controllers
 
             }
 
-
-            //string responseString = JsonSerializer.Serialize(receiptResponse);
-
-
-            //HttpResponseData response = req.CreateResponse(resultStatusCode);
-            //response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-
-            //response.WriteString(responseString);
-
-            //return response;
             return receiptResponse;
         }
 

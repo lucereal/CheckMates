@@ -26,19 +26,6 @@ namespace receiptParser.Controllers
             _logger = logger;
             _userReceiptService = userReceiptService;
         }
-        public class TestModel
-        {
-            public IList<IFormFile> File { get; set; }
-            public string Name { get; set; }
-
-        }
-
-        [HttpPost]
-        
-        public IActionResult TestMe([FromForm] TestModel testModel)
-        {
-            return Ok();
-        }
 
 
         [HttpPost(Name = "ParseReceipt")]
@@ -50,11 +37,6 @@ namespace receiptParser.Controllers
             var credential = new AzureKeyCredential(apiKey);
             var client = new DocumentAnalysisClient(new Uri(endpoint), credential);
 
-            // Parse the form data
-            //var parsedFormBody = MultipartFormDataParser.ParseAsync(req.Body).Result;
-            //var usersStr = parsedFormBody.GetParameterValue("users");
-            //var usersObj = JsonConvert.DeserializeObject<List<string>>(usersStr);
-            //List<string> users = usersObj != null ? usersObj : new List<string>();
             List<string> users = request.users;
 
             AnalyzeDocumentOperation? operation = null;
@@ -62,22 +44,12 @@ namespace receiptParser.Controllers
             IFormFile file = request.file.First();
             using (var stream = file.OpenReadStream())
             {
-
-                //Stream streamT = file.OpenReadStream();
-                //file.CopyTo(stream);
-                operation = await client.AnalyzeDocumentAsync(WaitUntil.Completed, "prebuilt-receipt", stream);
-                
+                operation = await client.AnalyzeDocumentAsync(WaitUntil.Completed, "prebuilt-receipt", stream);                
             }
-
-            //FilePart file = parsedFormBody.Files[0];
-            //MultipartFileData file = request.File.FirstOrDefault();
-            //var stream = file.Data;
-            
 
             ReceiptResponse responseReceipt = new ReceiptResponse();
             responseReceipt.isSuccess = true;
-            //responseReceipt.receipt = receiptDto;
-
+            
             if (operation != null) {
                 AnalyzeResult receipts = operation.Value;
 
@@ -209,6 +181,7 @@ namespace receiptParser.Controllers
                 receiptDto.items = items;
                 receiptDto.total = total;
                 receiptDto.tip = tip;
+                receiptDto._id = receiptId.ToString();
                 receiptDto.merchantName = merchantName;
                 receiptDto.users = userDtos;
                 receiptDto.receiptId = receiptId.ToString();
@@ -221,17 +194,7 @@ namespace receiptParser.Controllers
 
             }
 
-
             //ReceiptDto resultReceiptDto = await _userReceiptService.CreateReceipt(receiptDto);
-
-            
-
-            //string jsonResult = JsonConvert.SerializeObject(responseReceipt);
-
-            //// Create an HTTP response with the JSON data
-            //var response = req.CreateResponse(HttpStatusCode.OK);
-            //response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-            //response.WriteString(jsonResult);
 
             return responseReceipt;
         }

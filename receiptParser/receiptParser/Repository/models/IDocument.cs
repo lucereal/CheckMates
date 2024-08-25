@@ -12,7 +12,7 @@ namespace receiptParser.Repository.models
     {
         [BsonId]
         [BsonRepresentation(BsonType.String)]
-        ObjectId Id { get; set; }
+        ObjectId _id { get; set; }
 
         DateTime CreatedAt { get; }
     }

@@ -10,8 +10,8 @@ namespace receiptParser.Repository.models
 {
     public class Document : IDocument
     {
-        public ObjectId Id { get; set; }
+        public ObjectId _id { get; set; }
 
-        public DateTime CreatedAt => Id.CreationTime;
+        public DateTime CreatedAt => _id.CreationTime;
     }
 }
