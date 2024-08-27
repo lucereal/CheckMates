@@ -4,6 +4,7 @@ using receiptParser.Repository.impl;
 using receiptParser.Repository.inter;
 using receiptParser.Service.impl;
 using receiptParser.Service.inter;
+using receiptParser.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,12 +16,11 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-//builder.Services.AddScoped<IMyDependency, MyDependency>();
 builder.Services.AddScoped<IUserReceiptService, UserReceiptService>();
 builder.Services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
-//builder.Services.AddScoped(IMongoDBContext<>, MongoDBContext<>)();
-//services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddSingleton<IMongoDBContext>(new MongoDBContext(MongoClientSettings.FromUrl(new MongoUrl(connectionString))));
+
+builder.Services.AddSignalR();
 
 
 var app = builder.Build();
@@ -32,12 +32,27 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors(builder =>
+{
+    builder.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader();
+});
 
 
-app.UseHttpsRedirection();
-
+app.UseRouting();
 app.UseAuthorization();
 
-app.MapControllers();
+
+#pragma warning disable ASP0014 // Suggest using top level route registrations
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapHub<ChatHub>("/chatHub");
+});
+#pragma warning restore ASP0014 // Suggest using top level route registrations
+
+
+
 
 app.Run();
