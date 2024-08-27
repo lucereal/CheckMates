@@ -1,13 +1,13 @@
 ﻿using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using receiptParserServices.repository.inter;
+using receiptParser.Repository.inter;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace receiptParserServices.repository.impl
+namespace receiptParser.Repository.impl
 {
     public class MongoDBContext : IMongoDBContext
     {

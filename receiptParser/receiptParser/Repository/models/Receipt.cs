@@ -1,18 +1,18 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
-using receiptParserServices.domain;
-using receiptParserServices.repository.models;
+using receiptParser.Domain;
+using receiptParser.Repository.models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using receiptParserServices.util.attributes;
+using receiptParser.Util.attributes;
 
 using System.Text;
 using System.Threading.Tasks;
 
-namespace receiptParserServices.repository.model
+namespace receiptParser.Repository.model
 {
     [BsonCollection("receipts")]
-    internal class Receipt : Document
+    public class Receipt : Document
     {
         public Receipt()
         {

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace receiptParserServices.repository.inter
+namespace receiptParser.Repository.inter
 {
     public interface IMongoDBContext
     {
