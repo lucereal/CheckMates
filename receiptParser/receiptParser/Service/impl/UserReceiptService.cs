@@ -1,6 +1,8 @@
 ﻿using Amazon.SecurityToken.SAML;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using receiptParser.Domain;
+using receiptParser.Hubs;
 using receiptParser.Repository.inter;
 using receiptParser.Repository.mappers;
 using receiptParser.Repository.model;
@@ -11,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace receiptParser.Service.impl
@@ -23,10 +26,14 @@ namespace receiptParser.Service.impl
 
         private readonly IMongoRepository<Receipt> _userReceiptRepository;
 
-        public UserReceiptService(ILoggerFactory loggerFactory, IMongoRepository<Receipt> userReceiptRepository)
+
+        private readonly IHubContext<ChatHub> _hubContext;
+
+        public UserReceiptService(ILoggerFactory loggerFactory, IMongoRepository<Receipt> userReceiptRepository, IHubContext<ChatHub> hubContext)
         {
             _logger = loggerFactory.CreateLogger<UserReceiptService>();        
             _userReceiptRepository = userReceiptRepository;
+            _hubContext = hubContext;
         }
 
         public async Task<ReceiptDto> UpdateUserClaim(string id, string userId, int itemId, int quantity)
@@ -153,7 +160,37 @@ namespace receiptParser.Service.impl
             return ReceiptMapper.MapReceiptToReceiptDto(receipt);
         }
 
-       
+        public async Task<ReceiptDto> AddUserConnectionId(string receiptId, string userConnectionId, string userId)
+        {
+            Receipt receipt = await _userReceiptRepository.FindByIdAsync(receiptId);
+
+            if (receipt == null)
+            {
+                throw new HandleReceiptException("Could not find receipt while trying to update.", HandleReceiptFailureReason.CouldNotFindReceipt);
+            }
+
+            User? user = receipt.users.Where(user => user.userId.Equals(userId)).FirstOrDefault();
+
+            if(user != null)
+            {
+                user.connectionId = userConnectionId;
+            }
+
+            List<string> connectionIds = receipt.users.Where(user => user.connectionId != null).Select(user => user.connectionId).ToList();
+
+            //await Microsoft.AspNetCore.SignalR.Groups.AddToGroupAsync(Context.ConnectionId, group);
+            //            await _hubContext.Clients.Group(message.Group).SendAsync("GroupUpdate", message.Text);
+            foreach (string connectionId in connectionIds) {
+                await _hubContext.Groups.AddToGroupAsync(connectionId, receiptId);
+            }
+
+            await _hubContext.Clients.Group(receiptId).SendAsync("GroupUpdate", "user added " + userId + " to group " + receiptId);
+            
+
+            return ReceiptMapper.MapReceiptToReceiptDto(receipt);
+
+        }
+
 
     }
 }

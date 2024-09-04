@@ -15,5 +15,8 @@ namespace receiptParser.Service.inter
         Task<ReceiptDto> AddUsersToReceipt(string id, List<string> users);
         Task<ReceiptDto> CreateReceipt(ReceiptDto receiptDto);
         Task<ReceiptDto> GetReceipt(string id);
+
+        Task<ReceiptDto> AddUserConnectionId(string receiptId, string userConnectionId, string userId);
+
     }
 }
