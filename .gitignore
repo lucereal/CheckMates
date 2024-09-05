@@ -1,0 +1,8 @@
+receiptParser/receiptParser/obj/**
+receiptParser/receiptParser/bin/**
+receiptParser/receiptParser/Properties/**
+receiptParser/receiptParser/.config/**
+receiptParser/.vs/**
+receiptParserServices/.vs/**
+
+signalRClient/node_modules/*

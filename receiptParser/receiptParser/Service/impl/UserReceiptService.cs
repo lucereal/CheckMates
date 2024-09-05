@@ -174,20 +174,41 @@ namespace receiptParser.Service.impl
             if(user != null)
             {
                 user.connectionId = userConnectionId;
+                
             }
 
+            await _userReceiptRepository.ReplaceOneAsync(receipt);
             List<string> connectionIds = receipt.users.Where(user => user.connectionId != null).Select(user => user.connectionId).ToList();
 
             //await Microsoft.AspNetCore.SignalR.Groups.AddToGroupAsync(Context.ConnectionId, group);
             //            await _hubContext.Clients.Group(message.Group).SendAsync("GroupUpdate", message.Text);
-            foreach (string connectionId in connectionIds) {
-                await _hubContext.Groups.AddToGroupAsync(connectionId, receiptId);
-            }
-
-            await _hubContext.Clients.Group(receiptId).SendAsync("GroupUpdate", "user added " + userId + " to group " + receiptId);
+            //foreach (string connectionId in connectionIds) {
+            //    await _hubContext.Groups.AddToGroupAsync(connectionId, receiptId);
+            //}
             
+            //await _hubContext.Clients.Group(receiptId).SendAsync("GroupUpdate", "user added " + userId + " to group " + receiptId);
+            await _hubContext.Clients.Clients(connectionIds).SendAsync("GroupUpdate", "user added " + userId + " to group " + receiptId);
 
             return ReceiptMapper.MapReceiptToReceiptDto(receipt);
+
+        }
+
+        public async Task<ReceiptDto> UpdateUsers(ReceiptDto receiptDto)
+        {
+            Receipt receipt = await _userReceiptRepository.FindByIdAsync(receiptDto._id);
+
+            if (receipt == null)
+            {
+                throw new HandleReceiptException("Could not find receipt while trying to update.", HandleReceiptFailureReason.CouldNotFindReceipt);
+            }
+
+            List<string> connectionIds = receipt.users.Where(user => user.connectionId != null).Select(user => user.connectionId).ToList();
+
+            ReceiptDto updatedReceiptDto = ReceiptMapper.MapReceiptToReceiptDto(receipt);
+
+            await _hubContext.Clients.Clients(connectionIds).SendAsync("ReceiptUpdate", receiptDto);
+
+            return updatedReceiptDto;
 
         }
 

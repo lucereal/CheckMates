@@ -21,6 +21,7 @@ builder.Services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>)
 builder.Services.AddSingleton<IMongoDBContext>(new MongoDBContext(MongoClientSettings.FromUrl(new MongoUrl(connectionString))));
 
 builder.Services.AddSignalR();
+    //.AddJsonProtocol();
 
 
 var app = builder.Build();
