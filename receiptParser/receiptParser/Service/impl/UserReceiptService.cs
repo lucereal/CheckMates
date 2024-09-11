@@ -12,6 +12,7 @@ using shortid;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -71,7 +72,10 @@ namespace receiptParser.Service.impl
             {
                 claim.quantity = quantity;
                 await _userReceiptRepository.ReplaceOneAsync(receipt);
+                await UpdateUsers(receipt);
             }
+
+            
 
             return ReceiptMapper.MapReceiptToReceiptDto(receipt);
 
@@ -120,6 +124,7 @@ namespace receiptParser.Service.impl
             
             }
             await _userReceiptRepository.ReplaceOneAsync(receipt);
+            await UpdateUsers(receipt);
             return ReceiptMapper.MapReceiptToReceiptDto(receipt);
 
         }
@@ -138,6 +143,8 @@ namespace receiptParser.Service.impl
             receipt.users.AddRange(userList);
 
             await _userReceiptRepository.ReplaceOneAsync(receipt);
+
+            await UpdateUsers(receipt);
 
             return ReceiptMapper.MapReceiptToReceiptDto(receipt);
         }
@@ -180,14 +187,8 @@ namespace receiptParser.Service.impl
             await _userReceiptRepository.ReplaceOneAsync(receipt);
             List<string> connectionIds = receipt.users.Where(user => user.connectionId != null).Select(user => user.connectionId).ToList();
 
-            //await Microsoft.AspNetCore.SignalR.Groups.AddToGroupAsync(Context.ConnectionId, group);
-            //            await _hubContext.Clients.Group(message.Group).SendAsync("GroupUpdate", message.Text);
-            //foreach (string connectionId in connectionIds) {
-            //    await _hubContext.Groups.AddToGroupAsync(connectionId, receiptId);
-            //}
-            
-            //await _hubContext.Clients.Group(receiptId).SendAsync("GroupUpdate", "user added " + userId + " to group " + receiptId);
-            await _hubContext.Clients.Clients(connectionIds).SendAsync("GroupUpdate", "user added " + userId + " to group " + receiptId);
+
+            await UpdateUsers(receipt);
 
             return ReceiptMapper.MapReceiptToReceiptDto(receipt);
 
@@ -206,11 +207,32 @@ namespace receiptParser.Service.impl
 
             ReceiptDto updatedReceiptDto = ReceiptMapper.MapReceiptToReceiptDto(receipt);
 
-            await _hubContext.Clients.Clients(connectionIds).SendAsync("ReceiptUpdate", receiptDto);
+            await _hubContext.Clients.Clients(connectionIds).SendAsync("GroupReceiptUpdate", receiptDto);
 
             return updatedReceiptDto;
 
         }
+
+        public async Task<ReceiptDto> UpdateUsers(Receipt receipt)
+        {
+           
+            if (receipt == null)
+            {
+                throw new HandleReceiptException("Could not find receipt while trying to update.", HandleReceiptFailureReason.CouldNotFindReceipt);
+            }
+
+            Receipt updatedReceipt = await _userReceiptRepository.FindByIdAsync(receipt._id.ToString());
+
+            List<string> connectionIds = updatedReceipt.users.Where(user => user.connectionId != null).Select(user => user.connectionId).ToList();
+
+            ReceiptDto updatedReceiptDto = ReceiptMapper.MapReceiptToReceiptDto(updatedReceipt);
+
+            await _hubContext.Clients.Clients(connectionIds).SendAsync("GroupReceiptUpdate", updatedReceiptDto);
+
+            return updatedReceiptDto;
+
+        }
+
 
 
     }

@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using receiptParser;
 using receiptParser.Controllers;
 using receiptParser.Domain;
 using receiptParser.Repository.model;
+using receiptParser.Service.impl;
 using receiptParser.Service.inter;
 using System.Net;
 
@@ -13,13 +15,13 @@ namespace receiptParser.Hubs
         private readonly static ConnectionMapping<string> _connections =
             new ConnectionMapping<string>();
 
-        //private readonly ILogger _logger;
+        private readonly ILogger _logger;
 
         private readonly IUserReceiptService _userReceiptService;
 
-        public ChatHub(IUserReceiptService userReceiptService)
+        public ChatHub(ILoggerFactory loggerFactory, IUserReceiptService userReceiptService)
         {
-            //_logger = logger;
+            _logger = loggerFactory.CreateLogger<ChatHub>();
             _userReceiptService = userReceiptService;
         }
 
@@ -131,6 +133,10 @@ namespace receiptParser.Hubs
             await Clients.All.SendAsync("UserRemovedFromGroup", group, user, message);
         }
 
+        public void GroupUpdateReceived(string receiptId, string connectionId)
+        {
+            _logger.LogInformation("GroupUpdateReceived: receiptId: " + receiptId + " connectionId: " + connectionId);
+        }
 
         public void SendChatMessage(string who, string message)
         {
