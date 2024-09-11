@@ -21,6 +21,8 @@ const ReceiptBreakdown = (props) => {
     const navigate = useNavigate();
     const [selected, setSelected] = useState(-1);
     const [selectedName, setSelectedName] = useState("");
+    const [selectedNameId, setSelectedNameId] = useState("");
+    const [selectedUser, setSelectedUser] = useState(null);
     const [itemData, setItemData] = useState(data);
     const [showModal, setShowModal] = useState(false); // Summary modal
     const [showShare, setShowShare] = useState(false); // Share modal
@@ -37,18 +39,44 @@ const ReceiptBreakdown = (props) => {
         setItemData(tempMainData);
     }
 
+    
     const selectItem = (index, item) => {
         // item is selected with a name selection.
         if (selectedRef.current === index && selectedName !== "") {
             const tempItem = { ...item };
             const tempData = [ ...itemData.items ];
 
+
+            console.log("selectedName: " + selectedName)
+            const tempMainData = { ...itemData}
+            let currentUser = tempMainData.users.find(user => user.name === selectedName);
+
             // If the user has already claimed this item, then remove it instead of pushing.
             var tempIndex = item.claims.indexOf(selectedName);
             if (tempIndex > -1) {
                 tempItem.claims.splice(tempIndex, 1); // 2nd parameter means remove one item only
+               
             } else {
                 tempItem.claims.push(selectedName.toString());
+                const payload = {
+                    "id":tempMainData._id, "userId":currentUser.userId,"itemId":tempItem.itemId,"quantity":1
+                }
+                console.log("add user item payload: ")
+                console.log(payload);
+                axios.post("https://localhost:7196/HandleReceipt/AddUserItem", payload).then(res => {
+                    console.log('-- ReceiptBreakdown.js|109 >> res', res);
+                    
+                    
+                    if (res.status == "200") {
+                        const id = res?.data?.receipt?._id;
+                        console.log("add user item success");
+                        console.log(res.data.receipt);
+                        
+                    }
+                }).catch((err) => {
+                    console.log('-- ERR', err);
+                    
+                })
             }
 
             // Use item ID to grab that item from the array since they're just id's in chronological order
@@ -57,9 +85,42 @@ const ReceiptBreakdown = (props) => {
                 tempData[tempItem.id] = tempItem;
 
             // Get a temp data to modify it with the new additions.
-            const tempMainData = { ...itemData};
+            //const tempMainData = { ...itemData};
             tempMainData.items = tempData;
             setItemData(tempMainData);
+
+            console.log("in selectItem");
+
+            // {
+            //     "id":"66cb60abdb69f7b5c245ae64",
+            //     "userId":"v0QLohJH",
+            //     "itemId":"1",
+            //     "quantity": 1
+            // }
+            // const url = "https://localhost:7196/HandleReceipt/CreateReceipt";
+        
+            // setShareLoading(true);
+            // const payload = {
+            //     "receipt": data,
+            //     "id": data.receiptId
+            // }
+            // console.log("payload: " );
+            // console.log(payload);
+            // axios.post(url, payload).then(res => {
+            //     console.log('-- ReceiptBreakdown.js|109 >> res', res);
+            //     setShareLoading(false);
+            //     setShowShare(true);
+            //     if (res.status == "200") {
+            //         const id = res?.data?.receipt?._id;
+            //         setReceiptId(id);
+            //         navigate("/?receiptId=" + id);
+            //     }
+            // }).catch((err) => {
+            //     console.log('-- ERR', err);
+            //     setShareLoading(false);
+            // })
+
+
             return;
         }
 
@@ -68,6 +129,17 @@ const ReceiptBreakdown = (props) => {
     }
 
     const receiptItems = () => {
+
+        const tempMainData = { ...itemData}
+        console.log("in receiptItems");
+        console.log("itemData:");
+        console.log(tempMainData)
+        let currentUser = tempMainData.users.find(user => user.name === selectedName);
+        console.log("selectedUser: " );
+        console.log(currentUser);
+        //setSelectedUser(currentUser);
+
+
         return itemData?.items?.map((item, index) => {
             return (
                 <div 
@@ -109,7 +181,11 @@ const ReceiptBreakdown = (props) => {
         })
     }
 
+    const shareReceipt = () => {
+        console.log("Share Receipt");
+    }
     const createReceipt = () => {
+        
         if (receiptId != "") {
             const id = getUrlId();
             setReceiptId(id);
@@ -118,11 +194,17 @@ const ReceiptBreakdown = (props) => {
             return
         };
 
-        const url = "https://receiptparserservices20230928182301.azurewebsites.net/api/CreateReceipt?name=Functions";
+        //const url = "https://receiptparserservices20230928182301.azurewebsites.net/api/CreateReceipt?name=Functions";
+        
+        const url = "https://localhost:7196/HandleReceipt/CreateReceipt";
+        
         setShareLoading(true);
         const payload = {
-            "receipt": data
+            "receipt": data,
+            "id": data.receiptId
         }
+        console.log("payload: " );
+        console.log(payload);
         axios.post(url, payload).then(res => {
             console.log('-- ReceiptBreakdown.js|109 >> res', res);
             setShareLoading(false);
@@ -178,7 +260,7 @@ const ReceiptBreakdown = (props) => {
             </Col>
             <div className='bottom-row'>
                 {/* Only show this button if no ID exists in the url */}
-                <Button id='share-button' className='bottom-button' variant="primary" onClick={() => createReceipt()}>
+                <Button id='share-button' className='bottom-button' variant="primary" onClick={() => shareReceipt()}>
                     { shareLoading ? 
                         <Spinner />
                     :

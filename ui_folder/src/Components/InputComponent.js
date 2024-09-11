@@ -24,22 +24,48 @@ const InputComponent = () => {
         }
         setIsLoading(true);
         
+        console.log("participants: " + participants);
         // Must pass the array while preserving quotes
-        const names = "['" + participants.join("','") + "']";
+        //og: 
+        //const names = "['" + participants.join("','") + "']";
+        //const names = "['" + participants.join(",") + "']";
         
         var formData = new FormData();
         formData.append('file', receiptImg);
-        formData.append('users', names);
+        participants.forEach(p => {
+            formData.append('users', p);
+        })
+        //formData.append('users', names);
 
-        const url = 'https://receiptparserservices20230928182301.azurewebsites.net/api/ParseReceipt?name=Functions';
-
+        //const url = 'https://receiptparserservices20230928182301.azurewebsites.net/api/ParseReceipt?name=Functions';
+        const url = 'https://localhost:7196/ParseReceipt/ParseReceipt';
+        
         axios.post(url, formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
         }).then((res) => {
             console.log("-- RES: ", res);
-            setReceiptData(res?.data?.receipt);
+            const payload = {
+                "receipt": res.data.receipt,
+                "id": res.data.receipt.receiptId
+            }
+      
+            axios.post("https://localhost:7196/HandleReceipt/CreateReceipt", payload).then(res => {
+                console.log('-- ReceiptBreakdown.js|109 >> res', res);
+                
+                if (res.status == "200") {
+                    const id = res?.data?.receipt?._id;
+                    console.log("both call success");
+                    console.log(res.data);
+                    setReceiptData(res?.data?.receipt);
+                    navigate("/?receiptId=" + id);
+                }
+            }).catch((err) => {
+                console.log('-- ERR', err);
+            })
+
+            
             setIsLoading(false);
         }).catch((err) => {
             console.log("-- ERR: ", err)

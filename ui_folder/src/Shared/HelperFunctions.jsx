@@ -1,5 +1,5 @@
 export function getClaimedTotal(items) {
-    if (!items.length) return;
+    if (!items.length) return 0;
 
     let claimedTotal = 0.0;
     for (const item of items) {
@@ -8,6 +8,7 @@ export function getClaimedTotal(items) {
             claimedTotal += item.price;
         }
     }
+    console.log("returning claimedTotal: " + claimedTotal)
     return claimedTotal;
 }
 
