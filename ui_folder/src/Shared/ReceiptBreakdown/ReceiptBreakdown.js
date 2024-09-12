@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
  */
 const ReceiptBreakdown = (props) => {
     const data = props.data;
-    const claimedTotal = getClaimedTotal(data.items);
+    const claimedTotal = getClaimedTotal(data.items, data.tip, data.tax);
     const selectedRef = useRef();
 
     const navigate = useNavigate();
@@ -39,6 +39,46 @@ const ReceiptBreakdown = (props) => {
         setItemData(tempMainData);
     }
 
+    const addUserClaimToItem = (_id, userId, itemId) => {
+        const payload = {
+            "id":_id, "userId":userId,"itemId":itemId,"quantity":1
+        }
+        console.log("add user item payload: ")
+        console.log(payload);
+        axios.post("https://localhost:7196/HandleReceipt/AddUserItem", payload).then(res => {
+            console.log('-- ReceiptBreakdown.js|109 >> res', res);
+            
+            
+            if (res.status == "200") {
+                const id = res?.data?.receipt?._id;
+                console.log("add user item success");
+                console.log(res.data.receipt);
+                
+            }
+        }).catch((err) => {
+            console.log('-- ERR', err);
+            
+        })
+    }
+
+    const removeUserClaimFromItem = (_id, userId, itemId) => {
+        const payload = {
+            "id":_id, "userId":userId,"itemId":itemId
+        }
+        console.log("add user item payload: ")
+        console.log(payload);
+        axios.post("https://localhost:7196/HandleReceipt/RemoveUserItem", payload).then(res => {
+            console.log('-- ReceiptBreakdown.js|109 >> res', res);
+            if (res.status == "200") {
+                const id = res?.data?.receipt?._id;
+                console.log("remove user item success");
+                console.log(res.data.receipt);
+            }
+        }).catch((err) => {
+            console.log('-- ERR', err);
+            
+        })
+    }
     
     const selectItem = (index, item) => {
         // item is selected with a name selection.
@@ -55,28 +95,15 @@ const ReceiptBreakdown = (props) => {
             var tempIndex = item.claims.indexOf(selectedName);
             if (tempIndex > -1) {
                 tempItem.claims.splice(tempIndex, 1); // 2nd parameter means remove one item only
-               
+                removeUserClaimFromItem(tempMainData._id, currentUser.userId, tempItem.itemId)
+
             } else {
                 tempItem.claims.push(selectedName.toString());
                 const payload = {
                     "id":tempMainData._id, "userId":currentUser.userId,"itemId":tempItem.itemId,"quantity":1
                 }
-                console.log("add user item payload: ")
-                console.log(payload);
-                axios.post("https://localhost:7196/HandleReceipt/AddUserItem", payload).then(res => {
-                    console.log('-- ReceiptBreakdown.js|109 >> res', res);
-                    
-                    
-                    if (res.status == "200") {
-                        const id = res?.data?.receipt?._id;
-                        console.log("add user item success");
-                        console.log(res.data.receipt);
-                        
-                    }
-                }).catch((err) => {
-                    console.log('-- ERR', err);
-                    
-                })
+                addUserClaimToItem(tempMainData._id, currentUser.userId, tempItem.itemId)
+
             }
 
             // Use item ID to grab that item from the array since they're just id's in chronological order
@@ -88,38 +115,6 @@ const ReceiptBreakdown = (props) => {
             //const tempMainData = { ...itemData};
             tempMainData.items = tempData;
             setItemData(tempMainData);
-
-            console.log("in selectItem");
-
-            // {
-            //     "id":"66cb60abdb69f7b5c245ae64",
-            //     "userId":"v0QLohJH",
-            //     "itemId":"1",
-            //     "quantity": 1
-            // }
-            // const url = "https://localhost:7196/HandleReceipt/CreateReceipt";
-        
-            // setShareLoading(true);
-            // const payload = {
-            //     "receipt": data,
-            //     "id": data.receiptId
-            // }
-            // console.log("payload: " );
-            // console.log(payload);
-            // axios.post(url, payload).then(res => {
-            //     console.log('-- ReceiptBreakdown.js|109 >> res', res);
-            //     setShareLoading(false);
-            //     setShowShare(true);
-            //     if (res.status == "200") {
-            //         const id = res?.data?.receipt?._id;
-            //         setReceiptId(id);
-            //         navigate("/?receiptId=" + id);
-            //     }
-            // }).catch((err) => {
-            //     console.log('-- ERR', err);
-            //     setShareLoading(false);
-            // })
-
 
             return;
         }

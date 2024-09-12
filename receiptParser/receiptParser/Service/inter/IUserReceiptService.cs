@@ -18,6 +18,7 @@ namespace receiptParser.Service.inter
 
         Task<ReceiptDto> AddUserConnectionId(string receiptId, string userConnectionId, string userId);
 
+        Task<ReceiptDto> RemoveUserClaim(string id, string userId, int itemId);
         Task<ReceiptDto> UpdateUsers(ReceiptDto receiptDto);
 
     }

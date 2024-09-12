@@ -27,6 +27,8 @@ namespace receiptParser.Repository.model
         
         public double tip { get; set; }
 
+        public double tax { get; set; }
+
         public string merchantName { get; set; }
 
         public DateTimeOffset transactionDate { get; set; }

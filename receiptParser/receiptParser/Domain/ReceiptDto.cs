@@ -21,6 +21,8 @@ namespace receiptParser.Domain
 
         public double tip { get; set; }
 
+        public double tax { get; set; }
+
         public List<UserDto> users { get; set; }
 
         public DateTimeOffset transactionDate { get; set; }

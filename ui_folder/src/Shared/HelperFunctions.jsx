@@ -1,4 +1,4 @@
-export function getClaimedTotal(items) {
+export function getClaimedTotal(items, tip, tax) {
     if (!items.length) return 0;
 
     let claimedTotal = 0.0;
@@ -9,7 +9,7 @@ export function getClaimedTotal(items) {
         }
     }
     console.log("returning claimedTotal: " + claimedTotal)
-    return claimedTotal;
+    return claimedTotal + tip + tax;
 }
 
 // Gotta make a dictionary where the key is the user, have the value be a dictionary of values

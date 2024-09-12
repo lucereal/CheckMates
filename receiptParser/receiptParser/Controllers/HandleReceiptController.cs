@@ -215,16 +215,43 @@ namespace receiptParser.Controllers
                 resultStatusCode = HttpStatusCode.InternalServerError;
             }
 
+            return receiptResponse;
+        }
 
-            //string responseString = JsonSerializer.Serialize(receiptResponse);
+        [HttpPost(Name = "RemoveUserItem")]
+        public async Task<ReceiptResponse> RemoveUserItem(AddUserItemRequest req)
+        {
+            _logger.LogInformation("C# HTTP trigger function processed a request.");
+            HttpStatusCode resultStatusCode = HttpStatusCode.OK;
+            ReceiptResponse receiptResponse = new ReceiptResponse();
+            receiptResponse.isSuccess = false;
+            try
+            {
+
+                AddUserItemRequest? model = req;
 
 
-            //HttpResponseData response = req.CreateResponse(resultStatusCode);
-            //response.Headers.Add("Content-Type", "application/json; charset=utf-8");
+                if (model != null)
+                {
+                    ReceiptDto resultReceiptDto = await _userReceiptService.RemoveUserClaim(model.id, model.userId, model.itemId);
+                    receiptResponse.isSuccess = true;
+                    receiptResponse.message = "User claim removed on receipt: " + model.id + " for user: " + model.userId + " for item: " + model.itemId;
 
-            //response.WriteString(responseString);
+                    receiptResponse.receipt = resultReceiptDto;
+                }
+                else
+                {
+                    receiptResponse.isSuccess = false;
+                    receiptResponse.message = "Could not parse request object";
+                    resultStatusCode = HttpStatusCode.BadRequest;
+                }
+            }
+            catch (Exception e)
+            {
+                receiptResponse.isSuccess = false;
+                resultStatusCode = HttpStatusCode.InternalServerError;
+            }
 
-            //return response;
             return receiptResponse;
         }
 

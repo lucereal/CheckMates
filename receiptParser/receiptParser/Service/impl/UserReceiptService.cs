@@ -1,4 +1,5 @@
 ﻿using Amazon.SecurityToken.SAML;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using receiptParser.Domain;
@@ -129,6 +130,34 @@ namespace receiptParser.Service.impl
 
         }
 
+        public async Task<ReceiptDto> RemoveUserClaim(string id, string userId, int itemId)
+        {
+            Receipt receipt = await _userReceiptRepository.FindByIdAsync(id);
+
+            if (receipt == null)
+            {
+                throw new HandleReceiptException("Could not find receipt while trying to update.", HandleReceiptFailureReason.CouldNotFindReceipt);
+            }
+
+            Item? item = receipt.items.Where(x => x.itemId == itemId).FirstOrDefault();
+
+            if (item == null) { throw new HandleReceiptException("Could not find item in receipt while trying to add claim.", HandleReceiptFailureReason.CouldNotFindUserOrItem); }
+
+            Claim? claim = item.claims.Where(x => x.userId == userId).FirstOrDefault();
+
+            if(claim != null)
+            {
+                item.claims.Remove(claim);
+            }
+            else
+            {
+                throw new HandleReceiptException("Could not remove claim from item because no claim was found for user.", HandleReceiptFailureReason.CouldNotFindUserOrItem);
+            }
+
+            await _userReceiptRepository.ReplaceOneAsync(receipt);
+            await UpdateUsers(receipt);
+            return ReceiptMapper.MapReceiptToReceiptDto(receipt);
+        }
         public async Task<ReceiptDto> AddUsersToReceipt(string id, List<string> users)
         {
             Receipt receipt = await _userReceiptRepository.FindByIdAsync(id);    
