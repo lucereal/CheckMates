@@ -6,7 +6,7 @@ import SummaryModal from '../Modals/SummaryModal';
 import ShareModal from '../Modals/ShareModal';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import * as signalR from '@microsoft/signalr'
 /** IF ITEM ID IN THE RESPONSE STAYS IN AN ORDER, THEN THAT WILL KEEP THINGS EASY
  *  SINCE I DO NOT HAVE TO ITERATE THROUGH THINGS.
  * 
@@ -29,6 +29,33 @@ const ReceiptBreakdown = (props) => {
     const [shareLoading, setShareLoading] = useState(false);
     const [receiptId, setReceiptId] = useState(getUrlId());
     
+
+    let connectionId = "";
+    let connection = new signalR.HubConnectionBuilder()
+        .withUrl("http://localhost:5197/chatHub")
+        //.withUrl("http://localhost:49965/chatHub")
+        .build();
+
+    connection.start().then(() => {
+        // Connection to the hub is established
+        console.log("connection established");
+        let user = "david";
+        //connection.invoke("AddUser", user, "message");
+
+        const tempMainData = { ...itemData}
+        let currentUser = tempMainData.users[0]
+        //connection.invoke("AddUserConnectionId", "66cb60abdb69f7b5c245ae64", "v0QLohJH");
+        console.log("addUserConnectionId with receiptId: " + receiptId + " and userId: " + currentUser.userId);
+        connection.invoke("AddUserConnectionId", receiptId, currentUser.userId);
+    });
+
+    connection.on("GroupReceiptUpdate", (receiptDto) => {
+        console.log("receipt updated: " );
+        console.log(receiptDto);
+        connection.invoke("GroupUpdateReceived", receiptDto._id, connection.connectionId)
+    
+    })
+
     const resetClaims = () => {
         const tempMainData = { ...itemData}
 
