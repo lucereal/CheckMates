@@ -13,6 +13,7 @@ namespace receiptParser.Domain
         {
             items = new List<ItemDto>();
             users = new List<UserDto>();
+            connectionIds = new List<string>();
         }
         public string receiptId { get; set; }
         public List<ItemDto> items { get; set; }
@@ -29,6 +30,8 @@ namespace receiptParser.Domain
         public string merchantName { get; set; }
 
         public string _id {  get; set; }
+
+        public List<string> connectionIds { get; set; }
         
 
 

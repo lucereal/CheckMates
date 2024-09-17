@@ -51,7 +51,7 @@ connection.start().then(() => {
     let user = "david";
     //connection.invoke("AddUser", user, "message");
     
-    connection.invoke("AddUserConnectionId", "66e9fd57b518a54323a8c2bb", "w5cPVQht");
+    connection.invoke("AddUserConnectionId", "66ea07c6276ef2f999a791ad");
 
 });
 

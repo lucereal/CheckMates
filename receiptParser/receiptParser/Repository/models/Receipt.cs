@@ -18,6 +18,7 @@ namespace receiptParser.Repository.model
         {
             items = new List<Item>();
             users = new List<User>();
+            connectionIds = new List<string>();
         }
 
         
@@ -36,6 +37,8 @@ namespace receiptParser.Repository.model
         public List<User> users { get; set; }     
 
         public List<Item> items { get; set; }
+
+        public List<string> connectionIds { get; set; }
 
        
         

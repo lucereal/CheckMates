@@ -91,18 +91,20 @@ namespace receiptParser.Hubs
 
         }
 
-        public async Task AddUserConnectionId(string receiptId, string userId)
+        public async Task AddUserConnectionId(string receiptId)
         {
             //if (!_connections.GetConnections(user).Contains(Context.ConnectionId))
             //{
             //_connections.Add(user, Context.ConnectionId);
             //add user connection id to receipt user list so they can receive updates
             //need receipt id and user id and user connection id
-            await _userReceiptService.AddUserConnectionId(receiptId, Context.ConnectionId, userId);
+            await _userReceiptService.AddConnectionId(receiptId, Context.ConnectionId);
 
             //}
             //await Clients.All.SendAsync("UserAdded", user, message);
         }
+
+
 
         //public Task JoinRoom(string roomName)
         //{
