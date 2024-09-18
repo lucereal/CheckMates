@@ -30,7 +30,7 @@ const ReceiptBreakdown = (props) => {
     const [shareLoading, setShareLoading] = useState(false);
     const [receiptId, setReceiptId] = useState(getUrlId());
     const [connectionId, setConnectionId] = useState("");
-
+    const [users, setUsers] = useState(data.users);
 
 
     useEffect(() => {
@@ -55,6 +55,7 @@ const ReceiptBreakdown = (props) => {
             console.log("receipt update received: " );
             console.log(receiptDto);
             setData(receiptDto);
+            ///setItemData(receiptDto);
             connection.invoke("GroupUpdateReceived", receiptDto._id, connection.connectionId)
         
         })
@@ -249,7 +250,7 @@ const ReceiptBreakdown = (props) => {
         })
     }
 
-    
+
     return(
         <>
             <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
@@ -267,6 +268,7 @@ const ReceiptBreakdown = (props) => {
                 total={data.total}
                 claimedTotal={claimedTotal}
                 data={data}
+                
             />
             <ShareModal 
                 show={showShare}

@@ -4,13 +4,15 @@ import { summarize } from '../HelperFunctions';
 
 const SummaryModal = (props) => {
     const {show, setShow, total, claimedTotal, data} = props;
+    
     const items = data.items;
-    const users = data.users;
+    //const users = data.users;
+const users = data.users;
 
-    const getClaimedItemData = (summary, currentUser) => {
-        return summary[currentUser]?.claimedItems?.map((item, index) => {
+    const getClaimedItemData = (summary, currentUserId) => {
+        return summary[currentUserId]?.claimedItems?.map((item, index) => {
             return (
-                <div key={index} id={currentUser + '-item-' + index} className='item-row'>
+                <div key={index} id={currentUserId + '-item-' + index} className='item-row'>
                     <i>{item.name}</i>
                     { item.split === 1 ? 
                     <i>${item.price.toFixed(2)}</i> : 
@@ -22,7 +24,9 @@ const SummaryModal = (props) => {
     }
 
     const getUserRowSummary = () => {
+        console.log("users in getUserRowSummary: " + users)
         const summary = summarize(users, items, data.tip);
+        console.log("in getUserRowSummary after summarize");
         return data?.users?.map((user, index) => {
             return (
                 <div key={index} id='summary-row'>
@@ -31,17 +35,17 @@ const SummaryModal = (props) => {
                             {user.name}
                         </b>
                         <b>
-                            ${summary[user.name].claimedTotal}
+                            ${summary[user.userId].claimedTotal}
                         </b>
                     </div>
                     <div id='claimed-summary-container'>
-                        { getClaimedItemData(summary, user.name) }
+                        { getClaimedItemData(summary, user.userId) }
                         <div id='tip-row'>
                             <i>
                                 Tip (split evenly)
                             </i>
                             <i>
-                                ${summary[user.name].sharedTip}
+                                ${summary[user.userId].sharedTip}
                             </i>
                         </div>
                     </div>
