@@ -21,7 +21,8 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
 @import './App.scss';
-@import './Components/InputComponents.scss';
+@import './Components/MainContainer.scss';
 @import 'bootstrap/dist/css/bootstrap.min.css';
 @import './Shared/SharedComponents.scss';

@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export function getClaimedTotal(items) {
     if (!items.length) return;
 
@@ -67,6 +69,33 @@ export const getUrlId = () => {
     let id = window.location.search;
     if (id.indexOf('=') !== -1) {
         return id.split('=')[1];
+    }
+
+    return "";
+}
+
+export const addItemForUser = (receipt, item, name, users) => {
+    const url = "https://receiptparserservices20230928182301.azurewebsites.net/api/UpdateUserItem?name=Functions";
+    const payload = {
+        id: receipt,
+        userId: getUserIdByName(name, users),
+        itemId: item.itemId,
+        quantity: 1
+    }
+
+    axios.post(url, payload).then(res => {
+        return res;
+    }).catch(e => {
+        return false;
+    })
+}
+
+function getUserIdByName(name, data) {
+    // data is an array of user data objects
+    for (let user of data) {
+        if (user.name === name) {
+            return user.userId;
+        }
     }
 
     return "";

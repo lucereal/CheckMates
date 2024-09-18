@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Button, Col, Container, Navbar, Spinner } from 'react-bootstrap';
 import NameToggles from '../NameThings/NameToggles';
-import { getClaimedTotal, getUrlId } from '../HelperFunctions';
+import { addItemForUser, getClaimedTotal, getUrlId } from '../HelperFunctions';
 import SummaryModal from '../Modals/SummaryModal';
 import ShareModal from '../Modals/ShareModal';
 import axios from 'axios';
@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
  */
 const ReceiptBreakdown = (props) => {
     const data = props.data;
+    console.log('-- ReceiptBreakdown.js|17 >> data', data);
     const claimedTotal = getClaimedTotal(data.items);
     const selectedRef = useRef();
 
@@ -42,6 +43,8 @@ const ReceiptBreakdown = (props) => {
         if (selectedRef.current === index && selectedName !== "") {
             const tempItem = { ...item };
             const tempData = [ ...itemData.items ];
+
+            addItemForUser(receiptId, item, selectedName, data.users);
 
             // If the user has already claimed this item, then remove it instead of pushing.
             var tempIndex = item.claims.indexOf(selectedName);
@@ -110,7 +113,7 @@ const ReceiptBreakdown = (props) => {
     }
 
     const createReceipt = () => {
-        if (receiptId != "") {
+        if (receiptId !== "") {
             const id = getUrlId();
             setReceiptId(id);
             setShowShare(true);
@@ -127,7 +130,7 @@ const ReceiptBreakdown = (props) => {
             console.log('-- ReceiptBreakdown.js|109 >> res', res);
             setShareLoading(false);
             setShowShare(true);
-            if (res.status == "200") {
+            if (res.status === "200") {
                 const id = res?.data?.receipt?._id;
                 setReceiptId(id);
                 navigate("/?receiptId=" + id);
@@ -138,7 +141,7 @@ const ReceiptBreakdown = (props) => {
         })
     }
 
-    return(
+    return (
         <>
             <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
                 <Container>

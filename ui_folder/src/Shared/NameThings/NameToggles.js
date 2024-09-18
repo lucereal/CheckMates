@@ -4,7 +4,6 @@ const NameToggles = (props) => {
     const {selected, setSelected, names } = props;
     
     const toggleMe = (name) => {
-        console.log('-- NameToggles.js|8 >> name', name);
         setSelected(name);
     }
 

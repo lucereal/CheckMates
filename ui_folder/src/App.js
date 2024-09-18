@@ -1,4 +1,4 @@
-import InputComponent from './Components/InputComponent'
+import MainContainer from './Components/MainContainer'
 import {
     createBrowserRouter,
     RouterProvider,
@@ -7,12 +7,8 @@ import {
 const routes = createBrowserRouter([
     {
       path: "/",
-      element: <InputComponent />,
-    },
-    {
-        path: "/receipt",
-        element: <div><h1>NEW</h1></div>,
-    },
+      element: <MainContainer />,
+    }
   ]);
 
 function App() {
