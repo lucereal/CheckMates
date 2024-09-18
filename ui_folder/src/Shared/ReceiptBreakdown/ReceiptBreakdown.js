@@ -37,20 +37,13 @@ const ReceiptBreakdown = (props) => {
         .build();
 
     connection.start().then(() => {
-        // Connection to the hub is established
         console.log("connection established");
-        let user = "david";
-        //connection.invoke("AddUser", user, "message");
-
-        const tempMainData = { ...itemData}
-        let currentUser = tempMainData.users[0]
-        //connection.invoke("AddUserConnectionId", "66cb60abdb69f7b5c245ae64", "v0QLohJH");
-        console.log("addUserConnectionId with receiptId: " + receiptId + " and userId: " + currentUser.userId);
-        connection.invoke("AddUserConnectionId", receiptId, currentUser.userId);
+        console.log("addUserConnectionId with receiptId: " + receiptId + " and connectionId: " + connection.connectionId );
+        connection.invoke("AddUserConnectionId", receiptId);
     });
 
     connection.on("GroupReceiptUpdate", (receiptDto) => {
-        console.log("receipt updated: " );
+        console.log("receipt update received: " );
         console.log(receiptDto);
         connection.invoke("GroupUpdateReceived", receiptDto._id, connection.connectionId)
     

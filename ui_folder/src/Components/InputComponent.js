@@ -17,7 +17,7 @@ const InputComponent = () => {
     const navigate = useNavigate(); 
 
     const sendReceipt = () => {
-        navigate("/")
+        //navigate("/")
         if (receiptImg === null || receiptImg === undefined) {
             console.log("-- no image selected"); // TODO SHOW VISUAL ERROR OR DISABLE IT
             return;
@@ -58,6 +58,7 @@ const InputComponent = () => {
                     const id = res?.data?.receipt?._id;
                     console.log("both call success");
                     console.log(res.data);
+                    console.log("setting receipt data");
                     setReceiptData(res?.data?.receipt);
                     navigate("/?receiptId=" + id);
                 }
@@ -74,6 +75,7 @@ const InputComponent = () => {
     }
 
     if (receiptData !== null && receiptData !== undefined) {
+        console.log("creating receipt breakdown");
         return (
             <div id="receipt-breakdown-container">
                 <ReceiptBreakdown data={receiptData} />
