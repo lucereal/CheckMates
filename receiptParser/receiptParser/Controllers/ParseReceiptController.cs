@@ -186,16 +186,13 @@ namespace receiptParser.Controllers
                     items[i].itemId = i;
                 }
                 List<UserDto> userDtos = ReceiptMapper.MapUserNamesToUserDtos(users);
-                Guid receiptId = Guid.NewGuid();
                 ReceiptDto receiptDto = new ReceiptDto();
                 receiptDto.items = items;
                 receiptDto.total = total;
                 receiptDto.tip = tip;
                 receiptDto.tax = tax;
-                receiptDto._id = receiptId.ToString();
                 receiptDto.merchantName = merchantName;
                 receiptDto.users = userDtos;
-                receiptDto.receiptId = receiptId.ToString();
                 if (transactionDate != null)
                 {
                     receiptDto.transactionDate = transactionDate.Value;

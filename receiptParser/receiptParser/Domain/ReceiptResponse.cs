@@ -13,9 +13,11 @@ namespace receiptParser.Domain
         public bool isSuccess { get; set; }
 
         public string message { get; set; }
-        public ReceiptDto receipt { get; set; }
 
         public HandleReceiptFailureReason? failureReason { get; set; }
+        public ReceiptDto receipt { get; set; }
+
+        
 
 
     }

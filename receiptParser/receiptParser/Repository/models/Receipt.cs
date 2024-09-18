@@ -22,7 +22,7 @@ namespace receiptParser.Repository.model
         }
 
         
-        public string receiptId { get; set; }
+        //public string receiptId { get; set; }
       
         public double total { get; set; }
         

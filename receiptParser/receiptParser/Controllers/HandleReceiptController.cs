@@ -39,7 +39,6 @@ namespace receiptParser.Controllers
 
                 if (model != null)
                 {
-                    Guid receiptId = Guid.NewGuid();
                     ReceiptDto receiptDto = new ReceiptDto();
                     receiptDto = model.receipt;
 
@@ -47,7 +46,6 @@ namespace receiptParser.Controllers
 
                     receiptResponse.isSuccess = true;
                     receiptResponse.message = "Receipt created.";
-
                     receiptResponse.receipt = resultReceiptDto;
                 }
                 else
@@ -73,15 +71,6 @@ namespace receiptParser.Controllers
             }
 
 
-            //string responseString = JsonSerializer.Serialize(receiptResponse);
-
-
-            //HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
-            //response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-
-            //response.WriteString(responseString);
-
-            //return response;
             return receiptResponse;
         }
 
@@ -103,7 +92,7 @@ namespace receiptParser.Controllers
                 {
                     ReceiptDto receiptDto = await _userReceiptService.GetReceipt(id);
                     receiptResponse.isSuccess = true;
-                    receiptResponse.message = "Receipt created.";
+                    receiptResponse.message = "Receipt fetched.";
                     receiptResponse.receipt = receiptDto;
                 }
                 else
@@ -143,9 +132,7 @@ namespace receiptParser.Controllers
             try
             {
 
-
-
-                AddUserRequest? model = req;// await req.ReadFromJsonAsync<AddUserRequest>();
+                AddUserRequest? model = req;
 
                 if (model != null)
                 {
@@ -169,15 +156,6 @@ namespace receiptParser.Controllers
             }
 
 
-            //string responseString = JsonSerializer.Serialize(receiptResponse);
-
-
-            //HttpResponseData response = req.CreateResponse(resultStatusCode);
-            //response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-
-            //response.WriteString(responseString);
-
-            //return response;
             return receiptResponse;
         }
 
@@ -296,15 +274,6 @@ namespace receiptParser.Controllers
             }
 
 
-            //string responseString = JsonSerializer.Serialize(receiptResponse);
-
-
-            //HttpResponseData response = req.CreateResponse(resultStatusCode);
-            //response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-
-            //response.WriteString(responseString);
-
-            //return response;
             return receiptResponse;
         }
 

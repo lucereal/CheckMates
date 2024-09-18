@@ -17,7 +17,6 @@ namespace receiptParser.Repository.mappers
             ReceiptDto receiptDto = new ReceiptDto();
             if (receipt !=  null)
             {
-                receiptDto.receiptId = receipt.receiptId;
                 receiptDto._id = receipt._id.ToString();
                 receiptDto.total = receipt.total;
                 receiptDto.tip = receipt.tip;
@@ -60,11 +59,10 @@ namespace receiptParser.Repository.mappers
             {
                 receipt.tip = receiptDto.tip;
                 receipt.total = receiptDto.total;
-                receipt.receiptId = receiptDto.receiptId;
                 receipt.tax = receiptDto.tax;
-                //receipt.Id = receiptDto._id != null ? ObjectId.Parse(receiptDto._id) : ObjectId.Empty;
+                receipt._id = receiptDto._id != null ? ObjectId.Parse(receiptDto._id) : ObjectId.Empty;
                 receipt.connectionIds = receiptDto.connectionIds;
-
+                
                 receiptDto.users.ForEach(x =>
                 {
                     User user = new User();

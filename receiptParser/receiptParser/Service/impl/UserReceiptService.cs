@@ -242,6 +242,11 @@ namespace receiptParser.Service.impl
 
         public async Task<ReceiptDto> UpdateUsers(ReceiptDto receiptDto)
         {
+            if(receiptDto._id == null)
+            {
+                throw new HandleReceiptException("Could not find receipt because receipt._id is null.", HandleReceiptFailureReason.CouldNotFindReceipt);
+
+            }
             Receipt receipt = await _userReceiptRepository.FindByIdAsync(receiptDto._id);
 
             if (receipt == null)

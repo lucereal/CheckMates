@@ -47,8 +47,7 @@ const InputComponent = () => {
         }).then((res) => {
             console.log("-- RES: ", res);
             const payload = {
-                "receipt": res.data.receipt,
-                "id": res.data.receipt.receiptId
+                "receipt": res.data.receipt
             }
       
             axios.post("https://localhost:7196/HandleReceipt/CreateReceipt", payload).then(res => {
