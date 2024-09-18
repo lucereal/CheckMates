@@ -73,11 +73,13 @@ const InputComponent = () => {
         })
     }
 
+
     if (receiptData !== null && receiptData !== undefined) {
+        console.log("receiptData: " + receiptData)
         console.log("creating receipt breakdown");
         return (
             <div id="receipt-breakdown-container">
-                <ReceiptBreakdown data={receiptData} />
+                <ReceiptBreakdown data={receiptData} setData={setReceiptData} />
             </div>
         )
     } else {

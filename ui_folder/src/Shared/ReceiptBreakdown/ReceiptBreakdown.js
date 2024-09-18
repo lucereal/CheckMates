@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button, Col, Container, Navbar, Spinner } from 'react-bootstrap';
 import NameToggles from '../NameThings/NameToggles';
 import { getClaimedTotal, getUrlId } from '../HelperFunctions';
@@ -15,6 +15,7 @@ import * as signalR from '@microsoft/signalr'
  */
 const ReceiptBreakdown = (props) => {
     const data = props.data;
+    const setData = props.setData;
     const claimedTotal = getClaimedTotal(data.items, data.tip, data.tax);
     const selectedRef = useRef();
 
@@ -28,26 +29,38 @@ const ReceiptBreakdown = (props) => {
     const [showShare, setShowShare] = useState(false); // Share modal
     const [shareLoading, setShareLoading] = useState(false);
     const [receiptId, setReceiptId] = useState(getUrlId());
-    
+    const [connectionId, setConnectionId] = useState("");
 
-    let connectionId = "";
-    let connection = new signalR.HubConnectionBuilder()
+
+
+    useEffect(() => {
+        //everytime there is a change
+    })
+
+    useEffect(() => {
+        let connection = new signalR.HubConnectionBuilder()
         .withUrl("https://receiptparserdevelop001.azurewebsites.net/chatHub")
         //.withUrl("http://localhost:49965/chatHub")
         .build();
 
-    connection.start().then(() => {
-        console.log("connection established");
-        console.log("addUserConnectionId with receiptId: " + receiptId + " and connectionId: " + connection.connectionId );
-        connection.invoke("AddUserConnectionId", receiptId);
-    });
+        setConnectionId(connection.connectionId);
+        
+        connection.start().then(() => {
+            console.log("connection established");
+            console.log("addUserConnectionId with receiptId: " + receiptId + " and connectionId: " + connection.connectionId );
+            connection.invoke("AddUserConnectionId", receiptId);
+        });
 
-    connection.on("GroupReceiptUpdate", (receiptDto) => {
-        console.log("receipt update received: " );
-        console.log(receiptDto);
-        connection.invoke("GroupUpdateReceived", receiptDto._id, connection.connectionId)
-    
-    })
+        connection.on("GroupReceiptUpdate", (receiptDto) => {
+            console.log("receipt update received: " );
+            console.log(receiptDto);
+            setData(receiptDto);
+            connection.invoke("GroupUpdateReceived", receiptDto._id, connection.connectionId)
+        
+        })
+
+    }, [])
+
 
     const resetClaims = () => {
         const tempMainData = { ...itemData}
@@ -236,6 +249,7 @@ const ReceiptBreakdown = (props) => {
         })
     }
 
+    
     return(
         <>
             <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
