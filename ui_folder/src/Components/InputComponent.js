@@ -38,7 +38,7 @@ const InputComponent = () => {
         //formData.append('users', names);
 
         //const url = 'https://receiptparserservices20230928182301.azurewebsites.net/api/ParseReceipt?name=Functions';
-        const url = 'https://localhost:7196/ParseReceipt/ParseReceipt';
+        const url = 'https://receiptparserdevelop001.azurewebsites.net/ParseReceipt/ParseReceipt';
         
         axios.post(url, formData, {
             headers: {
@@ -50,7 +50,7 @@ const InputComponent = () => {
                 "receipt": res.data.receipt
             }
       
-            axios.post("https://localhost:7196/HandleReceipt/CreateReceipt", payload).then(res => {
+            axios.post("https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/CreateReceipt", payload).then(res => {
                 console.log('-- ReceiptBreakdown.js|109 >> res', res);
                 
                 if (res.status == "200") {

@@ -2,7 +2,7 @@ const signalR = require("@microsoft/signalr");
 
 let connectionId = "";
 let connection = new signalR.HubConnectionBuilder()
-    .withUrl("http://localhost:5197/chatHub")
+    .withUrl("https://receiptparserdevelop001.azurewebsites.net/chatHub")
     //.withUrl("http://localhost:49965/chatHub")
     .build();
 
@@ -51,7 +51,7 @@ connection.start().then(() => {
     let user = "david";
     //connection.invoke("AddUser", user, "message");
     
-    connection.invoke("AddUserConnectionId", "66ea07c6276ef2f999a791ad");
+    connection.invoke("AddUserConnectionId", "66eb2451a831dca3757f4618");
 
 });
 

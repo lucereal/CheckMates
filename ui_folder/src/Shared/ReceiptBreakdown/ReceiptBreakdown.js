@@ -32,7 +32,7 @@ const ReceiptBreakdown = (props) => {
 
     let connectionId = "";
     let connection = new signalR.HubConnectionBuilder()
-        .withUrl("http://localhost:5197/chatHub")
+        .withUrl("https://receiptparserdevelop001.azurewebsites.net/chatHub")
         //.withUrl("http://localhost:49965/chatHub")
         .build();
 
@@ -65,7 +65,8 @@ const ReceiptBreakdown = (props) => {
         }
         console.log("add user item payload: ")
         console.log(payload);
-        axios.post("https://localhost:7196/HandleReceipt/AddUserItem", payload).then(res => {
+        //axios.post("https://localhost:7196/HandleReceipt/AddUserItem", payload).then(res => {
+        axios.post("https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/AddUserItem", payload).then(res => {
             console.log('-- ReceiptBreakdown.js|109 >> res', res);
             
             
@@ -87,7 +88,7 @@ const ReceiptBreakdown = (props) => {
         }
         console.log("add user item payload: ")
         console.log(payload);
-        axios.post("https://localhost:7196/HandleReceipt/RemoveUserItem", payload).then(res => {
+        axios.post("https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/RemoveUserItem", payload).then(res => {
             console.log('-- ReceiptBreakdown.js|109 >> res', res);
             if (res.status == "200") {
                 const id = res?.data?.receipt?._id;
