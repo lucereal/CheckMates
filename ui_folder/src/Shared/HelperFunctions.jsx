@@ -1,5 +1,5 @@
-export function getClaimedTotal(items) {
-    if (!items.length) return;
+export function getClaimedTotal(items, tip, tax) {
+    if (!items.length) return 0;
 
     let claimedTotal = 0.0;
     for (const item of items) {
@@ -8,7 +8,7 @@ export function getClaimedTotal(items) {
             claimedTotal += item.price;
         }
     }
-    return claimedTotal;
+    return claimedTotal + tip + tax;
 }
 
 // Gotta make a dictionary where the key is the user, have the value be a dictionary of values
@@ -22,9 +22,10 @@ export function summarize(users, items, tip) {
     if (tip) {
         dividedTip = parseFloat((tip / users.length).toFixed(2));
     }
+
     // Set the initial values for each user, and set tip while we are iterating.
     for (let user of users) {
-        summaryDict[user.name] = {
+        summaryDict[user.userId] = {
             claimedTotal: 0.0,
             sharedTip: dividedTip,
             claimedItems: []
@@ -33,17 +34,18 @@ export function summarize(users, items, tip) {
 
     for (let item of items) {
         const claimedNumber = item.claims.length;
-        if (!claimedNumber) continue; // not claimed by anybody? move on.
-        
+        //if (!claimedNumber) continue; // not claimed by anybody? move on.
+        if(claimedNumber <= 0){
+            continue;
+        }
         // First check the users
-        for (let user of item.claims) {
-            console.log('-- HelperFunctions.jsx|43 >> summaryDict[user]', summaryDict[user]);
+        for (let claim of item.claims) {
             // Add prices.
             const price = parseFloat((item.price / claimedNumber));
-            summaryDict[user].claimedTotal += ((price * 100) / 100);
+            summaryDict[claim.userId].claimedTotal += ((price * 100) / 100);
 
             // Now populate the items obj.
-            summaryDict[user].claimedItems.push({
+            summaryDict[claim.userId].claimedItems.push({
                 name: item.description,
                 price: price,
                 split: claimedNumber // Number of people split with. 1 means not split.

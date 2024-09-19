@@ -39,7 +39,6 @@ namespace receiptParser.Controllers
 
                 if (model != null)
                 {
-                    Guid receiptId = Guid.NewGuid();
                     ReceiptDto receiptDto = new ReceiptDto();
                     receiptDto = model.receipt;
 
@@ -47,7 +46,6 @@ namespace receiptParser.Controllers
 
                     receiptResponse.isSuccess = true;
                     receiptResponse.message = "Receipt created.";
-
                     receiptResponse.receipt = resultReceiptDto;
                 }
                 else
@@ -73,15 +71,6 @@ namespace receiptParser.Controllers
             }
 
 
-            //string responseString = JsonSerializer.Serialize(receiptResponse);
-
-
-            //HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
-            //response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-
-            //response.WriteString(responseString);
-
-            //return response;
             return receiptResponse;
         }
 
@@ -103,7 +92,7 @@ namespace receiptParser.Controllers
                 {
                     ReceiptDto receiptDto = await _userReceiptService.GetReceipt(id);
                     receiptResponse.isSuccess = true;
-                    receiptResponse.message = "Receipt created.";
+                    receiptResponse.message = "Receipt fetched.";
                     receiptResponse.receipt = receiptDto;
                 }
                 else
@@ -143,9 +132,7 @@ namespace receiptParser.Controllers
             try
             {
 
-
-
-                AddUserRequest? model = req;// await req.ReadFromJsonAsync<AddUserRequest>();
+                AddUserRequest? model = req;
 
                 if (model != null)
                 {
@@ -169,15 +156,6 @@ namespace receiptParser.Controllers
             }
 
 
-            //string responseString = JsonSerializer.Serialize(receiptResponse);
-
-
-            //HttpResponseData response = req.CreateResponse(resultStatusCode);
-            //response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-
-            //response.WriteString(responseString);
-
-            //return response;
             return receiptResponse;
         }
 
@@ -215,16 +193,43 @@ namespace receiptParser.Controllers
                 resultStatusCode = HttpStatusCode.InternalServerError;
             }
 
+            return receiptResponse;
+        }
 
-            //string responseString = JsonSerializer.Serialize(receiptResponse);
+        [HttpPost(Name = "RemoveUserItem")]
+        public async Task<ReceiptResponse> RemoveUserItem(AddUserItemRequest req)
+        {
+            _logger.LogInformation("C# HTTP trigger function processed a request.");
+            HttpStatusCode resultStatusCode = HttpStatusCode.OK;
+            ReceiptResponse receiptResponse = new ReceiptResponse();
+            receiptResponse.isSuccess = false;
+            try
+            {
+
+                AddUserItemRequest? model = req;
 
 
-            //HttpResponseData response = req.CreateResponse(resultStatusCode);
-            //response.Headers.Add("Content-Type", "application/json; charset=utf-8");
+                if (model != null)
+                {
+                    ReceiptDto resultReceiptDto = await _userReceiptService.RemoveUserClaim(model.id, model.userId, model.itemId);
+                    receiptResponse.isSuccess = true;
+                    receiptResponse.message = "User claim removed on receipt: " + model.id + " for user: " + model.userId + " for item: " + model.itemId;
 
-            //response.WriteString(responseString);
+                    receiptResponse.receipt = resultReceiptDto;
+                }
+                else
+                {
+                    receiptResponse.isSuccess = false;
+                    receiptResponse.message = "Could not parse request object";
+                    resultStatusCode = HttpStatusCode.BadRequest;
+                }
+            }
+            catch (Exception e)
+            {
+                receiptResponse.isSuccess = false;
+                resultStatusCode = HttpStatusCode.InternalServerError;
+            }
 
-            //return response;
             return receiptResponse;
         }
 
@@ -269,15 +274,6 @@ namespace receiptParser.Controllers
             }
 
 
-            //string responseString = JsonSerializer.Serialize(receiptResponse);
-
-
-            //HttpResponseData response = req.CreateResponse(resultStatusCode);
-            //response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-
-            //response.WriteString(responseString);
-
-            //return response;
             return receiptResponse;
         }
 

@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 string connectionString = @"mongodb://receiptstorage:dlJPotZLpCSxRAkF97PRD48aUmtqyjTnVVhFuWU5pvviiyngNdAkScyqOc2DlBSsfm3AiQAy83KcACDbuNIecg==@receiptstorage.mongo.cosmos.azure.com:10255/?ssl=true&retrywrites=false&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@receiptstorage@";
 
 
+builder.Services.AddCors();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -35,9 +36,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors(builder =>
 {
-    builder.AllowAnyOrigin()
-           .AllowAnyMethod()
-           .AllowAnyHeader();
+    //builder.AllowAnyOrigin()
+    //       .AllowAnyMethod()
+    //       .AllowAnyHeader();
+    builder.AllowAnyMethod()
+       .AllowAnyHeader()
+       .AllowCredentials()
+       .WithOrigins("http://localhost:3000");
 });
 
 
