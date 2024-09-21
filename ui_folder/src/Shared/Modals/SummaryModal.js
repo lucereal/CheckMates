@@ -28,6 +28,7 @@ const users = data.users;
         const summary = summarize(users, items, data.tip);
         console.log("in getUserRowSummary after summarize");
         return data?.users?.map((user, index) => {
+     
             return (
                 <div key={index} id='summary-row'>
                     <div id={"user-row-" + index} className='summary-top-row'>

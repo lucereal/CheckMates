@@ -3,7 +3,7 @@ const signalR = require("@microsoft/signalr");
 let connectionId = "";
 let connection = new signalR.HubConnectionBuilder()
     .withUrl("https://receiptparserdevelop001.azurewebsites.net/chatHub")
-    //.withUrl("http://localhost:49965/chatHub")
+    //.withUrl("http://localhost:5197/chatHub")
     .build();
 
 connection.on("ReceiveMessage", (user, message) => {
@@ -48,10 +48,13 @@ connection.on("GroupUpdate", (message) => {
 connection.start().then(() => {
     // Connection to the hub is established
     console.log("connection established");
+    console.log("connection id: " + connection.connectionId);
     let user = "david";
     //connection.invoke("AddUser", user, "message");
     
-    connection.invoke("AddUserConnectionId", "66eb5a3cea7bdc104bc3d544");
+    connection.invoke("AddUserConnectionId", "66ee139195317a88e7778e8c");
+
+    
 
 });
 

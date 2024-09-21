@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson;
 using receiptParser.Domain;
-using receiptParser.Repository.model;
+using receiptParser.Repository.models;
 using shortid;
 using System;
 using System.Collections.Generic;
