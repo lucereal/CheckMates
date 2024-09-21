@@ -15,6 +15,9 @@ export function getClaimedTotal(items, tip, tax) {
 // a claimedTotal value, items dictionary which has the names and their total.
 // last note: Include the tip divided by the total amount of people
 export function summarize(users, items, tip) {
+
+    console.log("in summarize");
+
     if (!users?.length || !items?.length) return;
 
     const summaryDict = {};

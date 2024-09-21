@@ -31,15 +31,23 @@ const ReceiptBreakdown = (props) => {
     const [receiptId, setReceiptId] = useState(getUrlId());
     const [connectionId, setConnectionId] = useState("");
     const [users, setUsers] = useState(data.users);
+    const [showItemBreakdown, setShowItemBreakdown] = useState(false);
 
 
     useEffect(() => {
         //everytime there is a change
-    })
+        if(data !== null && data !== undefined){
+            if(data.items !== null && data.items !== undefined && data.items.length > 0){
+                setShowItemBreakdown(true);
+            }
+        }
+    },[])
 
     useEffect(() => {
+        const chatHubUrlDev = "https://receiptparserdevelop001.azurewebsites.net/chatHub";
+        const chatHubUrlLocal = "http://localhost:5197/chatHub";
         let connection = new signalR.HubConnectionBuilder()
-        .withUrl("https://receiptparserdevelop001.azurewebsites.net/chatHub")
+        .withUrl(chatHubUrlLocal)
         //.withUrl("http://localhost:49965/chatHub")
         .build();
 
@@ -55,6 +63,7 @@ const ReceiptBreakdown = (props) => {
             console.log("receipt update received: " );
             console.log(receiptDto);
             setData(receiptDto);
+            setItemData(receiptDto);
             ///setItemData(receiptDto);
             connection.invoke("GroupUpdateReceived", receiptDto._id, connection.connectionId)
         
@@ -79,20 +88,22 @@ const ReceiptBreakdown = (props) => {
         }
         console.log("add user item payload: ")
         console.log(payload);
-        //axios.post("https://localhost:7196/HandleReceipt/AddUserItem", payload).then(res => {
-        axios.post("https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/AddUserItem", payload).then(res => {
+        const addUserUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/AddUserItem";
+        const addUserUrlLocal = "https://localhost:7196/HandleReceipt/AddUserItem";
+        
+        axios.post(addUserUrlLocal, payload).then(res => {
             console.log('-- ReceiptBreakdown.js|109 >> res', res);
-            
-            
             if (res.status == "200") {
                 const id = res?.data?.receipt?._id;
                 console.log("add user item success");
                 console.log(res.data.receipt);
-                
+                return true;
+            }else{
+                return false;
             }
         }).catch((err) => {
             console.log('-- ERR', err);
-            
+            return false;
         })
     }
 
@@ -102,16 +113,21 @@ const ReceiptBreakdown = (props) => {
         }
         console.log("add user item payload: ")
         console.log(payload);
-        axios.post("https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/RemoveUserItem", payload).then(res => {
+        const removeUserUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/RemoveUserItem";
+        const removeUserUrlLocal = "https://localhost:7196/HandleReceipt/RemoveUserItem";
+        axios.post(removeUserUrlLocal, payload).then(res => {
             console.log('-- ReceiptBreakdown.js|109 >> res', res);
             if (res.status == "200") {
                 const id = res?.data?.receipt?._id;
                 console.log("remove user item success");
                 console.log(res.data.receipt);
+                return true;
+            }else{
+                return false;
             }
         }).catch((err) => {
             console.log('-- ERR', err);
-            
+            return false;
         })
     }
     
@@ -124,21 +140,38 @@ const ReceiptBreakdown = (props) => {
 
             console.log("selectedName: " + selectedName)
             const tempMainData = { ...itemData}
+            console.log(tempMainData.users);
             let currentUser = tempMainData.users.find(user => user.name === selectedName);
-
-            // If the user has already claimed this item, then remove it instead of pushing.
-            var tempIndex = item.claims.indexOf(selectedName);
+            console.log("found current user");
+            console.log(currentUser);
+            console.log(item.claims);
+  
+            var tempIndex = item.claims.findIndex(claim => claim.userId === currentUser.userId);
+            console.log("tempIndex: " + tempIndex);
             if (tempIndex > -1) {
-                tempItem.claims.splice(tempIndex, 1); // 2nd parameter means remove one item only
-                removeUserClaimFromItem(tempMainData._id, currentUser.userId, tempItem.itemId)
+                console.log("removing claim");
+                //tempItem.claims.splice(tempIndex, 1); // 2nd parameter means remove one item only
+                let removeUserClaimFromItemSuccess = removeUserClaimFromItem(tempMainData._id, currentUser.userId, tempItem.itemId)
+                if(removeUserClaimFromItemSuccess){
+                    alert("Failed to remove claim from item.");
+                }
 
             } else {
-                tempItem.claims.push(selectedName.toString());
+                //tempItem.claims.push(selectedName.toString());
+                //tempItem.claims.push(selectedName.toString());
+                //const claimTemp = {userId:currentUser.userId, quantity:1};
+                //tempItem.claims.push(claimTemp);
                 const payload = {
                     "id":tempMainData._id, "userId":currentUser.userId,"itemId":tempItem.itemId,"quantity":1
                 }
-                addUserClaimToItem(tempMainData._id, currentUser.userId, tempItem.itemId)
+                //addUserClaimToItem(tempMainData._id, currentUser.userId, tempItem.itemId)
 
+                let addUserClaimToItemSuccess = addUserClaimToItem(tempMainData._id, currentUser.userId, tempItem.itemId)
+                
+                if (addUserClaimToItemSuccess) {
+                    alert("Failed to claim item.");
+                }
+                
             }
 
             // Use item ID to grab that item from the array since they're just id's in chronological order
@@ -201,7 +234,7 @@ const ReceiptBreakdown = (props) => {
                         {
                             item.claims?.length ? 
                             <span id='claimed-by'>
-                                <i>{"Claimed by: " + item.claims.join(', ')}</i>
+                                <i>{"Claimed by: " + getItemClaimedList(item.claims)}</i>
                             </span>
                             : null
                         }
@@ -209,6 +242,18 @@ const ReceiptBreakdown = (props) => {
                 </div>
             )
         })
+    }
+
+    const getItemClaimedList = (claims) => {
+        //use the userId in the claims to get a list of the names from the data.users array
+        const tempMainData = { ...itemData}
+        const claimList = [];
+
+        for (let claim of claims) {
+            const user = tempMainData.users.find(user => user.userId === claim.userId);
+            claimList.push(user.name);
+        }
+        return claimList.join(", ");
     }
 
     const shareReceipt = () => {
@@ -250,61 +295,78 @@ const ReceiptBreakdown = (props) => {
         })
     }
 
-
-    return(
-        <>
+    if (showItemBreakdown !== null && showItemBreakdown !== undefined && showItemBreakdown === true) {
+        return(
+            <>
+                <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
+                    <Container>
+                        <Navbar.Text id='total-text'>{"Total: $" + data.total.toFixed(2)}</Navbar.Text>
+                        <Navbar.Text id='remaining-text'>{"Claimed: $" + claimedTotal.toFixed(2)}</Navbar.Text>
+                    </Container>
+                    <Button id='summary-button' variant="success" onClick={() => setShowModal(true)}>
+                        Summary
+                    </Button>
+                </Navbar>
+                <SummaryModal 
+                    show={showModal}
+                    setShow={setShowModal}
+                    total={data.total}
+                    claimedTotal={claimedTotal}
+                    data={data}
+                    
+                />
+                <ShareModal 
+                    show={showShare}
+                    setShow={setShowShare}
+                    receiptId={receiptId}
+                />
+    
+                <Col id='receipt-grid'>
+                    {/* make buttons to filter out selected ones or have all shown */}
+                    <NameToggles 
+                        selected={selectedName}
+                        setSelected={setSelectedName}
+                        names={data.users}
+                    />
+                    {/* <input
+                        className='input-name'
+                        onChange={(e) => inputChangeHandler(e)} 
+                        placeholder='Enter your name'
+                    /> */}
+                    {receiptItems()}
+                </Col>
+                <div className='bottom-row'>
+                    {/* Only show this button if no ID exists in the url */}
+                    <Button id='share-button' className='bottom-button' variant="primary" onClick={() => shareReceipt()}>
+                        { shareLoading ? 
+                            <Spinner />
+                        :
+                            "Share"
+                        }
+                    </Button>
+                    <Button id='reset-button' className='bottom-button' variant="danger" onClick={() => resetClaims()}>
+                        Reset
+                    </Button>
+                </div>
+            </>
+        );
+    }else{
+        return(
+            <>
             <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
                 <Container>
-                    <Navbar.Text id='total-text'>{"Total: $" + data.total.toFixed(2)}</Navbar.Text>
-                    <Navbar.Text id='remaining-text'>{"Claimed: $" + claimedTotal.toFixed(2)}</Navbar.Text>
+                    <Navbar.Text id='error-id'>no items to show</Navbar.Text>
+                    
                 </Container>
-                <Button id='summary-button' variant="success" onClick={() => setShowModal(true)}>
-                    Summary
-                </Button>
-            </Navbar>
-            <SummaryModal 
-                show={showModal}
-                setShow={setShowModal}
-                total={data.total}
-                claimedTotal={claimedTotal}
-                data={data}
-                
-            />
-            <ShareModal 
-                show={showShare}
-                setShow={setShowShare}
-                receiptId={receiptId}
-            />
 
-            <Col id='receipt-grid'>
-                {/* make buttons to filter out selected ones or have all shown */}
-                <NameToggles 
-                    selected={selectedName}
-                    setSelected={setSelectedName}
-                    names={data.users}
-                />
-                {/* <input
-                    className='input-name'
-                    onChange={(e) => inputChangeHandler(e)} 
-                    placeholder='Enter your name'
-                /> */}
-                {receiptItems()}
-            </Col>
-            <div className='bottom-row'>
-                {/* Only show this button if no ID exists in the url */}
-                <Button id='share-button' className='bottom-button' variant="primary" onClick={() => shareReceipt()}>
-                    { shareLoading ? 
-                        <Spinner />
-                    :
-                        "Share"
-                    }
-                </Button>
-                <Button id='reset-button' className='bottom-button' variant="danger" onClick={() => resetClaims()}>
-                    Reset
-                </Button>
-            </div>
-        </>
-    );
+            </Navbar>
+
+          
+            </>
+        );
+ 
+    }
+    
 }
 
 export default ReceiptBreakdown;

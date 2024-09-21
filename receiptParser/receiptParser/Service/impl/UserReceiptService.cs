@@ -6,7 +6,7 @@ using receiptParser.Domain;
 using receiptParser.Hubs;
 using receiptParser.Repository.inter;
 using receiptParser.Repository.mappers;
-using receiptParser.Repository.model;
+using receiptParser.Repository.models;
 using receiptParser.Service.inter;
 using receiptParser.Util.error;
 using shortid;
@@ -28,13 +28,16 @@ namespace receiptParser.Service.impl
 
         private readonly IMongoRepository<Receipt> _userReceiptRepository;
 
+        private readonly IMongoRepository<Connection> _userConnectionRepository;
+
 
         private readonly IHubContext<ChatHub> _hubContext;
 
-        public UserReceiptService(ILoggerFactory loggerFactory, IMongoRepository<Receipt> userReceiptRepository, IHubContext<ChatHub> hubContext)
+        public UserReceiptService(ILoggerFactory loggerFactory, IMongoRepository<Receipt> userReceiptRepository, IMongoRepository<Connection> userConnectionRepository, IHubContext<ChatHub> hubContext)
         {
             _logger = loggerFactory.CreateLogger<UserReceiptService>();        
             _userReceiptRepository = userReceiptRepository;
+            _userConnectionRepository = userConnectionRepository;
             _hubContext = hubContext;
         }
 
@@ -196,9 +199,14 @@ namespace receiptParser.Service.impl
             return ReceiptMapper.MapReceiptToReceiptDto(receipt);
         }
 
+        
         public async Task<ReceiptDto> AddConnectionId(string receiptId, string connectionId)
         {
             Receipt receipt = await _userReceiptRepository.FindByIdAsync(receiptId);
+            Connection connection = new Connection();
+            connection.receiptId = receiptId;
+            connection.connectionId = connectionId;
+            connection.connected = true;
 
             if (receipt == null)
             {
@@ -208,13 +216,32 @@ namespace receiptParser.Service.impl
             if (!receipt.connectionIds.Contains(connectionId))
             {
                 receipt.connectionIds.Add(connectionId);
+                await _userConnectionRepository.InsertOneAsync(connection);
+                
             }
 
             await _userReceiptRepository.ReplaceOneAsync(receipt);
+
         
             await UpdateUsers(receipt);
 
             return ReceiptMapper.MapReceiptToReceiptDto(receipt);
+
+        }
+
+
+        public async Task<Boolean> RemoveUserConnectionId(string connectionId)
+        {
+            Connection connection = await _userConnectionRepository.FindOneAsync(x => x.connectionId == connectionId);
+            if(connection != null)
+            {
+                Receipt receipt = await _userReceiptRepository.FindByIdAsync(connection.receiptId);
+
+                await RemoveConnectionId(receipt._id.ToString(), connectionId);
+
+                return true;
+            }
+            return false;
 
         }
 
@@ -230,6 +257,7 @@ namespace receiptParser.Service.impl
             if (receipt.connectionIds.Contains(connectionId))
             {
                 receipt.connectionIds.Remove(connectionId);
+                await _userConnectionRepository.DeleteOneAsync(x => x.connectionId == connectionId);
             }
 
             await _userReceiptRepository.ReplaceOneAsync(receipt);

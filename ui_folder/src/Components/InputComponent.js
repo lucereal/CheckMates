@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import InputImage from '../Shared/InputImage/InputImage';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
@@ -15,6 +15,38 @@ const InputComponent = () => {
     const [participants, setParticipants] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate(); 
+    const [existingReceiptId, setExistingReceiptId] = useState(null); 
+
+    const getUrlId = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('receiptId'); // Assuming the ID is passed as a query parameter
+    };
+    useEffect(() => {
+
+        console.log("here in useEffect for loading existing receipt");
+        
+        const id = getUrlId();
+        setExistingReceiptId(id);
+
+        console.log("id: " + id);
+        console.log(existingReceiptId)
+
+        if (id) {
+            const url = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/GetReceipt/" +id;
+            console.log("makeing get request for existing receipt");
+            //setReceiptLoading(true);
+            axios.get(url).then(res => {
+                console.log("got response for existing receipt");
+                setReceiptData(res?.data?.receipt);
+
+                //setReceiptLoading(false);
+            }).catch(e => {
+                console.log('-- ERR', e);
+                //setReceiptLoading(false);
+            })
+        }
+    }, []);
+
 
     const sendReceipt = () => {
         //navigate("/")
@@ -39,8 +71,8 @@ const InputComponent = () => {
 
         //const url = 'https://receiptparserservices20230928182301.azurewebsites.net/api/ParseReceipt?name=Functions';
         const url = 'https://receiptparserdevelop001.azurewebsites.net/ParseReceipt/ParseReceipt';
-        
-        axios.post(url, formData, {
+        const urlLocal = 'https://localhost:7196/ParseReceipt/ParseReceipt';
+        axios.post(urlLocal, formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
@@ -50,7 +82,9 @@ const InputComponent = () => {
                 "receipt": res.data.receipt
             }
       
-            axios.post("https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/CreateReceipt", payload).then(res => {
+            const createReceiptUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/CreateReceipt";
+            const createReceiptUrlLocal = "https://localhost:7196/HandleReceipt/CreateReceipt";
+            axios.post(createReceiptUrlLocal, payload).then(res => {
                 console.log('-- ReceiptBreakdown.js|109 >> res', res);
                 
                 if (res.status == "200") {

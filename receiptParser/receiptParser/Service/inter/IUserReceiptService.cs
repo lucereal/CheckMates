@@ -1,5 +1,5 @@
 ﻿using receiptParser.Domain;
-using receiptParser.Repository.model;
+using receiptParser.Repository.models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +19,8 @@ namespace receiptParser.Service.inter
         Task<ReceiptDto> AddConnectionId(string receiptId, string userConnectionId);
 
         Task<ReceiptDto> RemoveConnectionId(string receiptId, string userConnectionId);
+
+        Task<Boolean> RemoveUserConnectionId(string userConnectionId);
 
         Task<ReceiptDto> RemoveUserClaim(string id, string userId, int itemId);
         Task<ReceiptDto> UpdateUsers(ReceiptDto receiptDto);

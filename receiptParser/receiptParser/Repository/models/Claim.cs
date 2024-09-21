@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace receiptParser.Repository.model
+namespace receiptParser.Repository.models
 {
     public class Claim
     {

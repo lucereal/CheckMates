@@ -9,7 +9,7 @@ using receiptParser.Util.attributes;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace receiptParser.Repository.model
+namespace receiptParser.Repository.models
 {
     [BsonCollection("receipts")]
     public class Receipt : Document

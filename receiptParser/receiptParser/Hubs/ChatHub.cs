@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using receiptParser;
 using receiptParser.Controllers;
 using receiptParser.Domain;
-using receiptParser.Repository.model;
 using receiptParser.Service.impl;
 using receiptParser.Service.inter;
 using System.Net;
@@ -43,6 +42,7 @@ namespace receiptParser.Hubs
         public override Task OnDisconnectedAsync(Exception? exception)
         {
 
+            _userReceiptService.RemoveUserConnectionId(Context.ConnectionId);
 
             return base.OnDisconnectedAsync(exception);
 
