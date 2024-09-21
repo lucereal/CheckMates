@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button, ButtonGroup } from 'react-bootstrap';
 
 const NameToggles = (props) => {
     const {selected, setSelected, names } = props;
@@ -11,21 +12,22 @@ const NameToggles = (props) => {
     const createButtons = () => {
         return names?.map((data, index) => {
             return (
-                <span 
+                <Button 
                     key={index} 
-                    className={'toggle-button' + (selected === data.name ? ' selected' : "")}
+                    variant={selected === data.name ? 'primary' : 'outline-primary'}
+                    className="toggle-button me-2 mb-2"
                     onClick={() => toggleMe(data.name)}
                 >
                     {data.name}
-                </span>
+                </Button>
             )
         })
     }
 
     return (
-        <div className='name-buttons-container'>
+        <ButtonGroup className='name-buttons-container mb-3'>
             {createButtons()}
-        </div>
+        </ButtonGroup>
     );
 }
 

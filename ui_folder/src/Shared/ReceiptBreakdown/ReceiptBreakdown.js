@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Button, Col, Container, Navbar, Spinner } from 'react-bootstrap';
+import { Button, Col, Row, Container, Card, Navbar, Spinner } from 'react-bootstrap';
 import NameToggles from '../NameThings/NameToggles';
 import { getClaimedTotal, getUrlId } from '../HelperFunctions';
 import SummaryModal from '../Modals/SummaryModal';
@@ -7,6 +7,7 @@ import ShareModal from '../Modals/ShareModal';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import * as signalR from '@microsoft/signalr'
+
 /** IF ITEM ID IN THE RESPONSE STAYS IN AN ORDER, THEN THAT WILL KEEP THINGS EASY
  *  SINCE I DO NOT HAVE TO ITERATE THROUGH THINGS.
  * 
@@ -47,27 +48,38 @@ const ReceiptBreakdown = (props) => {
         const chatHubUrlDev = "https://receiptparserdevelop001.azurewebsites.net/chatHub";
         const chatHubUrlLocal = "http://localhost:5197/chatHub";
         let connection = new signalR.HubConnectionBuilder()
-        .withUrl(chatHubUrlLocal)
+        .withUrl(chatHubUrlDev)
         //.withUrl("http://localhost:49965/chatHub")
         .build();
 
         setConnectionId(connection.connectionId);
+        try{
+            connection.start().then(() => {
+                console.log("connection established");
+                console.log("addUserConnectionId with receiptId: " + receiptId + " and connectionId: " + connection.connectionId );
+                connection.invoke("AddUserConnectionId", receiptId);
+            });
+        }catch(e){
+            console.log("exception in connection start");
+            console.log(e);
+        }
         
-        connection.start().then(() => {
-            console.log("connection established");
-            console.log("addUserConnectionId with receiptId: " + receiptId + " and connectionId: " + connection.connectionId );
-            connection.invoke("AddUserConnectionId", receiptId);
-        });
+        try{
+            connection.on("GroupReceiptUpdate", (receiptDto) => {
+                console.log("receipt update received: " );
+                console.log(receiptDto);
+                setData(receiptDto);
+                setItemData(receiptDto);
+                ///setItemData(receiptDto);
+                connection.invoke("GroupUpdateReceived", receiptDto._id, connection.connectionId)
+            
+            })
+        }catch(e){
+            console.log("exception in connection on groupReceiptUpdate");
+            console.log(e);
+        }
 
-        connection.on("GroupReceiptUpdate", (receiptDto) => {
-            console.log("receipt update received: " );
-            console.log(receiptDto);
-            setData(receiptDto);
-            setItemData(receiptDto);
-            ///setItemData(receiptDto);
-            connection.invoke("GroupUpdateReceived", receiptDto._id, connection.connectionId)
         
-        })
 
     }, [])
 
@@ -91,7 +103,7 @@ const ReceiptBreakdown = (props) => {
         const addUserUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/AddUserItem";
         const addUserUrlLocal = "https://localhost:7196/HandleReceipt/AddUserItem";
         
-        axios.post(addUserUrlLocal, payload).then(res => {
+        axios.post(addUserUrlDev, payload).then(res => {
             console.log('-- ReceiptBreakdown.js|109 >> res', res);
             if (res.status == "200") {
                 const id = res?.data?.receipt?._id;
@@ -115,7 +127,7 @@ const ReceiptBreakdown = (props) => {
         console.log(payload);
         const removeUserUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/RemoveUserItem";
         const removeUserUrlLocal = "https://localhost:7196/HandleReceipt/RemoveUserItem";
-        axios.post(removeUserUrlLocal, payload).then(res => {
+        axios.post(removeUserUrlDev, payload).then(res => {
             console.log('-- ReceiptBreakdown.js|109 >> res', res);
             if (res.status == "200") {
                 const id = res?.data?.receipt?._id;
@@ -205,41 +217,38 @@ const ReceiptBreakdown = (props) => {
 
         return itemData?.items?.map((item, index) => {
             return (
-                <div 
-                    key={index}
-                    id={'placement-' + index } 
-                    className={'receipt-item' + (selected === index ? " selected" : "")}
-                    onClick={() => selectItem(index, item)}
-                >
-                    <div className='top-row'>
-                        <span className='item-name'>
-                            {item.description}
-                        </span>
-                        <span className='item-price'>
-                            ${item.price}
-                        </span>
-                    </div>
-                    <div className='bottom-row'>
-                        <span id='tap-instruction'>
-                            {/* Let the user know to select a name if they haven't, otherwise check if they have claimed yet. */}
-                            { selectedName !== "" ? 
-                                (selected === index ?
-                                (item.claims.indexOf(selectedName) >= 0 ? 
-                                "Tap again to remove"
-                                : "Tap again to confirm")  
-                                : "Tap to claim")
-                                : "Select a name"
-                            }
-                        </span>
-                        {
-                            item.claims?.length ? 
-                            <span id='claimed-by'>
-                                <i>{"Claimed by: " + getItemClaimedList(item.claims)}</i>
-                            </span>
-                            : null
-                        }
-                    </div>
-                </div>
+
+                <Card key={index} className={'receipt-item mb-3' + (selected === index ? " selected" : "")} onClick={() => selectItem(index, item)}>
+                    <Card.Body>
+                            <Row className="top-row">
+                                <Col className='item-name'>
+                                    {item.description}
+                                </Col>
+                                <Col className='item-price text-end'>
+                                    ${item.price}
+                                </Col>
+                            </Row>
+                            <Row className="bottom-row mt-2">
+                                <Col id='tap-instruction'>
+                                    { selectedName !== "" ? 
+                                        (selected === index ?
+                                        (item.claims.indexOf(selectedName) >= 0 ? 
+                                        "Tap again to remove"
+                                        : "Tap again to confirm")  
+                                        : "Tap to claim")
+                                        : "Select a name"
+                                    }
+                                </Col>
+                                {item.claims?.length ? 
+                                    <Col id='claimed-by' className="text-muted">
+                                        <i>{"Claimed by: " + getItemClaimedList(item.claims)}</i>
+                                    </Col>
+                                    : null
+                                }
+                            </Row>
+                        </Card.Body>
+                </Card>
+
             )
         })
     }
@@ -298,7 +307,22 @@ const ReceiptBreakdown = (props) => {
     if (showItemBreakdown !== null && showItemBreakdown !== undefined && showItemBreakdown === true) {
         return(
             <>
-                <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
+            <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
+                    <Container>
+                    <Navbar.Brand href="/">Receipt Buddy</Navbar.Brand>
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                    {/* <Navbar.Collapse className="justify-content-center"> */}
+                    {/* <Navbar.Text id='Title'>Welcome To Receipt Buddy</Navbar.Text> */}
+                    {/* <Navbar.Text>Signed in as: <a href="#login">Mark Otto</a></Navbar.Text> */}
+                    {/* </Navbar.Collapse> */}
+                    {/* <Navbar.Text className="justify-content-end" id='Title'>Welcome To Receipt Buddy</Navbar.Text> */}
+                        {/* <Navbar.Text id='remaining-text'>Text 2</Navbar.Text> */}
+                    </Container>
+                    {/* <Button id='summary-button' variant="success">
+                        Summary
+                    </Button> */}
+                </Navbar>
+                {/* <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
                     <Container>
                         <Navbar.Text id='total-text'>{"Total: $" + data.total.toFixed(2)}</Navbar.Text>
                         <Navbar.Text id='remaining-text'>{"Claimed: $" + claimedTotal.toFixed(2)}</Navbar.Text>
@@ -306,7 +330,9 @@ const ReceiptBreakdown = (props) => {
                     <Button id='summary-button' variant="success" onClick={() => setShowModal(true)}>
                         Summary
                     </Button>
-                </Navbar>
+                </Navbar> */}
+
+<Container>
                 <SummaryModal 
                     show={showModal}
                     setShow={setShowModal}
@@ -321,7 +347,8 @@ const ReceiptBreakdown = (props) => {
                     receiptId={receiptId}
                 />
     
-                <Col id='receipt-grid'>
+                <Col id='receipt-grid' className="m-2 p-2 bg-light border rounded">
+                <h6 className="mt-4">Selecting for user</h6>
                     {/* make buttons to filter out selected ones or have all shown */}
                     <NameToggles 
                         selected={selectedName}
@@ -333,8 +360,27 @@ const ReceiptBreakdown = (props) => {
                         onChange={(e) => inputChangeHandler(e)} 
                         placeholder='Enter your name'
                     /> */}
+
+                <div className="summary-row mt-4 d-flex flex-wrap align-items-center">
+                    <Row className="w-100">
+                        <Col xs={12} md={4} className="mb-2 mb-md-0">
+                            <span id='total-text' className="fw-bold">{"Total: $" + data.total.toFixed(2)}</span>
+                        </Col>
+                        <Col xs={12} md={4} className="mb-2 mb-md-0">
+                            <span id='remaining-text' className="fw-bold">{"Claimed: $" + claimedTotal.toFixed(2)}</span>
+                        </Col>
+                        <Col xs={12} md={4} className="text-md-end">
+                            <Button id='summary-button' variant="success" onClick={() => setShowModal(true)}>
+                                Summary
+                            </Button>
+                        </Col>
+                    </Row>
+                </div>
+
                     {receiptItems()}
+                    
                 </Col>
+                </Container>
                 <div className='bottom-row'>
                     {/* Only show this button if no ID exists in the url */}
                     <Button id='share-button' className='bottom-button' variant="primary" onClick={() => shareReceipt()}>

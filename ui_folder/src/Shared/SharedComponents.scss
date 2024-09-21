@@ -123,9 +123,21 @@
         align-items: center;
         max-width: 900px;
     
+        .item-name {
+            font-family: "Inter",sans-serif;
+            color: #020202;
+        }
+        .item-price{
+            font-family: "Inter",sans-serif;
+            color: #020202;
+        }
+        #tap-instruction{
+            font-family: "Inter",sans-serif;
+            color: #363636;
+        }
         span {
             font-family: "Inter",sans-serif;
-            color: #E7E9EC;
+            color: #020202;
         }
     
         // Styling for the name buttons
@@ -185,10 +197,16 @@
             }
         }
 
-        .selected {
-            outline: 3px solid ;
-            transition: 0.15s;
+        .summary-row {
+            width: 85%;
+            margin: .35rem 3rem;
+    
+            padding: .25rem .75rem;
+            
+            // background-color: #dddddd;
         }
+
+
     }
 
     .bottom-row {
@@ -199,4 +217,8 @@
             margin: 2.5rem 2.5rem;
         }
     }
+}
+
+#input-names-input{
+    width:50%;
 }

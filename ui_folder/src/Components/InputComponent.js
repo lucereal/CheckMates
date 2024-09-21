@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import InputImage from '../Shared/InputImage/InputImage';
-import Button from 'react-bootstrap/Button';
+//import Button from 'react-bootstrap/Button';
+import { Button, Col, Container, Navbar, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 import { mock } from './mockReceipt';
 import ReceiptBreakdown from '../Shared/ReceiptBreakdown/ReceiptBreakdown';
 import InputNames from '../Shared/InputNames/InputNames';
 import NameTags from '../Shared/NameThings/NameTags';
-import { Spinner } from 'react-bootstrap';
+//import { Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 const InputComponent = () => {
@@ -72,7 +73,7 @@ const InputComponent = () => {
         //const url = 'https://receiptparserservices20230928182301.azurewebsites.net/api/ParseReceipt?name=Functions';
         const url = 'https://receiptparserdevelop001.azurewebsites.net/ParseReceipt/ParseReceipt';
         const urlLocal = 'https://localhost:7196/ParseReceipt/ParseReceipt';
-        axios.post(urlLocal, formData, {
+        axios.post(url, formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
@@ -84,7 +85,7 @@ const InputComponent = () => {
       
             const createReceiptUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/CreateReceipt";
             const createReceiptUrlLocal = "https://localhost:7196/HandleReceipt/CreateReceipt";
-            axios.post(createReceiptUrlLocal, payload).then(res => {
+            axios.post(createReceiptUrlDev, payload).then(res => {
                 console.log('-- ReceiptBreakdown.js|109 >> res', res);
                 
                 if (res.status == "200") {
@@ -118,18 +119,41 @@ const InputComponent = () => {
         )
     } else {
         return (
-            <div id="input-receipt-container">
-                <div className='upload-section'>
+            <>
+            <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
+                    <Container>
+                    <Navbar.Brand href="/">Receipt Buddy</Navbar.Brand>
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                    {/* <Navbar.Collapse className="justify-content-center"> */}
+                    {/* <Navbar.Text id='Title'>Welcome To Receipt Buddy</Navbar.Text> */}
+                    {/* <Navbar.Text>Signed in as: <a href="#login">Mark Otto</a></Navbar.Text> */}
+                    {/* </Navbar.Collapse> */}
+                    {/* <Navbar.Text className="justify-content-end" id='Title'>Welcome To Receipt Buddy</Navbar.Text> */}
+                        {/* <Navbar.Text id='remaining-text'>Text 2</Navbar.Text> */}
+                    </Container>
+                    {/* <Button id='summary-button' variant="success">
+                        Summary
+                    </Button> */}
+                </Navbar>
+                <div id="input-receipt-container" className="d-flex flex-column align-items-center p-3" >
+                <div className='upload-section w-100'>
 
-                    <p className='upload-instruction'>
+                    <h4 className='upload-header mb-3'>
                         Upload your receipt
-                    </p>
-                    <InputImage setReceiptImg={setReceiptImg} />
+                    </h4>
+                    <h6 className='upload-instruction mb-4'>
+                        Select an image of your receipt. Then enter the names of the people who participated.
+                    </h6>
+                    <div className="mb-4">
+                    <InputImage receiptImg={receiptImg} setReceiptImg={setReceiptImg} />
+                    </div>
+                    <div className="mb-4">
                     <InputNames 
                         participantsNo={participants.length}
                         participants={participants}
                         setParticipants={setParticipants}
                     />
+                    </div>
                 </div>
 
                 {/* Make tags for each participant */}
@@ -154,6 +178,8 @@ const InputComponent = () => {
                 {/* Make a component for it... */}
                 <div className='bottom-nav'/>
             </div>
+            </>
+            
         );
     }
 }

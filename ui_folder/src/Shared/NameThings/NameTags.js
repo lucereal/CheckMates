@@ -16,7 +16,7 @@ const NameTags = (props) => {
     const createTags = () => {
         return names?.map((name, index) => {
             return (
-                <span key={index} className='tag' onClick={() => removeMe(name)}>
+                <span key={index} className='tag badge bg-secondary me-w mb-2' onClick={() => removeMe(name)}>
                     {name}  
                     <span className='bolden'>
                         &nbsp;| x
@@ -27,7 +27,7 @@ const NameTags = (props) => {
     }
 
     return (
-        <div id='tags-container'>
+        <div id='tags-container' className="d-flex flex-wrap">
             {createTags()}
         </div>
     );
