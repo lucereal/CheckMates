@@ -14,7 +14,7 @@ export function getClaimedTotal(items, tip, tax) {
 // Gotta make a dictionary where the key is the user, have the value be a dictionary of values
 // a claimedTotal value, items dictionary which has the names and their total.
 // last note: Include the tip divided by the total amount of people
-export function summarize(users, items, tip) {
+export function summarize(users, items, tip, tax) {
 
     console.log("in summarize");
 
@@ -22,8 +22,14 @@ export function summarize(users, items, tip) {
 
     const summaryDict = {};
     let dividedTip = 0.0;
+    let dividedTax = 0.0;
+
     if (tip) {
         dividedTip = parseFloat((tip / users.length).toFixed(2));
+    }
+
+    if (tax) {
+        dividedTax = parseFloat((tax / users.length).toFixed(2));
     }
 
     // Set the initial values for each user, and set tip while we are iterating.
@@ -31,14 +37,15 @@ export function summarize(users, items, tip) {
         summaryDict[user.userId] = {
             claimedTotal: 0.0,
             sharedTip: dividedTip,
+            sharedTax: dividedTax,
             claimedItems: []
         }
     }
 
     for (let item of items) {
         const claimedNumber = item.claims.length;
-        //if (!claimedNumber) continue; // not claimed by anybody? move on.
-        if(claimedNumber <= 0){
+         // not claimed by anybody? move on.
+        if (claimedNumber <= 0){
             continue;
         }
         // First check the users

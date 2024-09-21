@@ -217,7 +217,6 @@ const ReceiptBreakdown = (props) => {
 
         return itemData?.items?.map((item, index) => {
             return (
-
                 <Card key={index} className={'receipt-item mb-3' + (selected === index ? " selected" : "")} onClick={() => selectItem(index, item)}>
                     <Card.Body>
                             <Row className="top-row">
@@ -240,7 +239,7 @@ const ReceiptBreakdown = (props) => {
                                     }
                                 </Col>
                                 {item.claims?.length ? 
-                                    <Col id='claimed-by' className="text-muted">
+                                    <Col id='claimed-by' className="text-muted text-end">
                                         <i>{"Claimed by: " + getItemClaimedList(item.claims)}</i>
                                     </Col>
                                     : null
@@ -348,32 +347,43 @@ const ReceiptBreakdown = (props) => {
                 />
     
                 <Col id='receipt-grid' className="m-2 p-2 bg-light border rounded">
-                <h6 className="mt-4">Selecting for user</h6>
-                    {/* make buttons to filter out selected ones or have all shown */}
-                    <NameToggles 
-                        selected={selectedName}
-                        setSelected={setSelectedName}
-                        names={data.users}
-                    />
+                
                     {/* <input
                         className='input-name'
                         onChange={(e) => inputChangeHandler(e)} 
                         placeholder='Enter your name'
                     /> */}
 
-                <div className="summary-row mt-4 d-flex flex-wrap align-items-center">
-                    <Row className="w-100">
+                <div className="summary-row mt-2 d-flex flex-wrap align-items-center">
+                    <Row className="row-container">
+                    <Col xs={12} md={4} className="mb-2 mb-md-0">
+                        <h6 >Selecting for user</h6>
+                    {/* make buttons to filter out selected ones or have all shown */}
+                    <NameToggles 
+                        selected={selectedName}
+                        setSelected={setSelectedName}
+                        names={data.users}
+                    />                        </Col>
                         <Col xs={12} md={4} className="mb-2 mb-md-0">
-                            <span id='total-text' className="fw-bold">{"Total: $" + data.total.toFixed(2)}</span>
+                        
+                            <Row><span id='total-text' className="fw-bold">{"Total: $" + data.total.toFixed(2)}</span>
+                            </Row>
+                            <Row><span id='remaining-text' className="fw-bold">{"Claimed: $" + claimedTotal.toFixed(2)}</span>
+                            </Row>
+                            <Row>
+                            <Button id='summary-button' variant="success" onClick={() => setShowModal(true)}>
+                                Summary
+                            </Button></Row>
                         </Col>
-                        <Col xs={12} md={4} className="mb-2 mb-md-0">
+                        
+                        {/* <Col xs={12} md={4} className="mb-2 mb-md-0">
                             <span id='remaining-text' className="fw-bold">{"Claimed: $" + claimedTotal.toFixed(2)}</span>
                         </Col>
                         <Col xs={12} md={4} className="text-md-end">
                             <Button id='summary-button' variant="success" onClick={() => setShowModal(true)}>
                                 Summary
                             </Button>
-                        </Col>
+                        </Col> */}
                     </Row>
                 </div>
 

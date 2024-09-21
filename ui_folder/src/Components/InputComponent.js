@@ -122,7 +122,7 @@ const InputComponent = () => {
             <>
             <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
                     <Container>
-                    <Navbar.Brand href="/">Receipt Buddy</Navbar.Brand>
+                    <Navbar.Brand id='nav-brand' href="/">Receipt Buddy</Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     {/* <Navbar.Collapse className="justify-content-center"> */}
                     {/* <Navbar.Text id='Title'>Welcome To Receipt Buddy</Navbar.Text> */}
