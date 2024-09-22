@@ -7,7 +7,8 @@ const SummaryModal = (props) => {
     
     const items = data.items;
     //const users = data.users;
-const users = data.users;
+    const tax = data.tax;
+    const users = data.users;
 
     const getClaimedItemData = (summary, currentUserId) => {
         return summary[currentUserId]?.claimedItems?.map((item, index) => {
@@ -25,7 +26,7 @@ const users = data.users;
 
     const getUserRowSummary = () => {
         console.log("users in getUserRowSummary: " + users)
-        const summary = summarize(users, items, data.tip);
+        const summary = summarize(users, items, data.tip, data.tax);
         console.log("in getUserRowSummary after summarize");
         return data?.users?.map((user, index) => {
      
@@ -36,17 +37,26 @@ const users = data.users;
                             {user.name}
                         </b>
                         <b>
-                            ${summary[user.userId].claimedTotal}
+                            ${summary[user.userId]?.claimedTotal.toFixed(2)}
                         </b>
                     </div>
                     <div id='claimed-summary-container'>
                         { getClaimedItemData(summary, user.userId) }
-                        <div id='tip-row'>
+                        <div id='t
+                        '>
                             <i>
                                 Tip (split evenly)
                             </i>
                             <i>
-                                ${summary[user.userId].sharedTip}
+                                ${summary[user.userId].sharedTip.toFixed(2)}
+                            </i>
+                        </div>
+                        <div id='tax-row'>
+                            <i>
+                                Tax (split evenly)
+                            </i>
+                            <i>
+                                ${summary[user.userId].sharedTax.toFixed(2)}
                             </i>
                         </div>
                     </div>
