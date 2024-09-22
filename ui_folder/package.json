@@ -15,7 +15,11 @@
     "react-router-dom": "^6.16.0",
     "react-scripts": "5.0.1",
     "sass": "^1.68.0",
+    "ui_folder": "file:",
     "web-vitals": "^2.1.4"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.16.7"
   },
   "scripts": {
     "start": "react-scripts start",
