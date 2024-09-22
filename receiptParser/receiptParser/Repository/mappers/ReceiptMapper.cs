@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson;
 using receiptParser.Domain;
-using receiptParser.Repository.model;
+using receiptParser.Repository.models;
 using shortid;
 using System;
 using System.Collections.Generic;
@@ -17,10 +17,11 @@ namespace receiptParser.Repository.mappers
             ReceiptDto receiptDto = new ReceiptDto();
             if (receipt !=  null)
             {
-                receiptDto.receiptId = receipt.receiptId;
                 receiptDto._id = receipt._id.ToString();
                 receiptDto.total = receipt.total;
                 receiptDto.tip = receipt.tip;
+                receiptDto.tax = receipt.tax;
+                receiptDto.connectionIds = receipt.connectionIds;
 
                 receipt.items.ForEach(x =>
                 {
@@ -58,8 +59,10 @@ namespace receiptParser.Repository.mappers
             {
                 receipt.tip = receiptDto.tip;
                 receipt.total = receiptDto.total;
-                receipt.receiptId = receiptDto.receiptId;
-                //receipt.Id = receiptDto._id != null ? ObjectId.Parse(receiptDto._id) : ObjectId.Empty;
+                receipt.tax = receiptDto.tax;
+                receipt._id = receiptDto._id != null ? ObjectId.Parse(receiptDto._id) : ObjectId.Empty;
+                receipt.connectionIds = receiptDto.connectionIds;
+                
                 receiptDto.users.ForEach(x =>
                 {
                     User user = new User();

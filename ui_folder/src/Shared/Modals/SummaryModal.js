@@ -4,13 +4,16 @@ import { summarize } from '../HelperFunctions';
 
 const SummaryModal = (props) => {
     const {show, setShow, total, claimedTotal, data} = props;
+    
     const items = data.items;
+    //const users = data.users;
+    const tax = data.tax;
     const users = data.users;
 
-    const getClaimedItemData = (summary, currentUser) => {
-        return summary[currentUser]?.claimedItems?.map((item, index) => {
+    const getClaimedItemData = (summary, currentUserId) => {
+        return summary[currentUserId]?.claimedItems?.map((item, index) => {
             return (
-                <div key={index} id={currentUser + '-item-' + index} className='item-row'>
+                <div key={index} id={currentUserId + '-item-' + index} className='item-row'>
                     <i>{item.name}</i>
                     { item.split === 1 ? 
                     <i>${item.price.toFixed(2)}</i> : 
@@ -22,8 +25,11 @@ const SummaryModal = (props) => {
     }
 
     const getUserRowSummary = () => {
-        const summary = summarize(users, items, data.tip);
+        console.log("users in getUserRowSummary: " + users)
+        const summary = summarize(users, items, data.tip, data.tax);
+        console.log("in getUserRowSummary after summarize");
         return data?.users?.map((user, index) => {
+     
             return (
                 <div key={index} id='summary-row'>
                     <div id={"user-row-" + index} className='summary-top-row'>
@@ -31,17 +37,26 @@ const SummaryModal = (props) => {
                             {user.name}
                         </b>
                         <b>
-                            ${summary[user.name].claimedTotal}
+                            ${summary[user.userId]?.claimedTotal.toFixed(2)}
                         </b>
                     </div>
                     <div id='claimed-summary-container'>
-                        { getClaimedItemData(summary, user.name) }
-                        <div id='tip-row'>
+                        { getClaimedItemData(summary, user.userId) }
+                        <div id='t
+                        '>
                             <i>
                                 Tip (split evenly)
                             </i>
                             <i>
-                                ${summary[user.name].sharedTip}
+                                ${summary[user.userId].sharedTip.toFixed(2)}
+                            </i>
+                        </div>
+                        <div id='tax-row'>
+                            <i>
+                                Tax (split evenly)
+                            </i>
+                            <i>
+                                ${summary[user.userId].sharedTax.toFixed(2)}
                             </i>
                         </div>
                     </div>

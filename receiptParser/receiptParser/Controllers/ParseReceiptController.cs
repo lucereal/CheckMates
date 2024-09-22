@@ -57,6 +57,7 @@ namespace receiptParser.Controllers
                 Nullable<DateTimeOffset> transactionDate = null;
                 double total = 0;
                 double tip = 0;
+                double tax = 0;
                 List<ItemDto> items = new List<ItemDto>();
 
                 foreach (AnalyzedDocument receipt in receipts.Documents)
@@ -93,6 +94,15 @@ namespace receiptParser.Controllers
                         if (tipField.FieldType == DocumentFieldType.Double)
                         {
                             tip = tipField.Value.AsDouble();
+
+                        }
+                    }
+
+                    if (receipt.Fields.TryGetValue("TotalTax", out DocumentField taxField))
+                    {
+                        if (taxField.FieldType == DocumentFieldType.Double)
+                        {
+                            tax = taxField.Value.AsDouble();
 
                         }
                     }
@@ -176,15 +186,13 @@ namespace receiptParser.Controllers
                     items[i].itemId = i;
                 }
                 List<UserDto> userDtos = ReceiptMapper.MapUserNamesToUserDtos(users);
-                Guid receiptId = Guid.NewGuid();
                 ReceiptDto receiptDto = new ReceiptDto();
                 receiptDto.items = items;
                 receiptDto.total = total;
                 receiptDto.tip = tip;
-                receiptDto._id = receiptId.ToString();
+                receiptDto.tax = tax;
                 receiptDto.merchantName = merchantName;
                 receiptDto.users = userDtos;
-                receiptDto.receiptId = receiptId.ToString();
                 if (transactionDate != null)
                 {
                     receiptDto.transactionDate = transactionDate.Value;

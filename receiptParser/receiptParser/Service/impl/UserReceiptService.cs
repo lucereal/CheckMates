@@ -1,11 +1,12 @@
 ﻿using Amazon.SecurityToken.SAML;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using receiptParser.Domain;
 using receiptParser.Hubs;
 using receiptParser.Repository.inter;
 using receiptParser.Repository.mappers;
-using receiptParser.Repository.model;
+using receiptParser.Repository.models;
 using receiptParser.Service.inter;
 using receiptParser.Util.error;
 using shortid;
@@ -27,13 +28,16 @@ namespace receiptParser.Service.impl
 
         private readonly IMongoRepository<Receipt> _userReceiptRepository;
 
+        private readonly IMongoRepository<Connection> _userConnectionRepository;
+
 
         private readonly IHubContext<ChatHub> _hubContext;
 
-        public UserReceiptService(ILoggerFactory loggerFactory, IMongoRepository<Receipt> userReceiptRepository, IHubContext<ChatHub> hubContext)
+        public UserReceiptService(ILoggerFactory loggerFactory, IMongoRepository<Receipt> userReceiptRepository, IMongoRepository<Connection> userConnectionRepository, IHubContext<ChatHub> hubContext)
         {
             _logger = loggerFactory.CreateLogger<UserReceiptService>();        
             _userReceiptRepository = userReceiptRepository;
+            _userConnectionRepository = userConnectionRepository;
             _hubContext = hubContext;
         }
 
@@ -129,6 +133,34 @@ namespace receiptParser.Service.impl
 
         }
 
+        public async Task<ReceiptDto> RemoveUserClaim(string id, string userId, int itemId)
+        {
+            Receipt receipt = await _userReceiptRepository.FindByIdAsync(id);
+
+            if (receipt == null)
+            {
+                throw new HandleReceiptException("Could not find receipt while trying to update.", HandleReceiptFailureReason.CouldNotFindReceipt);
+            }
+
+            Item? item = receipt.items.Where(x => x.itemId == itemId).FirstOrDefault();
+
+            if (item == null) { throw new HandleReceiptException("Could not find item in receipt while trying to add claim.", HandleReceiptFailureReason.CouldNotFindUserOrItem); }
+
+            Claim? claim = item.claims.Where(x => x.userId == userId).FirstOrDefault();
+
+            if(claim != null)
+            {
+                item.claims.Remove(claim);
+            }
+            else
+            {
+                throw new HandleReceiptException("Could not remove claim from item because no claim was found for user.", HandleReceiptFailureReason.CouldNotFindUserOrItem);
+            }
+
+            await _userReceiptRepository.ReplaceOneAsync(receipt);
+            await UpdateUsers(receipt);
+            return ReceiptMapper.MapReceiptToReceiptDto(receipt);
+        }
         public async Task<ReceiptDto> AddUsersToReceipt(string id, List<string> users)
         {
             Receipt receipt = await _userReceiptRepository.FindByIdAsync(id);    
@@ -167,7 +199,53 @@ namespace receiptParser.Service.impl
             return ReceiptMapper.MapReceiptToReceiptDto(receipt);
         }
 
-        public async Task<ReceiptDto> AddUserConnectionId(string receiptId, string userConnectionId, string userId)
+        
+        public async Task<ReceiptDto> AddConnectionId(string receiptId, string connectionId)
+        {
+            Receipt receipt = await _userReceiptRepository.FindByIdAsync(receiptId);
+            Connection connection = new Connection();
+            connection.receiptId = receiptId;
+            connection.connectionId = connectionId;
+            connection.connected = true;
+
+            if (receipt == null)
+            {
+                throw new HandleReceiptException("Could not find receipt while trying to update.", HandleReceiptFailureReason.CouldNotFindReceipt);
+            }
+
+            if (!receipt.connectionIds.Contains(connectionId))
+            {
+                receipt.connectionIds.Add(connectionId);
+                await _userConnectionRepository.InsertOneAsync(connection);
+                
+            }
+
+            await _userReceiptRepository.ReplaceOneAsync(receipt);
+
+        
+            await UpdateUsers(receipt);
+
+            return ReceiptMapper.MapReceiptToReceiptDto(receipt);
+
+        }
+
+
+        public async Task<Boolean> RemoveUserConnectionId(string connectionId)
+        {
+            Connection connection = await _userConnectionRepository.FindOneAsync(x => x.connectionId == connectionId);
+            if(connection != null)
+            {
+                Receipt receipt = await _userReceiptRepository.FindByIdAsync(connection.receiptId);
+
+                await RemoveConnectionId(receipt._id.ToString(), connectionId);
+
+                return true;
+            }
+            return false;
+
+        }
+
+        public async Task<ReceiptDto> RemoveConnectionId(string receiptId, string connectionId)
         {
             Receipt receipt = await _userReceiptRepository.FindByIdAsync(receiptId);
 
@@ -176,17 +254,13 @@ namespace receiptParser.Service.impl
                 throw new HandleReceiptException("Could not find receipt while trying to update.", HandleReceiptFailureReason.CouldNotFindReceipt);
             }
 
-            User? user = receipt.users.Where(user => user.userId.Equals(userId)).FirstOrDefault();
-
-            if(user != null)
+            if (receipt.connectionIds.Contains(connectionId))
             {
-                user.connectionId = userConnectionId;
-                
+                receipt.connectionIds.Remove(connectionId);
+                await _userConnectionRepository.DeleteOneAsync(x => x.connectionId == connectionId);
             }
 
             await _userReceiptRepository.ReplaceOneAsync(receipt);
-            List<string> connectionIds = receipt.users.Where(user => user.connectionId != null).Select(user => user.connectionId).ToList();
-
 
             await UpdateUsers(receipt);
 
@@ -196,6 +270,11 @@ namespace receiptParser.Service.impl
 
         public async Task<ReceiptDto> UpdateUsers(ReceiptDto receiptDto)
         {
+            if(receiptDto._id == null)
+            {
+                throw new HandleReceiptException("Could not find receipt because receipt._id is null.", HandleReceiptFailureReason.CouldNotFindReceipt);
+
+            }
             Receipt receipt = await _userReceiptRepository.FindByIdAsync(receiptDto._id);
 
             if (receipt == null)
@@ -203,7 +282,7 @@ namespace receiptParser.Service.impl
                 throw new HandleReceiptException("Could not find receipt while trying to update.", HandleReceiptFailureReason.CouldNotFindReceipt);
             }
 
-            List<string> connectionIds = receipt.users.Where(user => user.connectionId != null).Select(user => user.connectionId).ToList();
+            List<string> connectionIds = receipt.connectionIds;
 
             ReceiptDto updatedReceiptDto = ReceiptMapper.MapReceiptToReceiptDto(receipt);
 
@@ -223,7 +302,7 @@ namespace receiptParser.Service.impl
 
             Receipt updatedReceipt = await _userReceiptRepository.FindByIdAsync(receipt._id.ToString());
 
-            List<string> connectionIds = updatedReceipt.users.Where(user => user.connectionId != null).Select(user => user.connectionId).ToList();
+            List<string> connectionIds = updatedReceipt.connectionIds;
 
             ReceiptDto updatedReceiptDto = ReceiptMapper.MapReceiptToReceiptDto(updatedReceipt);
 
