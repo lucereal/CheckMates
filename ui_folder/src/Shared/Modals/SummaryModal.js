@@ -42,8 +42,7 @@ const SummaryModal = (props) => {
                     </div>
                     <div id='claimed-summary-container'>
                         { getClaimedItemData(summary, user.userId) }
-                        <div id='t
-                        '>
+                        <div id='tip-row'>
                             <i>
                                 Tip (split evenly)
                             </i>
