@@ -336,7 +336,7 @@ const ReceiptBreakdown = (props) => {
                     receiptId={receiptId}
                 />
     
-                <Col id='receipt-grid' className="m-2 p-2 bg-light border rounded">
+                <Col id='receipt-grid' className="m-2 p-2 border rounded">
                 
                     {/* <input
                         className='input-name'
@@ -346,7 +346,7 @@ const ReceiptBreakdown = (props) => {
 
                 <div className="summary-row mt-2 d-flex flex-wrap align-items-center">
                     <Row className="row-container">
-                        <Col xs={6} md={4} className="mb-2 mb-md-0">
+                        <Col xs={6} md={4} className="d-flex justify-content-center ">
                             
                             <span id='select-for-user-text' className="fw-bold">Selecting for user</span>
                             {/* <NameToggles 
@@ -355,11 +355,15 @@ const ReceiptBreakdown = (props) => {
                                 names={data.users}
                             />                         */}
                         </Col>
-                        <Col xs={6} md={4} className="mb-2 mb-md-0">
+                        <Col xs={6} md={4} className="d-flex justify-content-center ">
                         
-                            <Row><span id='total-text' className="fw-bold">{"Total: $" + data.total.toFixed(2)}</span>
-                            </Row>
-                            <Row><span id='remaining-text' className="fw-bold">{"Claimed: $" + claimedTotal.toFixed(2)}</span>
+                        <Row>
+                            <Col>
+                            <span id='total-text' className="fw-bold">{"Total: $" + data.total.toFixed(2)}</span>
+                            </Col>
+                            <Col>
+                            <span id='remaining-text' className="fw-bold">{"Claimed: $" + claimedTotal.toFixed(2)}</span>
+                            </Col>
                             </Row>
                             {/* <Row>
                             <Button id='summary-button' variant="success" onClick={() => setShowModal(true)}>

@@ -40,7 +40,7 @@ const NameToggles = (props) => {
             <DropdownButton 
                 id="name-dropdown" 
                 title={selected || "Name"} 
-                className='name-dropdown-container mb-3'>
+                className='name-dropdown-container mb-3 w-100'>
                 {createButtons()}
             </DropdownButton>
         </div>
