@@ -24,6 +24,20 @@
             outline: none;
             margin-bottom: 1rem;
         }
+        #input-names-input{
+            width:50%;
+        }
+
+        #input-names-btn{
+            
+            background-color: transparent;
+            border: none;
+            
+            &:hover {
+                transform: scale(1.1); /* Make the button bigger */
+                background-color: rgba(255, 255, 255, 0.2); /* Change transparency */
+            }
+        }
     }
 
     #tags-container {
@@ -240,6 +254,3 @@
     }
 }
 
-#input-names-input{
-    width:50%;
-}

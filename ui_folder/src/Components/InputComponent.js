@@ -120,34 +120,19 @@ const InputComponent = () => {
     } else {
         return (
             <>
-            <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
-                    <Container>
-                    <Navbar.Brand id='nav-brand' href="/">Receipt Buddy</Navbar.Brand>
-                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                    {/* <Navbar.Collapse className="justify-content-center"> */}
-                    {/* <Navbar.Text id='Title'>Welcome To Receipt Buddy</Navbar.Text> */}
-                    {/* <Navbar.Text>Signed in as: <a href="#login">Mark Otto</a></Navbar.Text> */}
-                    {/* </Navbar.Collapse> */}
-                    {/* <Navbar.Text className="justify-content-end" id='Title'>Welcome To Receipt Buddy</Navbar.Text> */}
-                        {/* <Navbar.Text id='remaining-text'>Text 2</Navbar.Text> */}
-                    </Container>
-                    {/* <Button id='summary-button' variant="success">
-                        Summary
-                    </Button> */}
-                </Navbar>
-                <div id="input-receipt-container" className="d-flex flex-column align-items-center p-3" >
-                <div className='upload-section w-100'>
+
+                <div id="input-receipt-container" className="d-flex flex-column align-items-center justify-content-center vh-100 p-3" >
+                <div className='upload-section w-100 align-items-center justify-content-center'>
 
                     <h4 className='upload-header mb-3'>
                         Upload your receipt
                     </h4>
-                    <h6 className='upload-instruction mb-4'>
-                        Select an image of your receipt. Then enter the names of the people who participated.
-                    </h6>
+                    
+                    
                     <div className="mb-4">
                     <InputImage receiptImg={receiptImg} setReceiptImg={setReceiptImg} />
                     </div>
-                    <div className="mb-4">
+                    <div className="mb-4 ">
                     <InputNames 
                         participantsNo={participants.length}
                         participants={participants}

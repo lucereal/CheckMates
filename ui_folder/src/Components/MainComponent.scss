@@ -1,19 +1,16 @@
-#file-upload-label{
-    // display: inline-block;
-    width: 100%;
+
+#new-receipt-btn,
+#join-receipt-btn{
     height: 4rem;
-    // text-align: center;
-    text-align: center;
-    color: white;
+    width: 100%;
     background-color: transparent;
     border: none;
     font-size: 2rem;
     transition: transform 0.3s ease, background-color 0.3s ease; /* Smooth transition for transform and background-color */
-    cursor:pointer; /* Change cursor to pointer to indicate it's clickable */
 
     &:hover {
         transform: scale(1.1); /* Make the button bigger */
         background-color: rgba(255, 255, 255, 0.2); /* Change transparency */
     }
+    
 }
-

@@ -1,4 +1,5 @@
 import InputComponent from './Components/InputComponent'
+import MainContainer from './Components/MainComponent';
 import {
     createBrowserRouter,
     RouterProvider,
@@ -7,8 +8,12 @@ import {
 const routes = createBrowserRouter([
     {
       path: "/",
-      element: <InputComponent />,
+      element: <MainContainer />,
     },
+    {
+        path: "/input",
+        element: <InputComponent />,
+      },
     {
         path: "/receipt",
         element: <div><h1>NEW</h1></div>,
