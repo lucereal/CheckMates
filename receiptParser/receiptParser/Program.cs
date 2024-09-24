@@ -42,7 +42,7 @@ app.UseCors(builder =>
     builder.AllowAnyMethod()
        .AllowAnyHeader()
        .AllowCredentials()
-       .WithOrigins("http://localhost:3000");
+       .WithOrigins("http://localhost:3000", "https://lemon-tree-0c66a350f.5.azurestaticapps.net");
 });
 
 
