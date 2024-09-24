@@ -24,20 +24,6 @@
             outline: none;
             margin-bottom: 1rem;
         }
-        #input-names-input{
-            width:50%;
-        }
-
-        #input-names-btn{
-            
-            background-color: transparent;
-            border: none;
-            
-            &:hover {
-                transform: scale(1.1); /* Make the button bigger */
-                background-color: rgba(255, 255, 255, 0.2); /* Change transparency */
-            }
-        }
     }
 
     #tags-container {
@@ -67,9 +53,10 @@
 
 .modal-content {
     .modal-body {
+        
         #summary-row {
             margin-bottom: .75rem;
-
+            
             .summary-top-row {
                 display: flex;
                 justify-content: space-between;
@@ -182,33 +169,59 @@
         // Styling for the receipt items
         .receipt-item {
             width: 85%;
-            margin: .35rem 3rem;
+            margin: .35rem .35rem;
     
-            padding: .25rem .75rem;
+            padding: 0 .25rem;
             border: 2px solid ;
             border-radius: 8px;
             cursor: pointer;
     
-            .top-row {
+            .item-top-row {
                 display: flex;
                 flex-direction: row;
                 justify-content: space-between;
+                .item-text-main{
+                    font-size: 1rem;
+                }
             }
+            
     
-            .bottom-row {
+            .item-bottom-row {
                 display: flex;
+                flex-direction: row;
                 justify-content: space-between;
-    
+                .item-text-instrucation{
+                    font-size: 0.8rem;
+                }
     
                 #claimed-by {
                     i {
-                        font-size: xx-small;
+                        font-size: 0.7rem;
                     }
                 }
             }
     
             .item-grow {
                 font-weight: 600;
+            }
+            @media (max-width: 576px) {
+                .item-top-row{
+                    .item-text-main{
+                        font-size: 0.8rem;
+                    }
+                }
+                .item-bottom-row{
+                    .item-text-instrucation{
+                        font-size: 0.7rem;
+                    }
+                    #claimed-by {
+                        i {
+                            font-size: 0.6rem;
+                        }
+                    }
+                }
+
+
             }
         }
 
@@ -241,16 +254,70 @@
                 margin: 0.5rem 0;
                 max-width: 10rem;
             }
+            
+            #name-dropdown {
+                width: 100%;
+                margin: 0.5rem 0;
+                max-width: 10rem;
+                
+            }
+            @media (max-width: 576px) {
+                #name-dropdown {
+                    width: 100%; /* Adjust the width as needed */
+                    font-size: 0.8rem; /* Adjust the font size as needed */
+                }
+                #summary-button {
+                    width: 100%; /* Adjust the width as needed */
+                    font-size: 0.8rem; /* Adjust the font size as needed */
+                    margin: 0.5rem 0;
+                    max-width: 10rem;
+                }
+                #total-text,
+                #remaining-text,
+                #select-for-user-text{
+                    font-size: 0.8rem;
+                }
+
+            }
+            
+            
+        }
+        .bottom-row {
+            display: flex;
+            justify-content: space-between;
+            position: -webkit-sticky; /* For Safari */
+            position: sticky;
+            bottom: 0;
+            width: 100%;
+            background-color: #f8f9fa; /* Optional: Set a background color */
+            padding: 1rem; /* Optional: Add some padding */
+            // box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better visibility */
+            z-index: 1000;
+            .bottom-button {
+                width: 100%;
+                margin: .5rem 1rem;
+            }
+            @media (max-width: 576px) {
+                
+                .bottom-button {
+                    width: 100%; /* Adjust the width as needed */
+                    font-size: 0.8rem; /* Adjust the font size as needed */
+                    max-width: 10rem;
+                }
+                #total-text,
+                #remaining-text,
+                #select-for-user-text{
+                    font-size: 0.8rem;
+                }
+    
+            }
         }
     }
 
-    .bottom-row {
-        display: flex;
-        justify-content: space-between;
-        .bottom-button {
-            width: 100%;
-            margin: 2.5rem 2.5rem;
-        }
-    }
+
+}
+
+#input-names-input{
+    width:50%;
 }
 

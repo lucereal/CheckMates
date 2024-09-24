@@ -217,18 +217,23 @@ const ReceiptBreakdown = (props) => {
 
         return itemData?.items?.map((item, index) => {
             return (
-                <Card key={index} className={'receipt-item mb-3' + (selected === index ? " selected" : "")} onClick={() => selectItem(index, item)}>
+                <Card key={index} className={'receipt-item' + (selected === index ? " selected" : "")} onClick={() => selectItem(index, item)}>
                     <Card.Body>
-                            <Row className="top-row">
+                            <Row className="item-top-row">
                                 <Col className='item-name'>
+                                <span className='item-text-main'>
                                     {item.description}
+                                    </span>
                                 </Col>
                                 <Col className='item-price text-end'>
+                                <span className='item-text-main'>
                                     ${item.price}
+                                    </span>
                                 </Col>
                             </Row>
-                            <Row className="bottom-row mt-2">
+                            <Row className="item-bottom-row">
                                 <Col id='tap-instruction'>
+                                <span className='item-text-instrucation text-muted'>
                                     { selectedName !== "" ? 
                                         (selected === index ?
                                         (item.claims.indexOf(selectedName) >= 0 ? 
@@ -236,7 +241,7 @@ const ReceiptBreakdown = (props) => {
                                         : "Tap again to confirm")  
                                         : "Tap to claim")
                                         : "Select a name"
-                                    }
+                                    }</span>
                                 </Col>
                                 {item.claims?.length ? 
                                     <Col id='claimed-by' className="text-muted text-end">
@@ -310,26 +315,11 @@ const ReceiptBreakdown = (props) => {
                     <Container>
                     <Navbar.Brand href="/">Receipt Buddy</Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                    {/* <Navbar.Collapse className="justify-content-center"> */}
-                    {/* <Navbar.Text id='Title'>Welcome To Receipt Buddy</Navbar.Text> */}
-                    {/* <Navbar.Text>Signed in as: <a href="#login">Mark Otto</a></Navbar.Text> */}
-                    {/* </Navbar.Collapse> */}
-                    {/* <Navbar.Text className="justify-content-end" id='Title'>Welcome To Receipt Buddy</Navbar.Text> */}
-                        {/* <Navbar.Text id='remaining-text'>Text 2</Navbar.Text> */}
+
                     </Container>
-                    {/* <Button id='summary-button' variant="success">
-                        Summary
-                    </Button> */}
+
                 </Navbar>
-                {/* <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
-                    <Container>
-                        <Navbar.Text id='total-text'>{"Total: $" + data.total.toFixed(2)}</Navbar.Text>
-                        <Navbar.Text id='remaining-text'>{"Claimed: $" + claimedTotal.toFixed(2)}</Navbar.Text>
-                    </Container>
-                    <Button id='summary-button' variant="success" onClick={() => setShowModal(true)}>
-                        Summary
-                    </Button>
-                </Navbar> */}
+
 
 <Container>
                 <SummaryModal 
@@ -356,44 +346,55 @@ const ReceiptBreakdown = (props) => {
 
                 <div className="summary-row mt-2 d-flex flex-wrap align-items-center">
                     <Row className="row-container">
-                    <Col xs={12} md={4} className="mb-2 mb-md-0">
-                        <h6 >Selecting for user</h6>
-                    {/* make buttons to filter out selected ones or have all shown */}
-                    <NameToggles 
-                        selected={selectedName}
-                        setSelected={setSelectedName}
-                        names={data.users}
-                    />                        </Col>
-                        <Col xs={12} md={4} className="mb-2 mb-md-0">
+                        <Col xs={6} md={4} className="mb-2 mb-md-0">
+                            
+                            <span id='select-for-user-text' className="fw-bold">Selecting for user</span>
+                            {/* <NameToggles 
+                                selected={selectedName}
+                                setSelected={setSelectedName}
+                                names={data.users}
+                            />                         */}
+                        </Col>
+                        <Col xs={6} md={4} className="mb-2 mb-md-0">
                         
                             <Row><span id='total-text' className="fw-bold">{"Total: $" + data.total.toFixed(2)}</span>
                             </Row>
                             <Row><span id='remaining-text' className="fw-bold">{"Claimed: $" + claimedTotal.toFixed(2)}</span>
                             </Row>
-                            <Row>
+                            {/* <Row>
                             <Button id='summary-button' variant="success" onClick={() => setShowModal(true)}>
                                 Summary
-                            </Button></Row>
+                            </Button></Row> */}
                         </Col>
+                        <Row className='row-container'>
+                        <Col xs={6} md={4} className="mb-md-0">
+                            
+                            <NameToggles 
+                                selected={selectedName}
+                                setSelected={setSelectedName}
+                                names={data.users}
+                            />                        
+                        </Col>
+                        <Col xs={6} md={4} className="mb-md-0">
                         
-                        {/* <Col xs={12} md={4} className="mb-2 mb-md-0">
-                            <span id='remaining-text' className="fw-bold">{"Claimed: $" + claimedTotal.toFixed(2)}</span>
-                        </Col>
-                        <Col xs={12} md={4} className="text-md-end">
+     
+                            <Row>
+                            <div className="d-flex justify-content-center align-items-center mb-3 w-100">
                             <Button id='summary-button' variant="success" onClick={() => setShowModal(true)}>
                                 Summary
                             </Button>
-                        </Col> */}
+                            </div>
+                            </Row>
+                        </Col>
+                        </Row>
                     </Row>
                 </div>
 
                     {receiptItems()}
-                    
-                </Col>
-                </Container>
-                <div className='bottom-row'>
+
+                    <div className='bottom-row'>
                     {/* Only show this button if no ID exists in the url */}
-                    <Button id='share-button' className='bottom-button' variant="primary" onClick={() => shareReceipt()}>
+                    <Button id='share-button' className='bottom-button' variant="primary" onClick={() => setShowShare(true)}>
                         { shareLoading ? 
                             <Spinner />
                         :
@@ -404,6 +405,9 @@ const ReceiptBreakdown = (props) => {
                         Reset
                     </Button>
                 </div>
+                </Col>
+                </Container>
+                
             </>
         );
     }else{
