@@ -9,7 +9,7 @@ const ShareModal = (props) => {
 
     useEffect(() => {
         if (show) {
-            const linkToShare = window.location.origin + "?receiptId=" + receiptId;
+            const linkToShare = window.location.origin + "/input/?receiptId=" + receiptId;
             inputRef.current.value = linkToShare;
         } else {
             setCopyText("Copy");

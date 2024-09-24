@@ -4,9 +4,9 @@ const InputImage = (props) => {
 
     return(
         <div id="input-container" className="d-flex flex-column align-items-center justify-content-center"  >
-            <button htmlFor="file-upload" id="file-upload-label">
+            <label htmlFor="file-upload" id="file-upload-label" className='btn'>
                 Upload Image
-            </button>
+            </label>
             <input
             id="file-upload"
                 type="file"

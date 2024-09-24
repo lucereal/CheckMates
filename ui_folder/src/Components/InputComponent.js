@@ -94,7 +94,7 @@ const InputComponent = () => {
                     console.log(res.data);
                     console.log("setting receipt data");
                     setReceiptData(res?.data?.receipt);
-                    navigate("/?receiptId=" + id);
+                    navigate("/input/?receiptId=" + id);
                 }
             }).catch((err) => {
                 console.log('-- ERR', err);
@@ -139,14 +139,13 @@ const InputComponent = () => {
                         setParticipants={setParticipants}
                     />
                     </div>
-                </div>
-
-                {/* Make tags for each participant */}
+                                    {/* Make tags for each participant */}
                 { participants.length ? 
                     <NameTags names={participants} setNames={setParticipants}/> 
                     : null
                 }
 
+<div className="mb-4 ">
                 <Button 
                     className='submit-button'
                     id="submit-button" 
@@ -159,6 +158,10 @@ const InputComponent = () => {
                 >
                     {isLoading ? <Spinner size="sm"/> : "Submit"}
                 </Button>
+                </div>
+                </div>
+
+
                 
                 {/* Make a component for it... */}
                 <div className='bottom-nav'/>
