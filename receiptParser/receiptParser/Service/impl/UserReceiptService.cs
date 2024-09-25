@@ -98,17 +98,17 @@ namespace receiptParser.Service.impl
 
             if (item == null) { throw new HandleReceiptException("Could not find item in receipt while trying to add claim.", HandleReceiptFailureReason.CouldNotFindUserOrItem); }
 
-            List<Claim> otherUserClaims = item.claims.Where(x => x.userId != userId).ToList();
+            //List<Claim> otherUserClaims = item.claims.Where(x => x.userId != userId).ToList();
 
-            int otherUserClaimsQuantity = otherUserClaims.Sum(x => x.quantity);
+            //int otherUserClaimsQuantity = otherUserClaims.Sum(x => x.quantity);
 
             Claim? claim = item.claims.Where(x => x.userId == userId).FirstOrDefault();
           
-            if (otherUserClaimsQuantity + quantity > item.quantity)
-            {
-                //cannot add this quantity bc it surpases item quantity
-                throw new HandleReceiptException("Could not update user claim because of invalid quantity.", HandleReceiptFailureReason.CouldNotAddClaim);
-            }     
+            //if (otherUserClaimsQuantity + quantity > item.quantity)
+            //{
+            //    //cannot add this quantity bc it surpases item quantity
+            //    throw new HandleReceiptException("Could not update user claim because of invalid quantity.", HandleReceiptFailureReason.CouldNotAddClaim);
+            //}     
             if (claim == null)
             {
                 Claim nClaim = new Claim();
@@ -118,14 +118,15 @@ namespace receiptParser.Service.impl
             }
             else
             {
-                if (otherUserClaimsQuantity + claim.quantity > item.quantity)
-                {
-                    throw new HandleReceiptException("Could not update user claim because of invalid quantity.", HandleReceiptFailureReason.CouldNotAddClaim);
-                    //quantity is full
-                }
-                claim.quantity = quantity;
+                throw new HandleReceiptException("Could not add claim to item because claim already exists.", HandleReceiptFailureReason.CouldNotAddClaim);
+                //if (otherUserClaimsQuantity + claim.quantity > item.quantity)
+                //{
+                //    throw new HandleReceiptException("Could not update user claim because of invalid quantity.", HandleReceiptFailureReason.CouldNotAddClaim);
+                //    //quantity is full
+                //}
+                //claim.quantity = quantity;
                 
-            
+           
             }
             await _userReceiptRepository.ReplaceOneAsync(receipt);
             await UpdateUsers(receipt);
