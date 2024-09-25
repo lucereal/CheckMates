@@ -6,6 +6,7 @@ using receiptParser.Util.error;
 using System.Collections.Generic;
 using System.Net;
 using System;
+using receiptParser.Repository.models;
 
 namespace receiptParser.Controllers
 {
@@ -214,6 +215,110 @@ namespace receiptParser.Controllers
                     ReceiptDto resultReceiptDto = await _userReceiptService.RemoveUserClaim(model.id, model.userId, model.itemId);
                     receiptResponse.isSuccess = true;
                     receiptResponse.message = "User claim removed on receipt: " + model.id + " for user: " + model.userId + " for item: " + model.itemId;
+
+                    receiptResponse.receipt = resultReceiptDto;
+                }
+                else
+                {
+                    receiptResponse.isSuccess = false;
+                    receiptResponse.message = "Could not parse request object";
+                    resultStatusCode = HttpStatusCode.BadRequest;
+                }
+            }
+            catch (Exception e)
+            {
+                receiptResponse.isSuccess = false;
+                resultStatusCode = HttpStatusCode.InternalServerError;
+            }
+
+            return receiptResponse;
+        }
+
+        [HttpPost(Name = "EditItem")]
+        public async Task<ReceiptResponse> EditItem(EditItemRequest req)
+        {
+            _logger.LogInformation("C# HTTP trigger function processed a request.");
+            HttpStatusCode resultStatusCode = HttpStatusCode.OK;
+            ReceiptResponse receiptResponse = new ReceiptResponse();
+            receiptResponse.isSuccess = false;
+            try
+            {
+                EditItemRequest? model = req;
+                if (model != null)
+                {
+                    ReceiptDto resultReceiptDto = await _userReceiptService.EditItem(model.id, model.itemId, model.price, model.quantity, model.description);
+                    receiptResponse.isSuccess = true;
+                    receiptResponse.message = "Item updated";
+
+                    receiptResponse.receipt = resultReceiptDto;
+                }
+                else
+                {
+                    receiptResponse.isSuccess = false;
+                    receiptResponse.message = "Could not parse request object";
+                    resultStatusCode = HttpStatusCode.BadRequest;
+                }
+            }
+            catch (Exception e)
+            {
+                receiptResponse.isSuccess = false;
+                resultStatusCode = HttpStatusCode.InternalServerError;
+            }
+
+            return receiptResponse;
+        }
+
+        [HttpPost(Name = "DeleteItem")]
+        public async Task<ReceiptResponse> DeleteItem(DeleteItemRequest req)
+        {
+            _logger.LogInformation("C# HTTP trigger function processed a request.");
+            HttpStatusCode resultStatusCode = HttpStatusCode.OK;
+            ReceiptResponse receiptResponse = new ReceiptResponse();
+            receiptResponse.isSuccess = false;
+            try
+            {
+
+                DeleteItemRequest? model = req;
+                if (model != null)
+                {
+                    ReceiptDto resultReceiptDto = await _userReceiptService.DeleteItem(model.id, model.itemId);
+                    receiptResponse.isSuccess = true;
+                    receiptResponse.message = "Item updated";
+
+                    receiptResponse.receipt = resultReceiptDto;
+                }
+                else
+                {
+                    receiptResponse.isSuccess = false;
+                    receiptResponse.message = "Could not parse request object";
+                    resultStatusCode = HttpStatusCode.BadRequest;
+                }
+            }
+            catch (Exception e)
+            {
+                receiptResponse.isSuccess = false;
+                resultStatusCode = HttpStatusCode.InternalServerError;
+            }
+
+            return receiptResponse;
+        }
+
+        [HttpPost(Name = "AddItem")]
+        public async Task<ReceiptResponse> AddItem(AddItemRequest req)
+        {
+            _logger.LogInformation("C# HTTP trigger function processed a request.");
+            HttpStatusCode resultStatusCode = HttpStatusCode.OK;
+            ReceiptResponse receiptResponse = new ReceiptResponse();
+            receiptResponse.isSuccess = false;
+            try
+            {
+
+                AddItemRequest? model = req;
+                if (model != null)
+                {
+                    ReceiptDto resultReceiptDto = await _userReceiptService.AddItem(model.id, model.price, model.quantity, model.description);
+                    receiptResponse.isSuccess = true;
+                    receiptResponse.message = "Item updated";
 
                     receiptResponse.receipt = resultReceiptDto;
                 }

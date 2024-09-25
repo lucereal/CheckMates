@@ -181,11 +181,78 @@ namespace receiptParser.Service.impl
             return ReceiptMapper.MapReceiptToReceiptDto(receipt);
         }
 
-      
+        public async Task<ReceiptDto> EditItem(string id, int itemId, double price, double quantity, string description)
+        {
+
+           Receipt receipt = await _userReceiptRepository.FindByIdAsync(id);
+
+            if (receipt == null)
+            {
+                throw new HandleReceiptException("Could not find receipt while trying to update item.", HandleReceiptFailureReason.CouldNotFindReceipt);
+            }
+
+            Item? item = receipt.items.Where(x => x.itemId == itemId).FirstOrDefault();
+
+            if (item == null) { throw new HandleReceiptException("Could not find item in receipt while trying to update.", HandleReceiptFailureReason.CouldNotFindUserOrItem); }
+
+            item.price = price;
+            item.quantity = quantity;
+            item.description = description;
+
+            await _userReceiptRepository.ReplaceOneAsync(receipt);
+            await UpdateUsers(receipt);
+
+            return ReceiptMapper.MapReceiptToReceiptDto(receipt);
+        }
+
+        public async Task<ReceiptDto> DeleteItem(string id, int itemId)
+        {
+            Receipt receipt = await _userReceiptRepository.FindByIdAsync(id);
+
+            if (receipt == null)
+            {
+                throw new HandleReceiptException("Could not find receipt while trying to update item.", HandleReceiptFailureReason.CouldNotFindReceipt);
+            }
+
+            receipt.items.RemoveAll(x => x.itemId == itemId);
+
+            await _userReceiptRepository.ReplaceOneAsync(receipt);
+            await UpdateUsers(receipt);
+
+            return ReceiptMapper.MapReceiptToReceiptDto(receipt);
+        }
+
+        public async Task<ReceiptDto> AddItem(string id, double price, double quantity, string description)
+        {
+            Receipt receipt = await _userReceiptRepository.FindByIdAsync(id);
+
+            if (receipt == null)
+            {
+                throw new HandleReceiptException("Could not find receipt while trying to update item.", HandleReceiptFailureReason.CouldNotFindReceipt);
+            }
+
+            int largestItemId = receipt.items?.Any() == true ? receipt.items.Max(item => item.itemId) : 0;
+
+
+            Item item = new Item();
+            item.itemId = largestItemId + 1;
+            item.price = price;
+            item.quantity = quantity;
+            item.description = description;
+
+            receipt.items?.Add(item);
+
+            await _userReceiptRepository.ReplaceOneAsync(receipt);
+            await UpdateUsers(receipt);
+
+            return ReceiptMapper.MapReceiptToReceiptDto(receipt);
+        }
 
         public async Task<ReceiptDto> CreateReceipt(ReceiptDto receiptDto)
         {
             Receipt receipt = ReceiptMapper.MapReceiptDtoToReceipt(receiptDto);
+            receipt.originalReceipt = receipt.createCopy();
+
 
             await _userReceiptRepository.InsertOneAsync(receipt);
 
