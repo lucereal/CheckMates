@@ -22,6 +22,7 @@ namespace receiptParser.Repository.mappers
                 receiptDto.tip = receipt.tip;
                 receiptDto.tax = receipt.tax;
                 receiptDto.connectionIds = receipt.connectionIds;
+                receiptDto.originalReceipt = receipt.originalReceipt != null ? MapReceiptToReceiptDto(receipt.originalReceipt) : null;
 
                 receipt.items.ForEach(x =>
                 {
@@ -62,6 +63,7 @@ namespace receiptParser.Repository.mappers
                 receipt.tax = receiptDto.tax;
                 receipt._id = receiptDto._id != null ? ObjectId.Parse(receiptDto._id) : ObjectId.Empty;
                 receipt.connectionIds = receiptDto.connectionIds;
+                receipt.originalReceipt = receiptDto.originalReceipt != null ? MapReceiptDtoToReceipt(receiptDto.originalReceipt) : null;
                 
                 receiptDto.users.ForEach(x =>
                 {

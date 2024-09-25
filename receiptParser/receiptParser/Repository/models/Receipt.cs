@@ -40,7 +40,7 @@ namespace receiptParser.Repository.models
 
         public List<string> connectionIds { get; set; }
 
-        public Receipt originalReceipt { get; set; }
+        public Receipt? originalReceipt { get; set; }
 
         public Receipt createCopy()
         {

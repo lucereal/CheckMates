@@ -32,6 +32,8 @@ namespace receiptParser.Domain
         public string? _id {  get; set; }
 
         public List<string> connectionIds { get; set; }
+
+        public ReceiptDto? originalReceipt { get; set; }
         
 
 
