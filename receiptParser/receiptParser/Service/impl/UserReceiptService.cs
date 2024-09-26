@@ -232,16 +232,42 @@ namespace receiptParser.Service.impl
                 throw new HandleReceiptException("Could not find receipt while trying to update item.", HandleReceiptFailureReason.CouldNotFindReceipt);
             }
 
-            int largestItemId = receipt.items?.Any() == true ? receipt.items.Max(item => item.itemId) : 0;
+
+            if (quantity > 0)
+            {
+                for (int i = 0; i < quantity; i++)
+                {
+                    Item newItem = new Item();
+                    newItem.description = description;
+                    newItem.price = price;
+                    newItem.quantity = 1;
+                    int largestItemId = receipt.items?.Any() == true ? receipt.items.Max(item => item.itemId) : 0;
+                    newItem.itemId = largestItemId + 1;
+                    receipt.items?.Add(newItem);
+                }
+            }
+            else
+            {
+                Item newItem = new Item();
+
+                newItem.description = description;
+                newItem.price = price;
+                newItem.quantity = 1;
+                int largestItemId = receipt.items?.Any() == true ? receipt.items.Max(item => item.itemId) : 0;
+                newItem.itemId = largestItemId + 1;
+                receipt.items?.Add(newItem);
+            }
+
+            //int largestItemId = receipt.items?.Any() == true ? receipt.items.Max(item => item.itemId) : 0;
 
 
-            Item item = new Item();
-            item.itemId = largestItemId + 1;
-            item.price = price;
-            item.quantity = quantity;
-            item.description = description;
+            //Item item = new Item();
+            //item.itemId = largestItemId + 1;
+            //item.price = price;
+            //item.quantity = quantity;
+            //item.description = description;
 
-            receipt.items?.Add(item);
+            //receipt.items?.Add(item);
 
             await _userReceiptRepository.ReplaceOneAsync(receipt);
             await UpdateUsers(receipt);

@@ -28,7 +28,7 @@
             
             background-color: transparent;
             border: none;
-            
+            color: #020202;
             &:hover {
                 transform: scale(1.1); /* Make the button bigger */
                 background-color: rgba(255, 255, 255, 0.2); /* Change transparency */
@@ -93,6 +93,43 @@
 
     }
 }
+#edit-body-container,
+#add-item-body-container,
+#add-user-body-container {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    justify-content: center;
+
+    #edit-form{
+        width: 85%;
+    }
+    
+    #submit-edit-button,
+    #submit-add-new-item-button,
+    #submit-add-user-button {
+        height: 2.75rem;
+        border-radius: 8px 8px 8px 8px;
+        display: flex;
+        align-items: center;
+        margin: 1rem 1rem;
+        padding: 15px 25px;
+        color: #020202;
+        
+        // width: 100%;
+        background-color: #dddddd;
+        border: none;
+        font-size: 1rem;
+        transition: transform 0.3s ease, background-color 0.3s ease; /* Smooth transition for transform and background-color */
+
+        &:hover {
+            transform: scale(1.1); /* Make the button bigger */
+            //background-color: rgba(255, 255, 255, 0.2); /* Change transparency */
+        }
+    }
+
+}
+
 #share-body-container {
     display: flex;
     align-items: center;
@@ -103,12 +140,14 @@
         height: 2.75rem;
         border-radius: 8px 0 0 8px;
     }
+    
     #copy-button {
         height: 2.75rem;
         border-radius: 0 8px 8px 0;
         display: flex;
         align-items: center;
         padding: 15px 25px;
+        color: #020202;
         
         // width: 100%;
         background-color: #dddddd;
@@ -139,6 +178,7 @@
 #receipt-breakdown-container {
     display: flex;
     flex-direction: column;
+    
 
     #receipt-grid {
         display: flex;
@@ -177,7 +217,7 @@
                 background-color: #E7E9EC;
                 cursor: pointer;
                 font-family: "Inter",sans-serif;
-                color: black;
+                color: #020202;
             }
     
             .selected {
@@ -197,6 +237,20 @@
             border-radius: 8px;
             cursor: pointer;
     
+            #receipt-item-card-body{
+                padding: 1rem 0rem;
+            }
+            .recipt-item-col-start{
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: .5rem 0rem;
+            }
+            .recipt-item-col-end{
+                display: flex;
+                padding: .5rem 0rem;
+                align-items: center;
+            }
             .item-top-row {
                 display: flex;
                 flex-direction: row;
@@ -241,9 +295,45 @@
                         }
                     }
                 }
-
-
             }
+            #more-options-dropdown{
+                display: flex;
+                justify-content: right;
+                align-items: center;
+                width: 100%;
+            }
+            #more-options-dropdown-toggle {
+                display:flex;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                color:#020202;
+                max-width: 4rem;
+                height: 2rem;
+                padding: .5rem .5rem;
+                // width: 100%;
+                background-color: transparent;
+                border: none;
+                font-size: 1rem;
+                transition: transform 0.3s ease, background-color 0.3s ease; /* Smooth transition for transform and background-color */
+            
+                &:hover {
+                    transform: scale(1.1); /* Make the button bigger */
+                    background-color: rgba(0, 0, 0, 0.2); /* Change transparency */
+                }   
+            }
+            .more-options-text{
+                color:#020202;
+            }
+            @media (max-width: 576px) {
+                .more-options-dropdown-toggle {
+                    width: 100%; /* Adjust the width as needed */
+                    font-size: 0.8rem; /* Adjust the font size as needed */
+                    max-width: 3rem;
+                    height: 1.5rem;
+                }
+            }
+           
         }
 
         .receipt-item.selected {
@@ -261,7 +351,7 @@
             padding: .25rem 0rem;
             position: -webkit-sticky; /* For Safari */
             position: sticky;
-            top: 3.5rem;
+            top: 0;
             z-index: 1000;
             
             background-color: #dddddd;
@@ -271,13 +361,17 @@
                 width: 100%;
                 justify-content: space-evenly;
             }
-            #summary-button {
+            #summary-button,
+            #add-user-button {
+                display: flex;
+                justify-content: center;
                 margin: 0.5rem 0;
                 max-width: 15rem;
                 width: 100%;
+                color: #020202;
                 height: 3rem;
                 // width: 100%;
-                background-color: transparent;
+                background-color: rgba(255, 255, 255, 0.4);
                 border: none;
                 font-size: 1.25rem;
                 transition: transform 0.3s ease, background-color 0.3s ease; /* Smooth transition for transform and background-color */
@@ -293,9 +387,10 @@
                 margin: 0.5rem 0;
                 max-width: 15rem;
                 width: 100%;
+                color: #020202;
                 height: 3rem;
                 // width: 100%;
-                background-color: transparent;
+                background-color: rgba(255, 255, 255, 0.4);
                 border: none;
                 font-size: 1.25rem;
                 transition: transform 0.3s ease, background-color 0.3s ease; /* Smooth transition for transform and background-color */
@@ -306,13 +401,15 @@
                 }
                 
             }
+            
             @media (max-width: 576px) {
                 #name-dropdown {
                     width: 100%; /* Adjust the width as needed */
                     font-size: 0.8rem; /* Adjust the font size as needed */
                     height: 2rem;
                 }
-                #summary-button {
+                #summary-button,
+                #add-user-button {
                     width: 100%; /* Adjust the width as needed */
                     font-size: 0.8rem; /* Adjust the font size as needed */
                     margin: 0.5rem 0;
@@ -343,10 +440,10 @@
             .bottom-button {
                 width: 100%;
                 margin: .5rem 1rem;
-                
+                color: #020202;
                 height: 3rem;
                 // width: 100%;
-                background-color: transparent;
+                background-color: rgba(255, 255, 255, 0.4);
                 border: none;
                 font-size: 1.25rem;
                 transition: transform 0.3s ease, background-color 0.3s ease; /* Smooth transition for transform and background-color */
@@ -372,6 +469,50 @@
     
             }
         }
+         .floating-button-row{
+        //     display: flex;
+        //     justify-content: right;
+        //     position: -webkit-sticky; /* For Safari */
+        //     position: sticky;
+        //     bottom: 7rem;
+        //     width: 80%;
+            
+
+            .floating-button {
+                position: fixed;
+                bottom: 6rem;
+                right: 9rem;
+                border-radius: 50%;
+                width: 3rem;
+                height: 3rem;
+                border-color:transparent;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                z-index: 1000; /* Ensure it stays on top */
+                background-color: rgba(0, 0, 0, 0.6);
+                color:#020202;
+                &:hover {
+                    transform: scale(1.2); /* Make the button bigger */
+                    background-color: rgba(0, 0, 0, 0.2); /* Change transparency */
+                }
+            }
+            @media (max-width: 576px) {
+                
+                .floating-button {
+                    bottom: 4rem;
+                    right: 5rem;
+                    width: 3rem;
+                    height: 3rem;
+                    font-size: 0.8rem; /* Adjust the font size as needed */
+
+                }
+                
+    
+            }
+        }
+        
     }
 
 
