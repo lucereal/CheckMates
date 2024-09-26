@@ -57,7 +57,7 @@ const ReceiptBreakdown = (props) => {
         const chatHubUrlDev = "https://receiptparserdevelop001.azurewebsites.net/chatHub";
         const chatHubUrlLocal = "http://localhost:5197/chatHub";
         let connection = new signalR.HubConnectionBuilder()
-        .withUrl(chatHubUrlLocal)
+        .withUrl(chatHubUrlDev)
         //.withUrl("http://localhost:49965/chatHub")
         .build();
 
@@ -112,7 +112,7 @@ const ReceiptBreakdown = (props) => {
         const addUserUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/AddUserItem";
         const addUserUrlLocal = "https://localhost:7196/HandleReceipt/AddUserItem";
         
-        axios.post(addUserUrlLocal, payload).then(res => {
+        axios.post(addUserUrlDev, payload).then(res => {
             console.log('-- ReceiptBreakdown.js|109 >> res', res);
             if (res.status == "200") {
                 const id = res?.data?.receipt?._id;
@@ -136,7 +136,7 @@ const ReceiptBreakdown = (props) => {
         console.log(payload);
         const removeUserUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/RemoveUserItem";
         const removeUserUrlLocal = "https://localhost:7196/HandleReceipt/RemoveUserItem";
-        axios.post(removeUserUrlLocal, payload).then(res => {
+        axios.post(removeUserUrlDev, payload).then(res => {
             console.log('-- ReceiptBreakdown.js|109 >> res', res);
             if (res.status == "200") {
                 const id = res?.data?.receipt?._id;
@@ -225,7 +225,7 @@ const ReceiptBreakdown = (props) => {
             console.log('Calling API to update item:', deleteItem);
             const deleteItemUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/DeleteItem";
             const deleteItemUrlLocal = "https://localhost:7196/HandleReceipt/DeleteItem";
-            axios.post(deleteItemUrlLocal, deleteItem).then(res => {
+            axios.post(deleteItemUrlDev, deleteItem).then(res => {
                 console.log('-- ReceiptBreakdown.js|109 >> res', res);
                 if (res.status == "200") {
                     const id = res?.data?.receipt?._id;

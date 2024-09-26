@@ -17,7 +17,7 @@ const AddUserModal = (props) => {
             console.log('Calling API to add user to receipt:', addUsers);
             const addUsersUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/AddUsers";
             const addUsersUrlLocal = "https://localhost:7196/HandleReceipt/AddUsers";
-            axios.post(addUsersUrlLocal, addUsers).then(res => {
+            axios.post(addUsersUrlDev, addUsers).then(res => {
                 console.log('-- ReceiptBreakdown.js|109 >> res', res);
                 if (res.status == "200") {
                     const id = res?.data?.receipt?._id;

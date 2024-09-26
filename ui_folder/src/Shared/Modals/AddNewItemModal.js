@@ -22,7 +22,7 @@ const AddNewItemModal = (props) => {
             console.log('Calling API to add new item:', addItem);
             const addItemUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/AddItem";
             const addItemUrlLocal = "https://localhost:7196/HandleReceipt/AddItem";
-            axios.post(addItemUrlLocal, addItem).then(res => {
+            axios.post(addItemUrlDev, addItem).then(res => {
                 console.log('-- ReceiptBreakdown.js|109 >> res', res);
                 if (res.status == "200") {
                     const id = res?.data?.receipt?._id;
