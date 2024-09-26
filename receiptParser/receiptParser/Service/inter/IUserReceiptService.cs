@@ -22,6 +22,12 @@ namespace receiptParser.Service.inter
 
         Task<Boolean> RemoveUserConnectionId(string userConnectionId);
 
+        Task<ReceiptDto> EditItem(string id, int itemId, double price, double quantity, string description);
+
+        Task<ReceiptDto> DeleteItem(string id, int itemId);
+
+        Task<ReceiptDto> AddItem(string id, double price, double quantity, string description);
+
         Task<ReceiptDto> RemoveUserClaim(string id, string userId, int itemId);
         Task<ReceiptDto> UpdateUsers(ReceiptDto receiptDto);
 

@@ -33,7 +33,9 @@ const InputComponent = () => {
         console.log(existingReceiptId)
 
         if (id) {
+            
             const url = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/GetReceipt/" +id;
+            const urlLocal = "https://localhost:7196/HandleReceipt/GetReceipt/" +id;
             console.log("makeing get request for existing receipt");
             //setReceiptLoading(true);
             axios.get(url).then(res => {
