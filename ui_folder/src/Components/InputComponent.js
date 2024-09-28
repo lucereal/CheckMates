@@ -4,7 +4,8 @@ import InputImage from '../Shared/InputImage/InputImage';
 import { Button, Col, Container, Navbar, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 import { mock } from './mockReceipt';
-import ReceiptBreakdown from '../Shared/ReceiptBreakdown/ReceiptBreakdown';
+//import ReceiptBreakdown from '../Shared/ReceiptBreakdown/ReceiptBreakdown';
+import ReceiptBreakdownWrapper from '../Shared/ReceiptBreakdown/ReceiptBreakdown';
 import InputNames from '../Shared/InputNames/InputNames';
 import NameTags from '../Shared/NameThings/NameTags';
 //import { Spinner } from 'react-bootstrap';
@@ -18,6 +19,7 @@ const InputComponent = () => {
     const navigate = useNavigate(); 
     const [existingReceiptId, setExistingReceiptId] = useState(null); 
     const backendApiUrl = process.env.REACT_APP_BACKEND_API_URL;
+    const chatHubUrl = backendApiUrl + "/chatHub";
 
     const getUrlId = () => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -117,11 +119,19 @@ const InputComponent = () => {
 
 
     if (receiptData !== null && receiptData !== undefined) {
-        console.log("receiptData: " + receiptData)
+        console.log("receiptData: ");
+        console.log(receiptData);
         console.log("creating receipt breakdown");
         return (
             <div id="receipt-breakdown-container">
-                <ReceiptBreakdown data={receiptData} setData={setReceiptData} />
+                {/* <ReceiptBreakdown data={receiptData} setData={setReceiptData} />
+                 */}
+                 <ReceiptBreakdownWrapper data={receiptData} 
+                    setData={setReceiptData}
+                    chatHubUrl={chatHubUrl}
+                    receiptId={receiptData._id}
+                    />
+                
             </div>
         )
     } else {
