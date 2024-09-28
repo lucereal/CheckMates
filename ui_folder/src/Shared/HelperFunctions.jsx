@@ -8,7 +8,28 @@ export function getClaimedTotal(items, tip, tax) {
             claimedTotal += item.price;
         }
     }
-    return claimedTotal + tip + tax;
+    return claimedTotal;
+}
+
+export function getUserClaimedTotal(items, user) {
+
+    console.log("in getUserClaimedTotal");
+    console.log(user);
+
+    if (!items.length) return 0;
+
+    let claimedTotal = 0.0;
+    for (const item of items) {
+        // If the claims array has people, then we should add it to the total
+        if (item.claims.length) {
+            for(const claim of item.claims) {
+                if (claim.userId === user.userId) {
+                    claimedTotal += item.price/item.claims.length;
+                }
+            }
+        }
+    }
+    return claimedTotal;
 }
 
 // Gotta make a dictionary where the key is the user, have the value be a dictionary of values

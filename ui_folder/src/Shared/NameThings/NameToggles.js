@@ -37,10 +37,11 @@ const NameToggles = (props) => {
         //     {createButtons()}
         // </ButtonGroup>
         <div  className="d-flex justify-content-center align-items-center w-100 ">
-            <DropdownButton 
-                id="name-dropdown" 
+            <DropdownButton  
+                id={'name-dropdown' + (selected !== null && selected !== "" ? "-highlight" : "")}
                 title={selected || "Name"} 
-                className='name-dropdown-container mb-3 w-100'>
+                className='name-dropdown-container w-100'>
+                    
                 {createButtons()}
             </DropdownButton>
         </div>

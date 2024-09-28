@@ -178,13 +178,14 @@
 #receipt-breakdown-container {
     display: flex;
     flex-direction: column;
-    
-
+    padding: 2 2;
+    margin: 0rem 0rem;
     #receipt-grid {
         display: flex;
         flex-direction: column;
         align-items: center;
-        max-width: 900px;
+        // max-width: 900px;
+        // width: 65%;
     
         .item-name {
             font-family: "Inter",sans-serif;
@@ -229,11 +230,11 @@
     
         // Styling for the receipt items
         .receipt-item {
-            width: 85%;
-            margin: .35rem .35rem;
+            width: 100%;
+            margin: 0rem 0rem;
     
             padding: 0 .25rem;
-            border: 2px solid ;
+            // border: 2px solid ;
             border-radius: 8px;
             cursor: pointer;
     
@@ -342,6 +343,12 @@
             transition: .15s;
         }
 
+        .receipt-item.highlight {
+            background-color: #cbe9f4;
+            outline: 1px solid #cccfd3;
+            transition: .15s;
+        }
+
         .summary-row {
             display: flex;
             justify-content: space-evenly;
@@ -362,7 +369,9 @@
                 justify-content: space-evenly;
             }
             #summary-button,
+            #add-item-button,
             #add-user-button {
+                align-items: center;
                 display: flex;
                 justify-content: center;
                 margin: 0.5rem 0;
@@ -399,7 +408,18 @@
                     transform: scale(1.1); /* Make the button bigger */
                     background-color: rgba(255, 255, 255, 0.2); /* Change transparency */
                 }
-                
+            }
+            #name-dropdown-highlight{
+                @extend #name-dropdown;
+                background-color: #cbe9f4;
+                outline: 1px solid #cccfd3;
+                transition: .15s;
+            }
+            #total-text,
+            #remaining-text,
+            #select-for-user-text,
+            #user-total-text{
+                font-size: 1rem;
             }
             
             @media (max-width: 576px) {
@@ -409,6 +429,7 @@
                     height: 2rem;
                 }
                 #summary-button,
+                #add-item-button,
                 #add-user-button {
                     width: 100%; /* Adjust the width as needed */
                     font-size: 0.8rem; /* Adjust the font size as needed */
@@ -418,8 +439,9 @@
                 }
                 #total-text,
                 #remaining-text,
-                #select-for-user-text{
-                    font-size: 0.8rem;
+                #select-for-user-text,
+                #user-total-text{
+                    font-size: 0.6rem;
                 }
 
             }
@@ -463,8 +485,9 @@
                 }
                 #total-text,
                 #remaining-text,
+                #user-total-text,
                 #select-for-user-text{
-                    font-size: 0.8rem;
+                    font-size: 0.6rem;
                 }
     
             }
