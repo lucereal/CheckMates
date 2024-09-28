@@ -5,7 +5,8 @@ import axios from 'axios';
 const AddUserModal = (props) => {
     const {show, setShow, receiptId} = props;
     const userRef = useRef();
-
+    const backendApiUrl = process.env.REACT_APP_BACKEND_API_URL;
+    const addUserUrl = backendApiUrl + "/HandleReceipt/AddUsers";
     const submitAddUser = async (event) => {
         event.preventDefault();
         const addUsers = {
@@ -15,9 +16,8 @@ const AddUserModal = (props) => {
 
         try {
             console.log('Calling API to add user to receipt:', addUsers);
-            const addUsersUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/AddUsers";
-            const addUsersUrlLocal = "https://localhost:7196/HandleReceipt/AddUsers";
-            axios.post(addUsersUrlDev, addUsers).then(res => {
+
+            axios.post(addUserUrl, addUsers).then(res => {
                 console.log('-- ReceiptBreakdown.js|109 >> res', res);
                 if (res.status == "200") {
                     const id = res?.data?.receipt?._id;

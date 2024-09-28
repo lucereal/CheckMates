@@ -17,6 +17,7 @@ const InputComponent = () => {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate(); 
     const [existingReceiptId, setExistingReceiptId] = useState(null); 
+    const backendApiUrl = process.env.REACT_APP_BACKEND_API_URL;
 
     const getUrlId = () => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -34,11 +35,12 @@ const InputComponent = () => {
 
         if (id) {
             
-            const url = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/GetReceipt/" +id;
-            const urlLocal = "https://localhost:7196/HandleReceipt/GetReceipt/" +id;
+            //const url = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/GetReceipt/" +id;
+            //const urlLocal = "https://localhost:7196/HandleReceipt/GetReceipt/" +id;
+            const getReceiptUrl = backendApiUrl + "/HandleReceipt/GetReceipt/" +id;
             console.log("makeing get request for existing receipt");
             //setReceiptLoading(true);
-            axios.get(url).then(res => {
+            axios.get(getReceiptUrl).then(res => {
                 console.log("got response for existing receipt");
                 setReceiptData(res?.data?.receipt);
 
@@ -72,10 +74,12 @@ const InputComponent = () => {
         })
         //formData.append('users', names);
 
+        console.log("API URL: " + process.env.REACT_APP_BACKEND_API_URL);
         //const url = 'https://receiptparserservices20230928182301.azurewebsites.net/api/ParseReceipt?name=Functions';
-        const url = 'https://receiptparserdevelop001.azurewebsites.net/ParseReceipt/ParseReceipt';
-        const urlLocal = 'https://localhost:7196/ParseReceipt/ParseReceipt';
-        axios.post(url, formData, {
+        // const url = 'https://receiptparserdevelop001.azurewebsites.net/ParseReceipt/ParseReceipt';
+        // const urlLocal = 'https://localhost:7196/ParseReceipt/ParseReceipt';
+        const parseReceiptUrl = backendApiUrl + '/ParseReceipt/ParseReceipt';
+        axios.post(parseReceiptUrl, formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
@@ -85,9 +89,10 @@ const InputComponent = () => {
                 "receipt": res.data.receipt
             }
       
-            const createReceiptUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/CreateReceipt";
-            const createReceiptUrlLocal = "https://localhost:7196/HandleReceipt/CreateReceipt";
-            axios.post(createReceiptUrlDev, payload).then(res => {
+            // const createReceiptUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/CreateReceipt";
+            // const createReceiptUrlLocal = "https://localhost:7196/HandleReceipt/CreateReceipt";
+            const createReceiptUrl = backendApiUrl + "/HandleReceipt/CreateReceipt";
+            axios.post(createReceiptUrl, payload).then(res => {
                 console.log('-- ReceiptBreakdown.js|109 >> res', res);
                 
                 if (res.status == "200") {

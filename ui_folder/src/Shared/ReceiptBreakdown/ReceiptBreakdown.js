@@ -43,6 +43,11 @@ const ReceiptBreakdown = (props) => {
     const [showItemBreakdown, setShowItemBreakdown] = useState(false);
     const [editItem, setEditItem] = useState(null);
 
+    const backendApiUrl = process.env.REACT_APP_BACKEND_API_URL;
+    const chatHubUrl = backendApiUrl + "/chatHub";
+    const addUserUrl = backendApiUrl + "/HandleReceipt/AddUserItem";
+    const removeUserUrl = backendApiUrl + "/HandleReceipt/RemoveUserItem";
+    const deleteItemUrl = backendApiUrl + "/HandleReceipt/DeleteItem";
 
     useEffect(() => {
         //everytime there is a change
@@ -54,11 +59,9 @@ const ReceiptBreakdown = (props) => {
     },[])
 
     useEffect(() => {
-        const chatHubUrlDev = "https://receiptparserdevelop001.azurewebsites.net/chatHub";
-        const chatHubUrlLocal = "http://localhost:5197/chatHub";
+
         let connection = new signalR.HubConnectionBuilder()
-        .withUrl(chatHubUrlDev)
-        //.withUrl("http://localhost:49965/chatHub")
+        .withUrl(chatHubUrl)
         .build();
 
         setConnectionId(connection.connectionId);
@@ -109,10 +112,7 @@ const ReceiptBreakdown = (props) => {
         }
         console.log("add user item payload: ")
         console.log(payload);
-        const addUserUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/AddUserItem";
-        const addUserUrlLocal = "https://localhost:7196/HandleReceipt/AddUserItem";
-        
-        axios.post(addUserUrlDev, payload).then(res => {
+        axios.post(addUserUrl, payload).then(res => {
             console.log('-- ReceiptBreakdown.js|109 >> res', res);
             if (res.status == "200") {
                 const id = res?.data?.receipt?._id;
@@ -134,9 +134,8 @@ const ReceiptBreakdown = (props) => {
         }
         console.log("add user item payload: ")
         console.log(payload);
-        const removeUserUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/RemoveUserItem";
-        const removeUserUrlLocal = "https://localhost:7196/HandleReceipt/RemoveUserItem";
-        axios.post(removeUserUrlDev, payload).then(res => {
+
+        axios.post(removeUserUrl, payload).then(res => {
             console.log('-- ReceiptBreakdown.js|109 >> res', res);
             if (res.status == "200") {
                 const id = res?.data?.receipt?._id;
@@ -171,21 +170,16 @@ const ReceiptBreakdown = (props) => {
             console.log("tempIndex: " + tempIndex);
             if (tempIndex > -1) {
                 console.log("removing claim");
-                //tempItem.claims.splice(tempIndex, 1); // 2nd parameter means remove one item only
                 let removeUserClaimFromItemSuccess = removeUserClaimFromItem(tempMainData._id, currentUser.userId, tempItem.itemId)
                 if(removeUserClaimFromItemSuccess){
                     alert("Failed to remove claim from item.");
                 }
 
             } else {
-                //tempItem.claims.push(selectedName.toString());
-                //tempItem.claims.push(selectedName.toString());
-                //const claimTemp = {userId:currentUser.userId, quantity:1};
-                //tempItem.claims.push(claimTemp);
+
                 const payload = {
                     "id":tempMainData._id, "userId":currentUser.userId,"itemId":tempItem.itemId,"quantity":1
                 }
-                //addUserClaimToItem(tempMainData._id, currentUser.userId, tempItem.itemId)
 
                 let addUserClaimToItemSuccess = addUserClaimToItem(tempMainData._id, currentUser.userId, tempItem.itemId)
                 
@@ -223,9 +217,8 @@ const ReceiptBreakdown = (props) => {
         };
         try {
             console.log('Calling API to update item:', deleteItem);
-            const deleteItemUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/DeleteItem";
-            const deleteItemUrlLocal = "https://localhost:7196/HandleReceipt/DeleteItem";
-            axios.post(deleteItemUrlDev, deleteItem).then(res => {
+
+            axios.post(deleteItemUrl, deleteItem).then(res => {
                 console.log('-- ReceiptBreakdown.js|109 >> res', res);
                 if (res.status == "200") {
                     const id = res?.data?.receipt?._id;
