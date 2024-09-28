@@ -4,6 +4,12 @@ import './index.scss';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+
+console.log("NODE_ENV: " + process.env.NODE_ENV);
+console.log("Secret Key: " + process.env.REACT_APP_SECRET_KEY);
+console.log("API URL: " + process.env.REACT_APP_API_URL);
+
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
