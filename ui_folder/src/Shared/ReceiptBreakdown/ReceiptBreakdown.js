@@ -11,6 +11,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import * as signalR from '@microsoft/signalr'
 import { FaEllipsisV, FaEdit, FaTrash, FaPlus, FaUserPlus, FaShareSquare } from 'react-icons/fa';
+import { useSignalR } from '../SignalRContext';
+import { SignalRProvider } from '../SignalRContext';
 
 
 /** IF ITEM ID IN THE RESPONSE STAYS IN AN ORDER, THEN THAT WILL KEEP THINGS EASY
@@ -22,6 +24,7 @@ import { FaEllipsisV, FaEdit, FaTrash, FaPlus, FaUserPlus, FaShareSquare } from 
 const ReceiptBreakdown = (props) => {
     const data = props.data;
     const setData = props.setData;
+    const hubUrl = props.chatHubUrl
     const claimedTotal = getClaimedTotal(data.items, data.tip, data.tax);
     const selectedRef = useRef();
 
@@ -44,6 +47,9 @@ const ReceiptBreakdown = (props) => {
     const [editItem, setEditItem] = useState(null);
     const [userClaimedTotal, setUserClaimedTotal] = useState(0);
     const [userSelectedItems, setUserSelectedItems] = useState([]);
+    
+    const connection = useSignalR();
+
 
     const backendApiUrl = process.env.REACT_APP_BACKEND_API_URL;
     const chatHubUrl = backendApiUrl + "/chatHub";
@@ -68,24 +74,9 @@ const ReceiptBreakdown = (props) => {
     },[selectedName])
 
     useEffect(() => {
-
-        let connection = new signalR.HubConnectionBuilder()
-        .withUrl(chatHubUrl)
-        .build();
-
-        setConnectionId(connection.connectionId);
-        try{
-            connection.start().then(() => {
-                console.log("connection established");
-                console.log("addUserConnectionId with receiptId: " + receiptId + " and connectionId: " + connection.connectionId );
-                connection.invoke("AddUserConnectionId", receiptId);
-            });
-        }catch(e){
-            console.log("exception in connection start");
-            console.log(e);
-        }
-        
-        try{
+        if (connection) {
+            // Handle SignalR events here
+            console.log("in connection use effect conditional")
             connection.on("GroupReceiptUpdate", (receiptDto) => {
                 console.log("receipt update received: " );
                 console.log(receiptDto);
@@ -95,14 +86,45 @@ const ReceiptBreakdown = (props) => {
                 connection.invoke("GroupUpdateReceived", receiptDto._id, connection.connectionId)
             
             })
-        }catch(e){
-            console.log("exception in connection on groupReceiptUpdate");
-            console.log(e);
         }
+    }, [connection]);
+
+    // useEffect(() => {
+
+    //     let connection = new signalR.HubConnectionBuilder()
+    //     .withUrl(chatHubUrl)
+    //     .build();
+
+    //     setConnectionId(connection.connectionId);
+    //     try{
+    //         connection.start().then(() => {
+    //             console.log("connection established");
+    //             console.log("addUserConnectionId with receiptId: " + receiptId + " and connectionId: " + connection.connectionId );
+    //             connection.invoke("AddUserConnectionId", receiptId);
+    //         });
+    //     }catch(e){
+    //         console.log("exception in connection start");
+    //         console.log(e);
+    //     }
+        
+    //     try{
+    //         connection.on("GroupReceiptUpdate", (receiptDto) => {
+    //             console.log("receipt update received: " );
+    //             console.log(receiptDto);
+    //             setData(receiptDto);
+    //             setItemData(receiptDto);
+    //             ///setItemData(receiptDto);
+    //             connection.invoke("GroupUpdateReceived", receiptDto._id, connection.connectionId)
+            
+    //         })
+    //     }catch(e){
+    //         console.log("exception in connection on groupReceiptUpdate");
+    //         console.log(e);
+    //     }
 
         
 
-    }, [])
+    // }, [])
 
     const updateUserClaimsAndTotal = () => {
         setUserClaimedTotal(getUserClaimedTotal(itemData.items, 
@@ -524,4 +546,16 @@ const ReceiptBreakdown = (props) => {
     
 }
 
-export default ReceiptBreakdown;
+//export default ReceiptBreakdown;
+const ReceiptBreakdownWrapper = (props) => {
+    return (
+        <SignalRProvider chatHubUrl={props.chatHubUrl} receiptId={props.receiptId}>
+            <ReceiptBreakdown 
+            data={props.data}
+            setData={props.setData}
+            chatHubUrl={props.chatHubUrl} />
+        </SignalRProvider>
+    );
+};
+export default ReceiptBreakdownWrapper;
+//  <ReceiptBreakdown data={receiptData} setData={setReceiptData} />
