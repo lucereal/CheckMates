@@ -21,25 +21,7 @@ const MainContainer = () => {
     const [existingReceiptId, setExistingReceiptId] = useState(getUrlId());
     const inputRef = useRef();
     const [showJoin, setShowJoin] = useState(false); // Share modal
-    
 
-    // useEffect(() => {
-    //     if (existingReceiptId) {
-    //         const url = "https://receiptparserservices20230928182301.azurewebsites.net/api/GetReceipt?name=Functions";
-    //         const payload = {
-    //             id: existingReceiptId
-    //         }
-
-    //         setReceiptLoading(true);
-    //         axios.post(url, payload).then(res => {
-    //             setReceiptData(res?.data?.receipt);
-    //             setReceiptLoading(false);
-    //         }).catch(e => {
-    //             console.log('-- ERR', e);
-    //             setReceiptLoading(false);
-    //         })
-    //     }
-    // }, []);
     
     const joinReceiptInitiate = (inputRef) => {
         console.log("inputRef: ", inputRef.current.value);

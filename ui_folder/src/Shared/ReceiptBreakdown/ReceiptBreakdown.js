@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button, Col, Row, Container, Dropdown, Card, Navbar, Spinner } from 'react-bootstrap';
 import NameToggles from '../NameThings/NameToggles';
-import { getClaimedTotal, getUrlId } from '../HelperFunctions';
+import { getClaimedTotal, getUrlId, getUserClaimedTotal } from '../HelperFunctions';
 import SummaryModal from '../Modals/SummaryModal';
 import ShareModal from '../Modals/ShareModal';
 import EditModal from '../Modals/EditModal';
@@ -10,7 +10,7 @@ import AddUserModal from '../Modals/AddUserModal';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import * as signalR from '@microsoft/signalr'
-import { FaEllipsisV, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
+import { FaEllipsisV, FaEdit, FaTrash, FaPlus, FaUserPlus } from 'react-icons/fa';
 
 
 /** IF ITEM ID IN THE RESPONSE STAYS IN AN ORDER, THEN THAT WILL KEEP THINGS EASY
@@ -42,7 +42,14 @@ const ReceiptBreakdown = (props) => {
     const [users, setUsers] = useState(data.users);
     const [showItemBreakdown, setShowItemBreakdown] = useState(false);
     const [editItem, setEditItem] = useState(null);
+    const [userClaimedTotal, setUserClaimedTotal] = useState(0);
+    const [userSelectedItems, setUserSelectedItems] = useState([]);
 
+    const backendApiUrl = process.env.REACT_APP_BACKEND_API_URL;
+    const chatHubUrl = backendApiUrl + "/chatHub";
+    const addUserUrl = backendApiUrl + "/HandleReceipt/AddUserItem";
+    const removeUserUrl = backendApiUrl + "/HandleReceipt/RemoveUserItem";
+    const deleteItemUrl = backendApiUrl + "/HandleReceipt/DeleteItem";
 
     useEffect(() => {
         //everytime there is a change
@@ -54,11 +61,20 @@ const ReceiptBreakdown = (props) => {
     },[])
 
     useEffect(() => {
-        const chatHubUrlDev = "https://receiptparserdevelop001.azurewebsites.net/chatHub";
-        const chatHubUrlLocal = "http://localhost:5197/chatHub";
+        if(selectedName !== "") {
+            
+            setUserClaimedTotal(getUserClaimedTotal(itemData.items, 
+                itemData.users.find(user => user.name === selectedName))); 
+
+            const userItems = itemData.items.filter(item => item.claims.find(claim => claim.userId === itemData.users.find(user => user.name === selectedName).userId));
+            setUserSelectedItems(userItems.map(item => item.itemId));
+        }
+    },[selectedName])
+
+    useEffect(() => {
+
         let connection = new signalR.HubConnectionBuilder()
-        .withUrl(chatHubUrlDev)
-        //.withUrl("http://localhost:49965/chatHub")
+        .withUrl(chatHubUrl)
         .build();
 
         setConnectionId(connection.connectionId);
@@ -109,10 +125,7 @@ const ReceiptBreakdown = (props) => {
         }
         console.log("add user item payload: ")
         console.log(payload);
-        const addUserUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/AddUserItem";
-        const addUserUrlLocal = "https://localhost:7196/HandleReceipt/AddUserItem";
-        
-        axios.post(addUserUrlDev, payload).then(res => {
+        axios.post(addUserUrl, payload).then(res => {
             console.log('-- ReceiptBreakdown.js|109 >> res', res);
             if (res.status == "200") {
                 const id = res?.data?.receipt?._id;
@@ -134,9 +147,8 @@ const ReceiptBreakdown = (props) => {
         }
         console.log("add user item payload: ")
         console.log(payload);
-        const removeUserUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/RemoveUserItem";
-        const removeUserUrlLocal = "https://localhost:7196/HandleReceipt/RemoveUserItem";
-        axios.post(removeUserUrlDev, payload).then(res => {
+
+        axios.post(removeUserUrl, payload).then(res => {
             console.log('-- ReceiptBreakdown.js|109 >> res', res);
             if (res.status == "200") {
                 const id = res?.data?.receipt?._id;
@@ -171,21 +183,16 @@ const ReceiptBreakdown = (props) => {
             console.log("tempIndex: " + tempIndex);
             if (tempIndex > -1) {
                 console.log("removing claim");
-                //tempItem.claims.splice(tempIndex, 1); // 2nd parameter means remove one item only
                 let removeUserClaimFromItemSuccess = removeUserClaimFromItem(tempMainData._id, currentUser.userId, tempItem.itemId)
                 if(removeUserClaimFromItemSuccess){
                     alert("Failed to remove claim from item.");
                 }
 
             } else {
-                //tempItem.claims.push(selectedName.toString());
-                //tempItem.claims.push(selectedName.toString());
-                //const claimTemp = {userId:currentUser.userId, quantity:1};
-                //tempItem.claims.push(claimTemp);
+
                 const payload = {
                     "id":tempMainData._id, "userId":currentUser.userId,"itemId":tempItem.itemId,"quantity":1
                 }
-                //addUserClaimToItem(tempMainData._id, currentUser.userId, tempItem.itemId)
 
                 let addUserClaimToItemSuccess = addUserClaimToItem(tempMainData._id, currentUser.userId, tempItem.itemId)
                 
@@ -223,9 +230,8 @@ const ReceiptBreakdown = (props) => {
         };
         try {
             console.log('Calling API to update item:', deleteItem);
-            const deleteItemUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/DeleteItem";
-            const deleteItemUrlLocal = "https://localhost:7196/HandleReceipt/DeleteItem";
-            axios.post(deleteItemUrlDev, deleteItem).then(res => {
+
+            axios.post(deleteItemUrl, deleteItem).then(res => {
                 console.log('-- ReceiptBreakdown.js|109 >> res', res);
                 if (res.status == "200") {
                     const id = res?.data?.receipt?._id;
@@ -266,12 +272,16 @@ const ReceiptBreakdown = (props) => {
         console.log("selectedUser: " );
         console.log(currentUser);
         //setSelectedUser(currentUser);
-
+        console.log("userSelectedItems: ");
+        console.log(userSelectedItems);
+        
 
         return (
             <>
-                { itemData?.items?.map((item, index) => (
-                    <Card key={index} className={'receipt-item' + (selected === index ? " selected" : "")} onClick={() => selectItem(index, item)}>
+                { itemData?.items?.map((item, index) => 
+                
+                (
+                    <Card key={index} className={'receipt-item' + (selected === index ? " selected" : "") + (userSelectedItems?.includes(item.itemId) ? " highlight" : "")} onClick={() => selectItem(index, item)}>
                         <Card.Body id="receipt-item-card-body" className='d-flex justify-content-center'>
                             <Row className='d-flex w-100 h-100'>
                             <Col className='recipt-item-col-start col-10 col-sm-10 col-md-11'>
@@ -398,7 +408,7 @@ const ReceiptBreakdown = (props) => {
 
 
 
-                <Col id='receipt-grid' className="m-2 p-2 border rounded">
+                <Col id='receipt-grid' >
                 
                     {/* <input
                         className='input-name'
@@ -408,61 +418,57 @@ const ReceiptBreakdown = (props) => {
 
                 <div className="summary-row mt-2 d-flex flex-wrap align-items-center">
                     <Row className="row-container">
-                        <Col xs={6} md={4} className="d-flex justify-content-center ">
-                            
-                            <span id='select-for-user-text' className="fw-bold">Selecting for user</span>
-                            {/* <NameToggles 
-                                selected={selectedName}
-                                setSelected={setSelectedName}
-                                names={data.users}
-                            />                         */}
+                        <Col xs={3} md={3} className="d-flex justify-content-center ">
+                        <span id='total-text' className="fw-bold">{"Total: $" + data.total.toFixed(2)}</span>
                         </Col>
-                        <Col xs={6} md={4} className="d-flex justify-content-center ">
-                        
-                        <Row>
-                            <Col>
-                            <span id='total-text' className="fw-bold">{"Total: $" + data.total.toFixed(2)}</span>
-                            </Col>
-                            <Col>
-                            <span id='remaining-text' className="fw-bold">{"Claimed: $" + claimedTotal.toFixed(2)}</span>
-                            </Col>
-                            </Row>
-                            {/* <Row>
-                            <Button id='summary-button' variant="success" onClick={() => setShowModal(true)}>
-                                Summary
-                            </Button></Row> */}
+                        <Col xs={3} md={3} className="d-flex justify-content-center ">
+                        <span id='remaining-text' className="fw-bold">{"Total Claimed: $" + claimedTotal.toFixed(2)}</span>
                         </Col>
-                        <Row className='row-container'>
+                        <Col xs={3} md={3} className="d-flex justify-content-center" >
+                            <span id='user-total-text' className="fw-bold">{"User Total: $" + userClaimedTotal.toFixed(2)}</span>
+                        </Col>
+                    <Row className='row-container'>
                         <Col xs={6} md={4} className="mb-md-0">
-                            <Row>
+                            <Row className='d-flex align-items-center'>
                                 <Col className="col-7 col-sm-6">
                                     <NameToggles 
                                         selected={selectedName}
                                         setSelected={setSelectedName}
                                         names={data.users}
                                     />      
+                                </Col>
+                                    <Col className="col-5 col-sm-6">
+                                        <Button id='add-user-button' onClick={() => handleAddUser()} >
+                                            <FaUserPlus className='add-user-icon' />
+                                        </Button>
+                                    </Col> 
+                                </Row>
+                                                
                             </Col>
+                            <Col xs={6} md={4} className="mb-md-0">
+                                <Row>
+                                <Col className="col-7 col-sm-6">
+                                    <div className="d-flex justify-content-center align-items-center w-100">
+                                        <Button id='summary-button' variant="success" onClick={() => setShowModal(true)}>
+                                            Summary
+                                        </Button>
+                                    </div> 
+                                </Col>
                                 <Col className="col-5 col-sm-6">
-                                    <Button id='add-user-button' onClick={() => handleAddUser()} >
-                                        Add
-                                    </Button>
-                                </Col> 
-                            </Row>
-                                             
-                        </Col>
-                        <Col xs={6} md={4} className="mb-md-0">
-                        
-     
-                            <Row>
-                            <div className="d-flex justify-content-center align-items-center mb-3 w-100">
-                            <Button id='summary-button' variant="success" onClick={() => setShowModal(true)}>
-                                Summary
-                            </Button>
-                            </div>
-                            </Row>
-                        </Col>
-                        </Row>
+                                    <div className="d-flex justify-content-center align-items-center w-100">
+                                        
+                                        <Button
+                                            id="add-item-button"
+                                            onClick={() => handleAddNewItem()}
+                                            >
+                                            <FaPlus />
+                                        </Button>
+                                    </div> 
+                                </Col>
+                                </Row>
+                            </Col>
                     </Row>
+                </Row>
                 </div>
 
                     {receiptItems()}
@@ -481,8 +487,8 @@ const ReceiptBreakdown = (props) => {
                         Reset
                     </Button>
                 </div>
-                    <div className='floating-button-row'>
-                        {/* Floating Add Button */}
+                    {/* <div className='floating-button-row'>
+                       
                         <Button
                             id="floating-add-button"
                             variant="primary"
@@ -491,7 +497,7 @@ const ReceiptBreakdown = (props) => {
                             >
                             <FaPlus />
                         </Button>
-                    </div>
+                    </div> */}
                 </Col>
                 </Container>
                 

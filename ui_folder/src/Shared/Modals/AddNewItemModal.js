@@ -7,7 +7,8 @@ const AddNewItemModal = (props) => {
     const descriptionRef = useRef();
     const quantityRef = useRef();
     const priceRef = useRef();
-
+    const backendApiUrl = process.env.REACT_APP_BACKEND_API_URL;
+    const addItemUrl = backendApiUrl + "/HandleReceipt/AddItem";
     const submitAddNewItem = async (event) => {
         event.preventDefault();
         
@@ -20,9 +21,8 @@ const AddNewItemModal = (props) => {
 
         try {
             console.log('Calling API to add new item:', addItem);
-            const addItemUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/AddItem";
-            const addItemUrlLocal = "https://localhost:7196/HandleReceipt/AddItem";
-            axios.post(addItemUrlDev, addItem).then(res => {
+
+            axios.post(addItemUrl, addItem).then(res => {
                 console.log('-- ReceiptBreakdown.js|109 >> res', res);
                 if (res.status == "200") {
                     const id = res?.data?.receipt?._id;
