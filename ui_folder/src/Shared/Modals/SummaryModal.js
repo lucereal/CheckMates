@@ -42,7 +42,7 @@ const SummaryModal = (props) => {
                     </div>
                     <div id='claimed-summary-container'>
                         { getClaimedItemData(summary, user.userId) }
-                        <div id='tip-row'>
+                        {/* <div id='tip-row'>
                             <i>
                                 Tip (split evenly)
                             </i>
@@ -57,7 +57,7 @@ const SummaryModal = (props) => {
                             <i>
                                 ${summary[user.userId].sharedTax.toFixed(2)}
                             </i>
-                        </div>
+                        </div> */}
                     </div>
                     <hr />
                 </div>
@@ -73,7 +73,7 @@ const SummaryModal = (props) => {
             <Modal.Body>
                 {getUserRowSummary()}
                 <div id='final-row'>
-                    <b>total: ${total.toFixed(2)}</b>
+                    <b>Total: ${total.toFixed(2)}</b>
                     <b>Claimed Total: ${claimedTotal.toFixed(2)}</b>
                 </div>
             </Modal.Body>

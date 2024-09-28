@@ -181,6 +181,18 @@ namespace receiptParser.Controllers
 
                 }
 
+                ItemDto tipItem = new ItemDto();
+                tipItem.description = "Tip";
+                tipItem.price = tip;
+                tipItem.quantity = 1;
+                items.Add(tipItem);
+                
+                ItemDto taxItem = new ItemDto();
+                taxItem.description = "Tax";
+                taxItem.price = tax;
+                taxItem.quantity = 1;
+                items.Add(taxItem);
+
                 for (int i = 0; i < items.Count; i++)
                 {
                     items[i].itemId = i;
