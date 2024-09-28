@@ -10,7 +10,7 @@ import AddUserModal from '../Modals/AddUserModal';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import * as signalR from '@microsoft/signalr'
-import { FaEllipsisV, FaEdit, FaTrash, FaPlus, FaUserPlus } from 'react-icons/fa';
+import { FaEllipsisV, FaEdit, FaTrash, FaPlus, FaUserPlus, FaShareSquare } from 'react-icons/fa';
 
 
 /** IF ITEM ID IN THE RESPONSE STAYS IN AN ORDER, THEN THAT WILL KEEP THINGS EASY
@@ -62,12 +62,8 @@ const ReceiptBreakdown = (props) => {
 
     useEffect(() => {
         if(selectedName !== "") {
-            
-            setUserClaimedTotal(getUserClaimedTotal(itemData.items, 
-                itemData.users.find(user => user.name === selectedName))); 
-
-            const userItems = itemData.items.filter(item => item.claims.find(claim => claim.userId === itemData.users.find(user => user.name === selectedName).userId));
-            setUserSelectedItems(userItems.map(item => item.itemId));
+            updateUserClaimsAndTotal();
+           
         }
     },[selectedName])
 
@@ -108,6 +104,13 @@ const ReceiptBreakdown = (props) => {
 
     }, [])
 
+    const updateUserClaimsAndTotal = () => {
+        setUserClaimedTotal(getUserClaimedTotal(itemData.items, 
+            itemData.users.find(user => user.name === selectedName))); 
+
+        const userItems = itemData.items.filter(item => item.claims.find(claim => claim.userId === itemData.users.find(user => user.name === selectedName).userId));
+        setUserSelectedItems(userItems.map(item => item.itemId));
+    }
 
     const resetClaims = () => {
         const tempMainData = { ...itemData}
@@ -178,6 +181,8 @@ const ReceiptBreakdown = (props) => {
             console.log("found current user");
             console.log(currentUser);
             console.log(item.claims);
+
+            updateUserClaimsAndTotal();
   
             var tempIndex = item.claims.findIndex(claim => claim.userId === currentUser.userId);
             console.log("tempIndex: " + tempIndex);
@@ -369,17 +374,21 @@ const ReceiptBreakdown = (props) => {
     if (showItemBreakdown !== null && showItemBreakdown !== undefined && showItemBreakdown === true) {
         return(
             <>
-            {/* <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
+            <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
                     <Container>
-                    <Navbar.Brand href="/">Receipt Buddy</Navbar.Brand>
+                    <Navbar.Brand href="/">Home</Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
-
+                    <Navbar.Collapse className="justify-content-end">
+                            <Button variant="outline-light" onClick={() => setShowShare(true)}>
+                                <FaShareSquare />
+                            </Button>
+                        </Navbar.Collapse>
                     </Container>
 
-                </Navbar> */}
+                </Navbar>
 
 
-            <Container className='d-flex justify-content-center'>
+            <Container className='d-flex justify-content-center flex-column'>
                 <SummaryModal 
                     show={showModal}
                     setShow={setShowModal}
@@ -405,19 +414,9 @@ const ReceiptBreakdown = (props) => {
                     setShow={setShowAddUser}
                     receiptId={receiptId}
                 />
-
-
-
-                <Col id='receipt-grid' >
-                
-                    {/* <input
-                        className='input-name'
-                        onChange={(e) => inputChangeHandler(e)} 
-                        placeholder='Enter your name'
-                    /> */}
-
-                <div className="summary-row mt-2 d-flex flex-wrap align-items-center">
-                    <Row className="row-container">
+                <Row className="summary-row">
+               
+                    
                         <Col xs={3} md={3} className="d-flex justify-content-center ">
                         <span id='total-text' className="fw-bold">{"Total: $" + data.total.toFixed(2)}</span>
                         </Col>
@@ -427,80 +426,83 @@ const ReceiptBreakdown = (props) => {
                         <Col xs={3} md={3} className="d-flex justify-content-center" >
                             <span id='user-total-text' className="fw-bold">{"User Total: $" + userClaimedTotal.toFixed(2)}</span>
                         </Col>
-                    <Row className='row-container'>
-                        <Col xs={6} md={4} className="mb-md-0">
-                            <Row className='d-flex align-items-center'>
-                                <Col className="col-7 col-sm-6">
-                                    <NameToggles 
-                                        selected={selectedName}
-                                        setSelected={setSelectedName}
-                                        names={data.users}
-                                    />      
-                                </Col>
-                                    <Col className="col-5 col-sm-6">
-                                        <Button id='add-user-button' onClick={() => handleAddUser()} >
-                                            <FaUserPlus className='add-user-icon' />
-                                        </Button>
-                                    </Col> 
-                                </Row>
-                                                
-                            </Col>
-                            <Col xs={6} md={4} className="mb-md-0">
-                                <Row>
-                                <Col className="col-7 col-sm-6">
-                                    <div className="d-flex justify-content-center align-items-center w-100">
-                                        <Button id='summary-button' variant="success" onClick={() => setShowModal(true)}>
-                                            Summary
-                                        </Button>
-                                    </div> 
-                                </Col>
-                                <Col className="col-5 col-sm-6">
-                                    <div className="d-flex justify-content-center align-items-center w-100">
-                                        
-                                        <Button
-                                            id="add-item-button"
-                                            onClick={() => handleAddNewItem()}
-                                            >
-                                            <FaPlus />
-                                        </Button>
-                                    </div> 
-                                </Col>
-                                </Row>
-                            </Col>
-                    </Row>
+                    
+                
+                
                 </Row>
-                </div>
 
+                <Row>
+                <Col id='receipt-grid' >
+                
                     {receiptItems()}
 
-
-                    <div className='bottom-row'>
-                    {/* Only show this button if no ID exists in the url */}
-                    <Button id='share-button' className='bottom-button' variant="primary" onClick={() => setShowShare(true)}>
-                        { shareLoading ? 
-                            <Spinner />
-                        :
-                            "Share"
-                        }
-                    </Button>
-                    <Button id='reset-button' className='bottom-button' variant="danger" onClick={() => resetClaims()}>
-                        Reset
-                    </Button>
-                </div>
-                    {/* <div className='floating-button-row'>
-                       
-                        <Button
-                            id="floating-add-button"
-                            variant="primary"
-                            className="floating-button"
-                            onClick={() => handleAddNewItem()}
-                            >
-                            <FaPlus />
-                        </Button>
-                    </div> */}
                 </Col>
+                </Row>
+                <Row className="bottom-row">
+                        
+                            {/* <Button id='share-button' className='bottom-button' variant="primary" onClick={() => setShowShare(true)}>
+                                { shareLoading ? 
+                                    <Spinner />
+                                :
+                                    "Share"
+                                }
+                            </Button> */}
+                       
+                            <Col xs={3} md={3} className="bottom-row-col">
+                                <Row className='bottom-row-col-row'>
+                                    
+                                        <NameToggles 
+                                                selected={selectedName}
+                                                setSelected={setSelectedName}
+                                                names={data.users}
+                                            /> 
+                                           
+                                </Row>
+                            </Col>
+                            <Col xs={3} md={3} className="bottom-row-col">
+                                <Row className='bottom-row-col-row'>
+                                   
+                           
+                                                <Button id='add-user-button' onClick={() => handleAddUser()} >
+                                                    <FaUserPlus className='add-user-icon' />
+                                                </Button>
+                                   
+                                </Row>
+                            </Col>
+                            <Col xs={3} md={3} className="bottom-row-col">
+                                <Row className='bottom-row-col-row'>
+                                        
+                                                <Button id='summary-button' variant="success" onClick={() => setShowModal(true)}>
+                                                    Summary
+                                                </Button>
+                                            
+                                     
+                                        </Row>
+                                    </Col>
+                                <Col xs={3} md={3} className="bottom-row-col">
+                                    <Row className='bottom-row-col-row'>
+                                    
+                                                
+                                                <Button
+                                                    id="add-item-button"
+                                                    onClick={() => handleAddNewItem()}
+                                                    >
+                                                    <FaPlus />
+                                                </Button>
+                                       
+                                    </Row>
+                                </Col>
+                            
+                </Row>
                 </Container>
-                
+                {/* <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
+                    <Container>
+                    <Navbar.Brand href="/">Home</Navbar.Brand>
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+
+                    </Container>
+
+                </Navbar> */}
             </>
         );
     }else{
