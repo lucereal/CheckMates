@@ -71,7 +71,7 @@ const ReceiptBreakdown = (props) => {
             updateUserClaimsAndTotal();
            
         }
-    },[selectedName])
+    },[selectedName,itemData])
 
     useEffect(() => {
         if (connection) {
@@ -83,48 +83,13 @@ const ReceiptBreakdown = (props) => {
                 setData(receiptDto);
                 setItemData(receiptDto);
                 ///setItemData(receiptDto);
+                //updateUserClaimsAndTotal();
                 connection.invoke("GroupUpdateReceived", receiptDto._id, connection.connectionId)
             
             })
         }
     }, [connection]);
 
-    // useEffect(() => {
-
-    //     let connection = new signalR.HubConnectionBuilder()
-    //     .withUrl(chatHubUrl)
-    //     .build();
-
-    //     setConnectionId(connection.connectionId);
-    //     try{
-    //         connection.start().then(() => {
-    //             console.log("connection established");
-    //             console.log("addUserConnectionId with receiptId: " + receiptId + " and connectionId: " + connection.connectionId );
-    //             connection.invoke("AddUserConnectionId", receiptId);
-    //         });
-    //     }catch(e){
-    //         console.log("exception in connection start");
-    //         console.log(e);
-    //     }
-        
-    //     try{
-    //         connection.on("GroupReceiptUpdate", (receiptDto) => {
-    //             console.log("receipt update received: " );
-    //             console.log(receiptDto);
-    //             setData(receiptDto);
-    //             setItemData(receiptDto);
-    //             ///setItemData(receiptDto);
-    //             connection.invoke("GroupUpdateReceived", receiptDto._id, connection.connectionId)
-            
-    //         })
-    //     }catch(e){
-    //         console.log("exception in connection on groupReceiptUpdate");
-    //         console.log(e);
-    //     }
-
-        
-
-    // }, [])
 
     const updateUserClaimsAndTotal = () => {
         setUserClaimedTotal(getUserClaimedTotal(itemData.items, 
@@ -156,6 +121,7 @@ const ReceiptBreakdown = (props) => {
                 const id = res?.data?.receipt?._id;
                 console.log("add user item success");
                 console.log(res.data.receipt);
+                //updateUserClaimsAndTotal();
                 return true;
             }else{
                 return false;
@@ -179,6 +145,7 @@ const ReceiptBreakdown = (props) => {
                 const id = res?.data?.receipt?._id;
                 console.log("remove user item success");
                 console.log(res.data.receipt);
+                //updateUserClaimsAndTotal();
                 return true;
             }else{
                 return false;
@@ -190,8 +157,10 @@ const ReceiptBreakdown = (props) => {
     }
     
     const selectItem = (index, item) => {
+        console.log("in selectItem");
         // item is selected with a name selection.
-        if (selectedRef.current === index && selectedName !== "") {
+        if ( selectedName !== "") {
+            console.log("in conditoinal")
             const tempItem = { ...item };
             const tempData = [ ...itemData.items ];
 
@@ -204,13 +173,14 @@ const ReceiptBreakdown = (props) => {
             console.log(currentUser);
             console.log(item.claims);
 
-            updateUserClaimsAndTotal();
+            
   
             var tempIndex = item.claims.findIndex(claim => claim.userId === currentUser.userId);
             console.log("tempIndex: " + tempIndex);
             if (tempIndex > -1) {
                 console.log("removing claim");
                 let removeUserClaimFromItemSuccess = removeUserClaimFromItem(tempMainData._id, currentUser.userId, tempItem.itemId)
+                
                 if(removeUserClaimFromItemSuccess){
                     alert("Failed to remove claim from item.");
                 }
@@ -308,7 +278,7 @@ const ReceiptBreakdown = (props) => {
                 { itemData?.items?.map((item, index) => 
                 
                 (
-                    <Card key={index} className={'receipt-item' + (selected === index ? " selected" : "") + (userSelectedItems?.includes(item.itemId) ? " highlight" : "")} onClick={() => selectItem(index, item)}>
+                    <Card key={index} className={'receipt-item' + (userSelectedItems?.includes(item.itemId) ? " highlight" : "")} onClick={() => selectItem(index, item)}>
                         <Card.Body id="receipt-item-card-body" className='d-flex justify-content-center'>
                             <Row className='d-flex w-100 h-100'>
                             <Col className='recipt-item-col-start col-10 col-sm-10 col-md-11'>
@@ -325,7 +295,7 @@ const ReceiptBreakdown = (props) => {
                                     </Col>
                                 </Row>
                                 <Row className="item-bottom-row w-100">
-                                    <Col id='tap-instruction'>
+                                    {/* <Col id='tap-instruction'>
                                     <span className='item-text-instrucation text-muted'>
                                         { selectedName !== "" ? 
                                             (selected === index ?
@@ -335,9 +305,9 @@ const ReceiptBreakdown = (props) => {
                                             : "Tap to claim")
                                             : "Select a name"
                                         }</span>
-                                    </Col>
+                                    </Col> */}
                                     {item.claims?.length ? 
-                                        <Col id='claimed-by' className="text-muted text-end">
+                                        <Col id='claimed-by' className="text-muted text-start">
                                             <i>{"Claimed by: " + getItemClaimedList(item.claims)}</i>
                                         </Col>
                                         : null
@@ -389,6 +359,24 @@ const ReceiptBreakdown = (props) => {
         return claimList.join(", ");
     }
 
+    const handleShare = async () => {
+        if (navigator.share) {
+            const linkToShare = window.location.origin + "/input/?receiptId=" + receiptId;
+            
+            try {
+                await navigator.share({
+                    title: 'Tabman Receipt Share',
+                    text: "Let's split this receipt!",
+                    url: linkToShare,
+                });
+                console.log('Content shared successfully');
+            } catch (error) {
+                console.error('Error sharing content:', error);
+            }
+        } else {
+            console.log('Web Share API is not supported in this browser.');
+        }
+    }
     const shareReceipt = () => {
         console.log("Share Receipt");
     }
@@ -398,10 +386,10 @@ const ReceiptBreakdown = (props) => {
             <>
             <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
                     <Container>
-                    <Navbar.Brand href="/">Home</Navbar.Brand>
+                    <Navbar.Brand  href="/">Home</Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse className="justify-content-end">
-                            <Button variant="outline-light" onClick={() => setShowShare(true)}>
+                            <Button variant="outline-light" onClick={() => handleShare()}>
                                 <FaShareSquare />
                             </Button>
                         </Navbar.Collapse>
@@ -453,7 +441,7 @@ const ReceiptBreakdown = (props) => {
                 
                 </Row>
 
-                <Row>
+                <Row id='receipt-grid-row'>
                 <Col id='receipt-grid' >
                 
                     {receiptItems()}

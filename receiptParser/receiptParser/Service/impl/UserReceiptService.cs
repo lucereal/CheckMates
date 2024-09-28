@@ -200,6 +200,11 @@ namespace receiptParser.Service.impl
             item.quantity = quantity;
             item.description = description;
 
+            if (receipt.items != null)
+            {
+                receipt.total = GetTotalPrice(receipt.items);
+            }
+
             await _userReceiptRepository.ReplaceOneAsync(receipt);
             await UpdateUsers(receipt);
 
@@ -216,6 +221,12 @@ namespace receiptParser.Service.impl
             }
 
             receipt.items.RemoveAll(x => x.itemId == itemId);
+
+            if (receipt.items != null)
+            {
+                receipt.total = GetTotalPrice(receipt.items);
+            }
+
 
             await _userReceiptRepository.ReplaceOneAsync(receipt);
             await UpdateUsers(receipt);
@@ -255,7 +266,12 @@ namespace receiptParser.Service.impl
                 newItem.quantity = 1;
                 int largestItemId = receipt.items?.Any() == true ? receipt.items.Max(item => item.itemId) : 0;
                 newItem.itemId = largestItemId + 1;
-                receipt.items?.Add(newItem);
+                receipt.items?.Add(newItem);   
+            }
+
+            if(receipt.items != null)
+            {
+                receipt.total = GetTotalPrice(receipt.items);
             }
 
             //int largestItemId = receipt.items?.Any() == true ? receipt.items.Max(item => item.itemId) : 0;
@@ -275,11 +291,22 @@ namespace receiptParser.Service.impl
             return ReceiptMapper.MapReceiptToReceiptDto(receipt);
         }
 
+        private double GetTotalPrice(List<Item> items)
+        {
+            double total = 0;
+            foreach(Item item in items)
+            {
+                total += item.price;
+            }
+            return total;
+        }
+
         public async Task<ReceiptDto> CreateReceipt(ReceiptDto receiptDto)
         {
             Receipt receipt = ReceiptMapper.MapReceiptDtoToReceipt(receiptDto);
             receipt.originalReceipt = receipt.createCopy();
 
+            receipt.items.RemoveAll(x => x.price <= 0);
 
             await _userReceiptRepository.InsertOneAsync(receipt);
 

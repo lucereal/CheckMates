@@ -16,7 +16,7 @@ const EditModal = (props) => {
             id: receiptId,
             itemId: item.itemId,
             description: descriptionRef.current.value,
-            quantity: quantityRef.current.value,
+            quantity: 1,
             price: priceRef.current.value,
         };
 
@@ -64,15 +64,7 @@ const EditModal = (props) => {
                         required
                     />
                 </Form.Group>
-                <Form.Group controlId="formItemQuantity">
-                    <Form.Label>Quantity</Form.Label>
-                    <Form.Control
-                        type="number"
-                        defaultValue={item.quantity}
-                        ref={quantityRef}
-                        required
-                    />
-                </Form.Group>
+     
                 <Form.Group controlId="formItemPrice">
                     <Form.Label>Price</Form.Label>
                     <Form.Control
