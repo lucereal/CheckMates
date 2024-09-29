@@ -18,6 +18,8 @@ ReceiptSplit is a web application that allows users to upload a picture of a rec
 ## Future Functionality
 
 - **Payment Service Integrations**: Plans to integrate with payment services such as Venmo, CashApp, Zelle, and more.
+- **Progressive Web App**: Make into progressive web app so that users can have an app on their phone.
+- **Custom Domain**: Custom Domain
 
 ## Fixes Needed
 
