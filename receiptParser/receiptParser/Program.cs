@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using MongoDB.Driver.Core.Configuration;
 using MongoDB.Driver;
 using receiptParser.Repository.impl;
@@ -8,8 +9,12 @@ using receiptParser.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-string connectionString = @"mongodb://receiptstorage:dlJPotZLpCSxRAkF97PRD48aUmtqyjTnVVhFuWU5pvviiyngNdAkScyqOc2DlBSsfm3AiQAy83KcACDbuNIecg==@receiptstorage.mongo.cosmos.azure.com:10255/?ssl=true&retrywrites=false&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@receiptstorage@";
+var configuration = new ConfigurationBuilder()
+    .AddEnvironmentVariables()
+    .AddUserSecrets<Program>()
+    .Build();
+
+string? connectionString = configuration["connectionString"];
 
 
 builder.Services.AddCors();
