@@ -4,6 +4,7 @@ import './index.scss';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 // import Head from 'next/head';
+import * as serviceWorker from './serviceWorkerRegistration';
 
 console.log("NODE_ENV: " + process.env.NODE_ENV);
 console.log("Secret Key: " + process.env.REACT_APP_SECRET_KEY);
@@ -41,6 +42,8 @@ root.render(
         
     </React.StrictMode>
 );
+
+serviceWorker.register();
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
