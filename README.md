@@ -19,6 +19,12 @@ ReceiptSplit is a web application that allows users to upload a picture of a rec
 
 - **Payment Service Integrations**: Plans to integrate with payment services such as Venmo, CashApp, Zelle, and more.
 
+## Fixes Needed
+
+- **404: Not Found**: When a URL is shared I get a 404 not found sometimes
+- **Improved SignalR**: SignalR set up is basic and sometimes requires rejoining the receipt with the code in order to see the real time updates. 
+
+
 
 ## Contributing
 
