@@ -10,7 +10,27 @@ import AddUserModal from '../Modals/AddUserModal';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import * as signalR from '@microsoft/signalr'
-import { FaEllipsisV, FaEdit, FaTrash, FaPlus, FaUserPlus, FaShareSquare } from 'react-icons/fa';
+import Typography from '@mui/material/Typography';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Avatar from '@mui/material/Avatar';
+import IconButton from '@mui/material/IconButton';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import Grid from '@mui/material/Grid';
+import FolderIcon from '@mui/icons-material/Folder';
+import DeleteIcon from '@mui/icons-material/Delete';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Divider from '@mui/material/Divider';
+import EditIcon from '@mui/icons-material/Edit';
+import { Box } from '@mui/material';
+import Chip from '@mui/material/Chip';
+import FaceIcon from '@mui/icons-material/Face';
+import ListItemButton from '@mui/material/ListItemButton';
 
 /** IF ITEM ID IN THE RESPONSE STAYS IN AN ORDER, THEN THAT WILL KEEP THINGS EASY
  *  SINCE I DO NOT HAVE TO ITERATE THROUGH THINGS.
@@ -30,47 +50,45 @@ const ReceiptItem = (props) => {
     const [editItem, setEditItem] = useState(null);
 
     const backendApiUrl = process.env.REACT_APP_BACKEND_API_URL;
-    const deleteItemUrl = backendApiUrl + "/HandleReceipt/DeleteItem";
     const addUserUrl = backendApiUrl + "/HandleReceipt/AddUserItem";
     const removeUserUrl = backendApiUrl + "/HandleReceipt/RemoveUserItem";
+
+
+
     
     const getItemClaimedList = (claims) => {
+        // Use the custom styles
+
         //use the userId in the claims to get a list of the names from the data.users array
         const claimList = [];
         for (let claim of claims) {
             const user = users.find(user => user.userId === claim.userId);
             claimList.push(user.name);
         }
-        return claimList.join(", ");
+
+        console.log("selected name: " + selectedName)
+        console.log("claimList: ");
+        console.log(claimList);
+        // <Chip icon={<FaceIcon />} label="With Icon" variant="outlined" size="small" />
+        return (
+            <>
+        {claimList.map((name, index) => (
+            <Chip
+                c 
+                key={index}
+                icon={<FaceIcon />}
+                label={name}
+                variant="outlined"
+                size="small"
+                sx={{
+                    backgroundColor: selectedName === name ? 'rgba(78, 69, 255, 0.2)' : 'inherit',
+                }}
+            />
+        ))}
+    </>
+        )
+        
     }
-
-    const handleDelete = async (itemId) => {
-        const deleteItem = {
-            id: receiptId,
-            itemId: itemId
-        };
-        try {
-            console.log('Calling API to update item:', deleteItem);
-
-            axios.post(deleteItemUrl, deleteItem).then(res => {
-                console.log('-- ReceiptBreakdown.js|109 >> res', res);
-                if (res.status == "200") {
-                    const id = res?.data?.receipt?._id;
-                    console.log("remove user item success");
-                    console.log(res.data.receipt);
-                    return true;
-                }else{
-                    return false;
-                }
-            }).catch((err) => {
-                console.log('-- ERR', err);
-                return false;
-            })
-            //setShow(false);
-        } catch (error) {
-            console.error('Error updating item:', error);
-        }
-    };
 
     const handleEdit = (item) => {
         console.log("edit item button clicked in handleEdit")
@@ -126,7 +144,7 @@ const ReceiptItem = (props) => {
         })
     }
 
-    const selectItem = (index, item) => {
+    const selectItem = () => {
         console.log("in selectItem");
         // item is selected with a name selection.
         if ( selectedName !== "") {
@@ -164,76 +182,66 @@ const ReceiptItem = (props) => {
                 
             }
 
-            // Use item ID to grab that item from the array since they're just id's in chronological order
-            // This is handy because we dont have to iterate.
-            // if (tempData[tempItem.id] !== undefined)
-            //     tempData[tempItem.id] = tempItem;
-
-            // Get a temp data to modify it with the new additions.
-            //const tempMainData = { ...itemData};
-            //tempMainData.items = tempData;
-            //setItemData(tempMainData);
-
             return;
         }
 
-        //selectedRef.current = index;
-        // setSelected(index);
     }
 
     return (
         <>
-                       <EditModal
+                    <EditModal
                     show={showEdit}
                     setShow={setShowEdit}
                     receiptId={receiptId}
                     item={editItem}
-                />
-          <Card key={index} className={'receipt-item' + (userSelectedItems?.includes(item.itemId) ? " highlight" : "")} onClick={() => selectItem(index, item)}>
-                        <Card.Body id="receipt-item-card-body" className='d-flex justify-content-center'>
-                            <Row className='d-flex w-100 h-100'>
-                            <Col className='recipt-item-col-start col-10 col-sm-10 col-md-11'>
-                                <Row className="item-top-row w-100">
-                                    <Col className='item-name'>
-                                        <span className='item-text-main'>
-                                            {item.description}
-                                        </span>
-                                    </Col>
-                                    <Col className='item-price text-end'>
-                                        <span className='item-text-main'>
-                                            ${item.price}
-                                        </span>
-                                    </Col>
-                                </Row>
-                                <Row className="item-bottom-row w-100">
-                                   
-                                    {item.claims?.length ? 
-                                        <Col id='claimed-by' className="text-muted text-start">
-                                            <i>{"Claimed by: " + getItemClaimedList(item.claims)}</i>
-                                        </Col>
-                                        : null
-                                    }
-                                </Row>
-                            </Col>
-                            <Col className='recipt-item-col-end col-2 col-sm-2 col-md-1'>
-                                <Dropdown id='more-options-dropdown'  >
-                                    <Dropdown.Toggle id="more-options-dropdown-toggle">
-                                        <FaEllipsisV className='more-options-text' />
-                                    </Dropdown.Toggle>
-                
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item onClick={() => handleEdit(item)}>
-                                            <FaEdit className='more-options-text' /> Edit
-                                        </Dropdown.Item>
-                                        <Dropdown.Item onClick={() => handleDelete(item.itemId)}>
-                                            <FaTrash className='more-options-text'/> Delete
-                                        </Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                            </Col>
-                            </Row>
-                        </Card.Body>
-                    </Card>
+                 />
+
+                    <ListItemButton
+                    
+                    onClick={() => selectItem()}
+                    >
+                               
+                    <ListItemText
+                        primary={ 
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                            <Typography
+                                component="span"
+                                variant="body2"
+                                sx={{ color: 'text.primary', display: 'inline' }}
+                            >
+                                {item.description}
+                            </Typography>
+                            <Typography
+                                component="span"
+                                variant="body2"
+                                sx={{ color: 'text.primary', display: 'inline' }}
+                            >
+                                {item.claims?.length ? 
+                               getItemClaimedList(item.claims)
+                                : null
+                                }
+                            </Typography>
+                            </Box>
+                        }
+                        secondary={ 
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                            <Typography
+                                component="span"
+                                variant="body2"
+                                sx={{ color: 'text.primary', display: 'inline' }}
+                            >
+                                {item.price}
+                            </Typography>
+                           
+                            </Box>
+                        }
+                    />
+                    <IconButton edge="end" onClick={() => handleEdit(item)}>
+                                    <EditIcon />
+                                </IconButton>
+                    </ListItemButton>
+                    <Divider variant="middle" component="li" />
+
         </>
     )
 }

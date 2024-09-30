@@ -13,7 +13,7 @@ body {
 p, h1, label {
     font-family: "Inter",sans-serif;
     color: #020202;
-    text-align: center;
+    // text-align: center;
 }
 
 
@@ -28,3 +28,4 @@ code {
 @import './Shared/SharedComponents.scss';
 @import './Shared/InputImage/InputImage.scss';
 @import './Components/MainComponent.scss';
+@import './Shared/ReceiptItem/ReceiptItem.scss';

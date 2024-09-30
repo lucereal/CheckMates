@@ -1,20 +1,31 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Button, Col, Row, Container, Dropdown, Card, Navbar, Spinner } from 'react-bootstrap';
+import { Button, Col, Row, Container, Navbar, Spinner } from 'react-bootstrap';
 import NameToggles from '../NameThings/NameToggles';
 import { getClaimedTotal, getUrlId, getUserClaimedTotal } from '../HelperFunctions';
 import SummaryModal from '../Modals/SummaryModal';
 import ShareModal from '../Modals/ShareModal';
-import EditModal from '../Modals/EditModal';
 import AddNewItemModal from '../Modals/AddNewItemModal';
 import AddUserModal from '../Modals/AddUserModal';
-
-import { useNavigate } from 'react-router-dom';
-
 import { FaPlus, FaUserPlus, FaShareSquare } from 'react-icons/fa';
 import { useSignalR } from '../SignalRContext';
 import { SignalRProvider } from '../SignalRContext';
 import ReceiptItem from '../ReceiptItem/ReceiptItem';
-
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Avatar from '@mui/material/Avatar';
+import IconButton from '@mui/material/IconButton';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import FolderIcon from '@mui/icons-material/Folder';
+import DeleteIcon from '@mui/icons-material/Delete';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Divider from '@mui/material/Divider';
 
 /** IF ITEM ID IN THE RESPONSE STAYS IN AN ORDER, THEN THAT WILL KEEP THINGS EASY
  *  SINCE I DO NOT HAVE TO ITERATE THROUGH THINGS.
@@ -27,36 +38,22 @@ const ReceiptBreakdown = (props) => {
     const setData = props.setData;
     const hubUrl = props.chatHubUrl
     const claimedTotal = getClaimedTotal(data.items, data.tip, data.tax);
-    const selectedRef = useRef();
 
-    const navigate = useNavigate();
-    const [selected, setSelected] = useState(-1);
     const [selectedName, setSelectedName] = useState("");
-    const [selectedNameId, setSelectedNameId] = useState("");
-    const [selectedUser, setSelectedUser] = useState(null);
+
     const [itemData, setItemData] = useState(data);
     const [showModal, setShowModal] = useState(false); // Summary modal
     const [showShare, setShowShare] = useState(false); // Share modal
-    const [showEdit, setShowEdit] = useState(false); // Edit modal
     const [showAddItem, setShowAddItem] = useState(false); // Edit modal
     const [showAddUser, setShowAddUser] = useState(false); // Add User modal
-    const [shareLoading, setShareLoading] = useState(false);
     const [receiptId, setReceiptId] = useState(getUrlId());
-    const [connectionId, setConnectionId] = useState("");
-    const [users, setUsers] = useState(data.users);
     const [showItemBreakdown, setShowItemBreakdown] = useState(false);
-    const [editItem, setEditItem] = useState(null);
     const [userClaimedTotal, setUserClaimedTotal] = useState(0);
     const [userSelectedItems, setUserSelectedItems] = useState([]);
     
     const connection = useSignalR();
 
 
-    const backendApiUrl = process.env.REACT_APP_BACKEND_API_URL;
-    const chatHubUrl = backendApiUrl + "/chatHub";
-    const addUserUrl = backendApiUrl + "/HandleReceipt/AddUserItem";
-    const removeUserUrl = backendApiUrl + "/HandleReceipt/RemoveUserItem";
-    const deleteItemUrl = backendApiUrl + "/HandleReceipt/DeleteItem";
 
     useEffect(() => {
         //everytime there is a change
@@ -100,17 +97,6 @@ const ReceiptBreakdown = (props) => {
         setUserSelectedItems(userItems.map(item => item.itemId));
     }
 
-    const resetClaims = () => {
-        const tempMainData = { ...itemData}
-
-        for (let ind in tempMainData.items) {
-            tempMainData.items[ind].claims = [];
-        }
-
-        setItemData(tempMainData);
-    }
-
-  
 
     const handleAddNewItem = async () => {
         console.log("add item button clicked in handleAddNewItem")
@@ -125,21 +111,55 @@ const ReceiptBreakdown = (props) => {
 
     const receiptItems = () => {
 
-        const tempMainData = { ...itemData}
-        console.log("in receiptItems");
-        console.log("itemData:");
-        console.log(tempMainData)
-        let currentUser = tempMainData.users.find(user => user.name === selectedName);
-        console.log("selectedUser: " );
-        console.log(currentUser);
-        //setSelectedUser(currentUser);
-        console.log("userSelectedItems: ");
-        console.log(userSelectedItems);
-        
-
         return (
             <>
-                { itemData?.items?.map((item, index) => 
+
+            {/* <List dense={dense}>
+                {generate(
+                    <ListItem>
+                    <ListItemAvatar>
+                        <Avatar>
+                        <FolderIcon />
+                        </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                        primary="Single-line item"
+                        secondary={secondary ? 'Secondary text' : null}
+                    />
+                    </ListItem>,
+                )}
+            </List> */}
+                        <List id='reciept-list'>
+                {
+                    itemData?.items?.map((item, index) => 
+
+                        (
+                            <>
+                             <ReceiptItem
+                    item={item}
+                    index={index}
+                    users={itemData.users}
+                    selectedName={selectedName}
+                    userSelectedItems={userSelectedItems}
+                    receiptId={itemData._id}>
+                    </ReceiptItem>
+                            {/* <ListItem>
+                               
+                    <ListItemText
+                        primary="Single-line item"
+                        secondary='Secondary text'
+                    />
+                    <IconButton edge="end" aria-label="delete">
+                                  <MoreVertIcon />
+                                </IconButton>
+                    </ListItem>
+                              <Divider variant="middle" component="li" /> */}
+                              </>
+                        ))
+                }
+            </List>
+
+                {/* { itemData?.items?.map((item, index) => 
                 
                 (
                   <ReceiptItem
@@ -150,7 +170,7 @@ const ReceiptBreakdown = (props) => {
                     userSelectedItems={userSelectedItems}
                     receiptId={itemData._id}>
                     </ReceiptItem>
-                ))}
+                ))} */}
              
                
 
@@ -159,17 +179,6 @@ const ReceiptBreakdown = (props) => {
 
     }
 
-    const getItemClaimedList = (claims) => {
-        //use the userId in the claims to get a list of the names from the data.users array
-        const tempMainData = { ...itemData}
-        const claimList = [];
-
-        for (let claim of claims) {
-            const user = tempMainData.users.find(user => user.userId === claim.userId);
-            claimList.push(user.name);
-        }
-        return claimList.join(", ");
-    }
 
     const handleShare = async () => {
         if (navigator.share) {
@@ -189,9 +198,7 @@ const ReceiptBreakdown = (props) => {
             console.log('Web Share API is not supported in this browser.');
         }
     }
-    const shareReceipt = () => {
-        console.log("Share Receipt");
-    }
+
 
     if (showItemBreakdown !== null && showItemBreakdown !== undefined && showItemBreakdown === true) {
         return(
@@ -260,16 +267,10 @@ const ReceiptBreakdown = (props) => {
 
                 </Col>
                 </Row>
-                <Row className="bottom-row">
-                        
-                            {/* <Button id='share-button' className='bottom-button' variant="primary" onClick={() => setShowShare(true)}>
-                                { shareLoading ? 
-                                    <Spinner />
-                                :
-                                    "Share"
-                                }
-                            </Button> */}
-                       
+
+                </Container>
+                <Container id="bottom-row-container" className='d-flex justify-content-center flex-column'>
+                <Row className="bottom-row">    
                             <Col xs={3} md={3} className="bottom-row-col">
                                 <Row className='bottom-row-col-row'>
                                     
@@ -314,17 +315,9 @@ const ReceiptBreakdown = (props) => {
                                        
                                     </Row>
                                 </Col>
-                            
                 </Row>
                 </Container>
-                {/* <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
-                    <Container>
-                    <Navbar.Brand href="/">Home</Navbar.Brand>
-                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
-
-                    </Container>
-
-                </Navbar> */}
+                
             </>
         );
     }else{
@@ -358,4 +351,4 @@ const ReceiptBreakdownWrapper = (props) => {
     );
 };
 export default ReceiptBreakdownWrapper;
-//  <ReceiptBreakdown data={receiptData} setData={setReceiptData} />
+

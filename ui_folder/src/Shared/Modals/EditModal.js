@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Button, Modal, Form } from "react-bootstrap";
+import { Modal, Form } from "react-bootstrap";
 import axios from 'axios';
+import Button from '@mui/material/Button';
 
 const EditModal = (props) => {
     const {show, setShow, receiptId, item} = props;
@@ -9,6 +10,8 @@ const EditModal = (props) => {
     const priceRef = useRef();
     const backendApiUrl = process.env.REACT_APP_BACKEND_API_URL;
     const editItemUrl = backendApiUrl + "/HandleReceipt/EditItem";
+    const deleteItemUrl = backendApiUrl + "/HandleReceipt/DeleteItem";
+
     
     const submitEditItem = async (event) => {
         event.preventDefault();
@@ -44,6 +47,35 @@ const EditModal = (props) => {
         }
     };
 
+    const handleDelete = async (itemId) => {
+        const deleteItem = {
+            id: receiptId,
+            itemId: itemId
+        };
+        try {
+            console.log('Calling API to update item:', deleteItem);
+
+            axios.post(deleteItemUrl, deleteItem).then(res => {
+                console.log('-- ReceiptBreakdown.js|109 >> res', res);
+                if (res.status == "200") {
+                    const id = res?.data?.receipt?._id;
+                    console.log("remove user item success");
+                    console.log(res.data.receipt);
+                    setShow(false);
+
+                    return true;
+                }else{
+                    return false;
+                }
+            }).catch((err) => {
+                console.log('-- ERR', err);
+                return false;
+            })
+            //setShow(false);
+        } catch (error) {
+            console.error('Error updating item:', error);
+        }
+    };
     
     return (
         <>
@@ -75,8 +107,17 @@ const EditModal = (props) => {
                         required
                     />
                 </Form.Group>
-                <Button id='submit-edit-button' type="submit">
+                {/* <Button id='submit-edit-button' type="submit">
                     Submit
+                </Button>
+                <Button id='delete-edit-button'>
+                    Delete
+                </Button> */}
+                <Button variant="contained"  type="submit">
+                Submit
+                </Button>
+                <Button variant="outlined" color="error" onClick={() => handleDelete(item.itemId)}>
+                Delete
                 </Button>
             </Form>
 )}

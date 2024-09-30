@@ -1,0 +1,20 @@
+.delete-edit-button{
+    height: 2.75rem;
+    border-radius: 8px 8px 8px 8px;
+    display: flex;
+    align-items: center;
+    margin: 1rem 1rem;
+    padding: 15px 25px;
+    color: #020202;
+    
+    // width: 100%;
+    background-color: #dddddd;
+    border: none;
+    font-size: 1rem;
+    transition: transform 0.3s ease, background-color 0.3s ease; /* Smooth transition for transform and background-color */
+
+    &:hover {
+        transform: scale(1.1); /* Make the button bigger */
+        //background-color: rgba(255, 255, 255, 0.2); /* Change transparency */
+    }
+}
