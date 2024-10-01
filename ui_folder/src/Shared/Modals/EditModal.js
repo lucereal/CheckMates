@@ -78,32 +78,22 @@ const EditModal = (props) => {
         }
     };
     
+    
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            submitEditItem();
+        }
+    };
+
     return (
         <>
-       
-       <Dialog open={show} onClose={() => setShow(false)}>
+       {(item && show) && (
+       <Dialog open={show} onClose={() => setShow(false)} onKeyDown={handleKeyDown}>
                     <DialogTitle>Edit Item</DialogTitle>
                     <DialogContent>
-                    <TextField
-                      autoFocus
-                      required
-                      margin="dense"
-                      id="item-description"
-                      name="item-description"
-                      label="Item Description"
-                      variant="standard"
-                      inputRef={descriptionRef}
-                    />
-                     <TextField
-                      autoFocus
-                      required
-                      margin="dense"
-                      id="item-price"
-                      name="item-price"
-                      label="Item Price"
-                      variant="standard"
-                      inputRef={priceRef}
-                    />
+                    <TextField required margin="dense" id="item-description" name="item-description" label="Item Description" variant="standard" defaultValue={item.description} inputRef={descriptionRef} />
+                    <TextField required type="number" step="0.01" margin="dense" id="item-price" name="item-price" label="Item Price" variant="standard" defaultValue={item.price} inputRef={priceRef} />
+
                   </DialogContent>
                   <DialogActions>
                     <Button variant="text" onClick={() => setShow(false)}>Cancel</Button>
@@ -111,6 +101,7 @@ const EditModal = (props) => {
                     <Button variant="text" onClick={() => submitEditItem()}>Submit</Button>
                   </DialogActions>
         </Dialog>
+       )}
         </>
     )
 }

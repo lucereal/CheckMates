@@ -227,43 +227,44 @@ const InputComponent = () => {
         if(existingReceiptId === null || existingReceiptId === undefined) {
             return (
                 <>
-                        <Box >
+                        <Box sx={{ flexGrow: 1 }} >
                         <AppBar position="fixed" sx={{ bgcolor: 'background.paper', boxShadow: 'none' }}>
                             <Toolbar>
-                                <Typography variant="h6" noWrap component="a" href="/" sx={{ mr: 2, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem', color: 'primary', textDecoration: 'none' }}>
+                            <Typography variant="h6" noWrap component="a" href="/" sx={{ mr: 2, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem', color: 'primary.main', textDecoration: 'none' }}>
                                     CheckMates
                                 </Typography>
                                 <Box sx={{ flexGrow: 1 }} />
 
-                            <Button color="primary"  >Login</Button>
+                            <Button color="primary" variant="text"  >Login</Button>
                             </Toolbar>
                         </AppBar>
                     </Box>
                     <Container fixed sx={{ display: 'flex',  alignItems: 'center', justifyContent: 'center',
-                        flexDirection: 'column' // Responsive flex direction
+                        flexDirection: 'column', height: '100vh' // Responsive flex direction
                      }}>
                         <Box sx={{ display: 'flex',  alignItems: 'center', justifyContent: 'center',
                             flexDirection: { xs: 'column', xm: 'column', md: 'row' }}}>
                             
-                            <Button disabled
+                            <Button
+                            color="primary"
                                 variant={isManualEntry ? "contained" : "outlined"}
                                 onClick={() => handleManualEntry()}
                             >
                                 Manual Entry
                             </Button>
                             
-                            <Typography sx={{ fontFamily: 'monospace', mr: 2, ml: 2, mt: 2, mb: 2, fontWeight: 700, color: 'primary', textDecoration: 'none' }}>
+                            <Typography sx={{ fontFamily: 'monospace', mr: 2, ml: 2, mt: 2, mb: 2, fontWeight: 700, color: 'primary.main', textDecoration: 'none' }}>
                                 or
                             </Typography>
                             
-                            <Button component="label" role={undefined} variant={isImageEntry ? "contained" : "outlined"} startIcon={<CloudUploadIcon />} onClick={() => handleImageEntry()}>
+                            <Button component="label" color="primary" role={undefined} variant={isImageEntry ? "contained" : "outlined"} startIcon={<CloudUploadIcon />} onClick={() => handleImageEntry()}>
                                 Receipt Image
                                 <VisuallyHiddenInput type="file" onChange={handleFileChange} />
                             </Button>
                             
 
                            
-                            {isImageEntry && <Typography sx={{ ml: 2 }}>{fileName}</Typography>}
+                            {isImageEntry && <Typography sx={{ ml: 2, color:'text.primary' }}>{fileName}</Typography>}
                             
                         </Box>
                         {showUserField && (

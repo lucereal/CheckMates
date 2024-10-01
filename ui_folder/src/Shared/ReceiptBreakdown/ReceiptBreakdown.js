@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Button, Col, Row, Navbar, Spinner } from 'react-bootstrap';
+import { Col, Row, Navbar, Spinner } from 'react-bootstrap';
 import NameToggles from '../NameThings/NameToggles';
 import { getClaimedTotal, getUrlId, getUserClaimedTotal } from '../HelperFunctions';
 import SummaryModal from '../Modals/SummaryModal';
@@ -34,10 +34,13 @@ import Container from '@mui/material/Container';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/material/styles/useTheme';
 import FaceIcon from '@mui/icons-material/Face';
+import Button from '@mui/material/Button';
 import ContentCut from '@mui/icons-material/ContentCut';
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
-
+import Avatar from '@mui/material/Avatar';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { ListItemIcon } from '@mui/material';
 /** IF ITEM ID IN THE RESPONSE STAYS IN AN ORDER, THEN THAT WILL KEEP THINGS EASY
  *  SINCE I DO NOT HAVE TO ITERATE THROUGH THINGS.
  * 
@@ -142,41 +145,46 @@ const ReceiptBreakdown = (props) => {
     }
 
     const renderUserMenu = () => (
+        <Box>
+            
         <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleClose}
-            
+            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
             {data.users.map((user, index) => (
-        <Box key={index} sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'space-between',
-                flexDirection: 'row', pl:1, pr:2}}>
-             <Box sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'center',
-                                    flexDirection: 'row'}}>
-                                
-                <MenuItem key={index} onClick={() => handleSelectUser(user)} sx={{ flexGrow: 1 }}>
-                    {user.name}
-                    
-                </MenuItem>
-                <IconButton edge="end" color="inherit" onClick={() => handleDeleteUser(user)}>
-                        <CloseIcon />
-                    </IconButton>
-                </Box>
+                <Box key={index} sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'space-between',
+                    flexDirection: 'row', pr:2}}>
+                    <Box sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'center',
+                                            flexDirection: 'row'}}>
+                 
+                        <MenuItem key={index} onClick={() => handleSelectUser(user)} sx={{ flexGrow: 1 }}>
+                            <ListItemIcon>
+                                <FaceIcon fontSize="small" />
+                            </ListItemIcon>
+                            {user.name}
+                        </MenuItem>
+                        <IconButton edge="end" color="inherit" onClick={() => handleDeleteUser(user)}>
+                            <CloseIcon />
+                        </IconButton>
+                    </Box>
                    
                   
                     
-                    </Box>
+                </Box>
             ))}
-            {/* <MenuItem onClick={handleAddUser}>Add New User</MenuItem> */}
-            <Divider variant="middle" orientation="horizontal" sx={{ width: '100%', m:0, borderWidth: '1px' }}/>
-            <Box sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'center',
-                        flexDirection: 'row'}}>
-                        <IconButton edge="end" color="inherit" >
-                        <PersonAddAltIcon />
-                    </IconButton>
-                    </Box>
+            
+            <MenuItem onClick={handleAddUser}>
+                <ListItemIcon>
+                    <PersonAddAltIcon fontSize="small" />
+                </ListItemIcon>
+                Add User
+            </MenuItem>
             
         </Menu>
+    </Box>
         
     );
 
@@ -229,7 +237,7 @@ const ReceiptBreakdown = (props) => {
              <Box sx={{ flexGrow: 1 }}>
                         <AppBar position="fixed" sx={{ bgcolor: 'background.paper', boxShadow: 'none' }}>
                             <Toolbar>
-                            <Typography variant="h6" noWrap component="a" href="/" sx={{ mr: 2, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem', color: 'primary', textDecoration: 'none' }}>
+                            <Typography variant="h6" noWrap component="a" href="/" sx={{ mr: 2, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem', color: 'primary.main', textDecoration: 'none' }}>
                                     CheckMates
                                 </Typography>
                                 <Box sx={{ flexGrow: 1 }} />
@@ -240,12 +248,12 @@ const ReceiptBreakdown = (props) => {
                     </Box>
 
                 <Container fixed sx={{ display: 'flex',  alignItems: 'center', justifyContent: 'center',
-                        flexDirection: 'column'
+                        flexDirection: 'column', width: '100%'
                      }}>
                 <Box id="header-box" sx={{ display: 'flex',  alignItems: 'center', justifyContent: 'center',
                             flexDirection: 'column', position: 'sticky', top: isMobile ? 54 : 64, zIndex: 1, 
                             bgcolor: 'background.paper', width: '100%'}}>
-                    <Typography sx={{ fontFamily: 'monospace', m: isMobile ? 1.5 : 2, fontWeight: 700, color: 'primary', textDecoration: 'none',
+                    <Typography sx={{ fontFamily: 'monospace', m: isMobile ? 1.5 : 2, fontWeight: 700, color: 'text.primary', textDecoration: 'none',
                         fontSize: isMobile ? '1.25rem' : '1.5rem'
                      }}>
                                 {"Receipt Breakdown"}
@@ -254,18 +262,18 @@ const ReceiptBreakdown = (props) => {
                 </Box>
                 <Box id="summary-box" sx={{display: 'flex',  alignItems: 'center', justifyContent: 'center',
                             flexDirection: 'row', position: 'sticky', top: isMobile ? 100 : 124, zIndex: 1, bgcolor: 'background.paper', width: '100%'}}>
-                    <Typography sx={{ fontFamily: 'monospace', fontWeight: 400, color: 'primary', textDecoration: 'none',
+                    <Typography sx={{ fontFamily: 'monospace', fontWeight: 400, color: 'text.primary', textDecoration: 'none',
                         fontSize: isMobile ? '.8rem' : '1rem', m: isMobile ? 1 : 2
                      }}>
                     {"Total: $" + data.total.toFixed(2)}
                     </Typography>
-                    <Typography sx={{ fontFamily: 'monospace', fontWeight: 400, color: 'primary', textDecoration: 'none',
+                    <Typography sx={{ fontFamily: 'monospace', fontWeight: 400, color: 'text.primary', textDecoration: 'none',
                         fontSize: isMobile ? '.8rem' : '1rem', m: isMobile ? 1 : 2
                      }}>
                     {"Claimed: $" + claimedTotal.toFixed(2)}
                     </Typography>
                     {(selectedName) && (
-                    <Typography sx={{ fontFamily: 'monospace',  fontWeight: 400, color: 'primary', textDecoration: 'none',
+                    <Typography sx={{ fontFamily: 'monospace',  fontWeight: 400, color: 'text.primary', textDecoration: 'none',
                         fontSize: isMobile ? '.8rem' : '1rem', m: isMobile ? 1 : 2
                      }}>
                     {selectedName + ": $" + userClaimedTotal.toFixed(2)}
@@ -273,7 +281,7 @@ const ReceiptBreakdown = (props) => {
                 </Box>
                 
                 <Box sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'center',
-                            flexDirection: 'row', mt: isMobile ? '30rem' : '35rem', mb: isMobile ? '5rem' : '5rem'}}>
+                            flexDirection: 'row', mt: isMobile ? '5rem' : '5rem', mb: isMobile ? '5rem' : '5rem'}}>
                                 {receiptItems()}
                                 </Box>
                     </Container>
@@ -283,41 +291,10 @@ const ReceiptBreakdown = (props) => {
                 <AddUserModal show={showAddUser} setShow={setShowAddUser} receiptId={receiptId} />
                 {renderUserMenu()}
                     
-            {/* <Container className='d-flex justify-content-center flex-column'>
-                <SummaryModal show={showModal} setShow={setShowModal} total={data.total} claimedTotal={claimedTotal} data={data} />
-                <ShareModal show={showShare} setShow={setShowShare} receiptId={receiptId} />
-                <AddNewItemModal show={showAddItem} setShow={setShowAddItem} receiptId={receiptId} />
-                <AddUserModal show={showAddUser} setShow={setShowAddUser} receiptId={receiptId} />
-                 */}
-                {/* <Row className="summary-row">
-               
-                  
-                        <Col xs={3} md={3} className="d-flex justify-content-center ">
-                        <span id='total-text' className="fw-bold">{"Total: $" + data.total.toFixed(2)}</span>
-                        </Col>
-                        <Col xs={3} md={3} className="d-flex justify-content-center ">
-                        <span id='remaining-text' className="fw-bold">{"Total Claimed: $" + claimedTotal.toFixed(2)}</span>
-                        </Col>
-                        <Col xs={3} md={3} className="d-flex justify-content-center" >
-                            <span id='user-total-text' className="fw-bold">{"User Total: $" + userClaimedTotal.toFixed(2)}</span>
-                        </Col>
-                    
-                
-                
-                </Row> */}
-
-                {/* <Row id='receipt-grid-row'>
-                <Col id='receipt-grid' >
-                
-                    {receiptItems()}
-
-                </Col>
-                </Row>
-                {renderUserMenu()}
-                </Container> */}
+       
  
                 
-                <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
+                <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, mb:5 }} elevation={3}>
                     <BottomNavigation
                     showLabels
                     >

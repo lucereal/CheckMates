@@ -78,7 +78,6 @@ const MainContainer = () => {
                     <DialogTitle>Join Receipt</DialogTitle>
                     <DialogContent>
                     <TextField
-                      autoFocus
                       required
                       margin="dense"
                       id="name"
@@ -120,7 +119,7 @@ const MainContainer = () => {
                     <Box sx={{ flexGrow: 1 }}>
                         <AppBar position="fixed" sx={{ bgcolor: 'background.paper', boxShadow: 'none' }}>
                             <Toolbar>
-                            <Typography variant="h6" noWrap component="a" href="/" sx={{ mr: 2, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem', color: 'primary', textDecoration: 'none' }}>
+                            <Typography variant="h6" noWrap component="a" href="/" sx={{ mr: 2, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem', color: 'primary.main', textDecoration: 'none' }}>
                                     CheckMates
                                 </Typography>
                                 <Box sx={{ flexGrow: 1 }} />
@@ -136,22 +135,19 @@ const MainContainer = () => {
                 </Container> */}
                 <div id="menu-container" className="d-flex flex-column align-items-center justify-content-center vh-100">
                     
-                    
-                        <Row className="d-flex justify-content-center mb-3 w-100">
-                            
-                        <Col xs={12} md={6} lg={4} xl={4} xxl={4}>
-                                    <Button  id="join-receipt-btn" onClick={() => { navigate(`/input`)}}  >New Receipt</Button>
-                                </Col>
-                            
-                        </Row>
-                        <Row className="justify-content-center mb-3 w-100">
-                            <Col xs={12} md={6} lg={4} xl={4} xxl={4}>
-                                <Button id="join-receipt-btn"  onClick={() => setShowJoin(true)}>Join Receipt</Button>
-                            </Col>
-                        </Row>
+                    <Box sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'center',
+                            flexDirection: 'column', bgcolor:'background.paper'}}>
+                                
+                       
+                                    <Button variant="text" size='large' color="primary" onClick={() => { navigate(`/input`)}}  >New Receipt</Button>
+                       
+                      
+                                <Button size='large' color="primary" onClick={() => setShowJoin(true)}>Join Receipt</Button>
+                         
                    
-                    
+                        </Box>
                         {joinReceiptModal()}
+                        
                 </div>
                 
                 
