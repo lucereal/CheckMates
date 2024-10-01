@@ -34,7 +34,7 @@ const App = () => {
                                     fontFamily: 'monospace',
                                     fontWeight: 700,
                                     letterSpacing: '.3rem',
-                                    color: 'text.primary',
+                                    color: 'primary.main',
                                     textDecoration: 'none'
                                 }}
                             >
