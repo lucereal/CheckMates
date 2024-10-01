@@ -116,7 +116,7 @@ const MainContainer = () => {
         } else {
             return (
                 <>
-                    <Box sx={{ flexGrow: 1 }}>
+                    {/* <Box sx={{ flexGrow: 1 }}>
                         <AppBar position="fixed" sx={{ bgcolor: 'background.paper', boxShadow: 'none' }}>
                             <Toolbar>
                             <Typography variant="h6" noWrap component="a" href="/" sx={{ mr: 2, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem', color: 'primary.main', textDecoration: 'none' }}>
@@ -127,7 +127,7 @@ const MainContainer = () => {
                             <Button color="primary"  >Login</Button>
                             </Toolbar>
                         </AppBar>
-                    </Box>
+                    </Box> */}
                 
                     {/* <Container fixed>
 

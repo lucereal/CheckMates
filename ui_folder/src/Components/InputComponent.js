@@ -227,7 +227,7 @@ const InputComponent = () => {
         if(existingReceiptId === null || existingReceiptId === undefined) {
             return (
                 <>
-                        <Box sx={{ flexGrow: 1 }} >
+                        {/* <Box sx={{ flexGrow: 1 }} >
                         <AppBar position="fixed" sx={{ bgcolor: 'background.paper', boxShadow: 'none' }}>
                             <Toolbar>
                             <Typography variant="h6" noWrap component="a" href="/" sx={{ mr: 2, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem', color: 'primary.main', textDecoration: 'none' }}>
@@ -238,7 +238,7 @@ const InputComponent = () => {
                             <Button color="primary" variant="text"  >Login</Button>
                             </Toolbar>
                         </AppBar>
-                    </Box>
+                    </Box> */}
                     <Container fixed sx={{ display: 'flex',  alignItems: 'center', justifyContent: 'center',
                         flexDirection: 'column', height: '100vh' // Responsive flex direction
                      }}>
