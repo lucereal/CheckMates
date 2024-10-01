@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import InputImage from '../Shared/InputImage/InputImage';
 //import Button from 'react-bootstrap/Button';
-import { Button, Col, Container, Navbar, Spinner } from 'react-bootstrap';
+import { Col, Navbar, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 import { mock } from './mockReceipt';
 //import ReceiptBreakdown from '../Shared/ReceiptBreakdown/ReceiptBreakdown';
@@ -10,19 +10,53 @@ import InputNames from '../Shared/InputNames/InputNames';
 import NameTags from '../Shared/NameThings/NameTags';
 //import { Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import Box from '@mui/material/Box';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import Button from '@mui/material/Button';
+import { styled } from '@mui/material/styles';
+import { useRef } from 'react';
+import { TextField } from '@mui/material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import Divider from '@mui/material/Divider';
+import Chip from '@mui/material/Chip';
+import FaceIcon from '@mui/icons-material/Face';
+
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+const VisuallyHiddenInput = styled('input')({
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: 1,
+    overflow: 'hidden',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    whiteSpace: 'nowrap',
+    width: 1,
+  });
 
 const InputComponent = () => {
     const [receiptImg, setReceiptImg] = useState(null);
     const [receiptData, setReceiptData] = useState(null);
     const [participants, setParticipants] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [receiptId, setReceiptId] = useState(null);
     const navigate = useNavigate(); 
     const [existingReceiptId, setExistingReceiptId] = useState(null); 
     const backendApiUrl = process.env.REACT_APP_BACKEND_API_URL;
     const chatHubUrl = backendApiUrl + "/chatHub";
+    const [showUserField, setShowUserField] = useState(false);
+    const [showSubmitButton, setShowSubmitButton] = useState(false);
+    const inputRef = useRef();
+    const [fileName, setFileName] = useState('');
+    const [isManualEntry, setIsManualEntry] = useState(false);
+    const [isImageEntry, setIsImageEntry] = useState(false);
 
     const getUrlId = () => {
         const urlParams = new URLSearchParams(window.location.search);
+        
         return urlParams.get('receiptId'); // Assuming the ID is passed as a query parameter
     };
     useEffect(() => {
@@ -54,9 +88,67 @@ const InputComponent = () => {
         }
     }, []);
 
+    const getParticipantChips = () => {
 
+        return (
+            <>
+        {participants.map((name, index) => (
+            <Chip
+                c 
+                key={index}
+                label={name}
+                variant="outlined"
+                size="small"
+                onDelete={() => {
+                    const temp = participants;
+                    temp.splice(index, 1);
+                    setParticipants([...temp]);
+                }}
+                
+            />
+        ))}
+    </>
+        )
+        
+    }
+
+    const handleAddUser = () => {
+        const userName = inputRef.current.value;
+        if (userName.trim()) {
+            const temp = participants;
+            temp.push(userName);
+            setParticipants([...temp]);
+
+            // Now do this to clear the input field
+            inputRef.current.value = "";
+            setShowSubmitButton(true);
+        }
+    };
+
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        console.log("handleFileChange: ", file.name);
+        if (file) {
+            setReceiptImg(file);
+            setFileName(file.name);
+        }
+    };
+
+    const handleManualEntry = () => {
+        setIsManualEntry(true);
+        setIsImageEntry(false);
+        setShowUserField(true);
+        // setReceiptImg(null);
+        // setFileName('');
+    }
+    const handleImageEntry = () => {
+        setIsManualEntry(false);
+        setIsImageEntry(true);
+        setShowUserField(true);
+        
+    }
     const sendReceipt = () => {
-        //navigate("/")
+        console.log("in send receipt")
         if (receiptImg === null || receiptImg === undefined) {
             console.log("-- no image selected"); // TODO SHOW VISUAL ERROR OR DISABLE IT
             return;
@@ -64,10 +156,7 @@ const InputComponent = () => {
         setIsLoading(true);
         
         console.log("participants: " + participants);
-        // Must pass the array while preserving quotes
-        //og: 
-        //const names = "['" + participants.join("','") + "']";
-        //const names = "['" + participants.join(",") + "']";
+
         
         var formData = new FormData();
         formData.append('file', receiptImg);
@@ -135,57 +224,93 @@ const InputComponent = () => {
             </div>
         )
     } else {
-        return (
-            <>
+        if(existingReceiptId === null || existingReceiptId === undefined) {
+            return (
+                <>
+                        <Box >
+                        <AppBar position="fixed" sx={{ bgcolor: 'background.paper', boxShadow: 'none' }}>
+                            <Toolbar>
+                                <Typography variant="h6" noWrap component="a" href="/" sx={{ mr: 2, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem', color: 'primary', textDecoration: 'none' }}>
+                                    CheckMates
+                                </Typography>
+                                <Box sx={{ flexGrow: 1 }} />
 
-                <div id="input-receipt-container" className="d-flex flex-column align-items-center justify-content-center vh-100 p-3" >
-                <div className='upload-section w-100 align-items-center justify-content-center'>
+                            <Button color="primary"  >Login</Button>
+                            </Toolbar>
+                        </AppBar>
+                    </Box>
+                    <Container fixed sx={{ display: 'flex',  alignItems: 'center', justifyContent: 'center',
+                        flexDirection: 'column' // Responsive flex direction
+                     }}>
+                        <Box sx={{ display: 'flex',  alignItems: 'center', justifyContent: 'center',
+                            flexDirection: { xs: 'column', xm: 'column', md: 'row' }}}>
+                            
+                            <Button disabled
+                                variant={isManualEntry ? "contained" : "outlined"}
+                                onClick={() => handleManualEntry()}
+                            >
+                                Manual Entry
+                            </Button>
+                            
+                            <Typography sx={{ fontFamily: 'monospace', mr: 2, ml: 2, mt: 2, mb: 2, fontWeight: 700, color: 'primary', textDecoration: 'none' }}>
+                                or
+                            </Typography>
+                            
+                            <Button component="label" role={undefined} variant={isImageEntry ? "contained" : "outlined"} startIcon={<CloudUploadIcon />} onClick={() => handleImageEntry()}>
+                                Receipt Image
+                                <VisuallyHiddenInput type="file" onChange={handleFileChange} />
+                            </Button>
+                            
 
-                    <h4 className='upload-header mb-3'>
-                        Upload your receipt
-                    </h4>
-                    
-                    
-                    <div className="mb-4">
-                    <InputImage receiptImg={receiptImg} setReceiptImg={setReceiptImg} />
-                    </div>
-                    <div className="mb-4 ">
-                    <InputNames 
-                        participantsNo={participants.length}
-                        participants={participants}
-                        setParticipants={setParticipants}
-                    />
-                    </div>
-                                    {/* Make tags for each participant */}
-                { participants.length ? 
-                    <NameTags names={participants} setNames={setParticipants}/> 
-                    : null
-                }
+                           
+                            {isImageEntry && <Typography sx={{ ml: 2 }}>{fileName}</Typography>}
+                            
+                        </Box>
+                        {showUserField && (
+                            <Divider variant="middle" orientation="horizontal" sx={{ width: '100%', my: 2, borderWidth: '2px' }}/>
+                        )}
+                        <Box sx={{ display: 'flex',  alignItems: 'center', justifyContent: 'center',
+                            flexDirection: 'column'}}>
+                        {showUserField && (
+                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mt: 2 }}>
+                                <TextField size="small" variant="standard" label="Name" inputRef={inputRef}  sx={{ mb: 2 }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            handleAddUser();
+                                        }
+                                    }} />
+                                <Button onClick={handleAddUser}>
+                                    <AddCircleOutlineIcon></AddCircleOutlineIcon>
+                                </Button>
+                                
+                            </Box>
 
-<div className="mb-4 ">
-                <Button 
-                    className='submit-button'
-                    id="submit-button" 
-                    variant="primary"
-                    onClick={() => sendReceipt()}
-                    disabled={ 
-                        participants.length === 0 || (receiptImg === null || receiptImg === undefined) ||
-                        isLoading
-                    }
-                >
-                    {isLoading ? <Spinner size="sm"/> : "Submit"}
-                </Button>
-                </div>
-                </div>
+                        )}
+                        <Box sx={{ display: 'flex',  alignItems: 'center', justifyContent: 'center',
+                            flexDirection: 'row'}}>
+                            {getParticipantChips()}
+                        </Box>
 
 
+                        </Box>
+                        {showSubmitButton && (
+                        <Divider variant="middle" orientation="horizontal" sx={{ width: '100%', my: 2, borderWidth: '2px' }}/>
+
+                        )}
+
+                        {showSubmitButton && (
+                            <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={() => sendReceipt()}>
+                                Submit
+                            </Button>
+                        )}
+                    </Container>
+                   
+                </>
                 
-                {/* Make a component for it... */}
-                <div className='bottom-nav'/>
-            </div>
-            </>
-            
-        );
+            );
+        
+        }
+        
     }
 }
 

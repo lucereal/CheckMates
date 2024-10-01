@@ -76,7 +76,7 @@ const ReceiptItem = (props) => {
             <Chip
                 c 
                 key={index}
-                icon={<FaceIcon />}
+                
                 label={name}
                 variant="outlined"
                 size="small"
@@ -236,6 +236,9 @@ const ReceiptItem = (props) => {
                             </Box>
                         }
                     />
+                    <Box sx={{display:'flex', alignItems: 'stretch', height:'100%'}}>
+                    <Divider flexItem orientation='vertical' sx={{ m:1, height:'100%', borderWidth: '2px' }}></Divider>
+                    </Box>
                     <IconButton edge="end" onClick={() => handleEdit(item)}>
                                     <EditIcon />
                                 </IconButton>

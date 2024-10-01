@@ -1,14 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Button, Modal, Form } from "react-bootstrap";
 import axios from 'axios';
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 
 const AddUserModal = (props) => {
     const {show, setShow, receiptId} = props;
     const userRef = useRef();
     const backendApiUrl = process.env.REACT_APP_BACKEND_API_URL;
     const addUserUrl = backendApiUrl + "/HandleReceipt/AddUsers";
-    const submitAddUser = async (event) => {
-        event.preventDefault();
+    const submitAddUser = async () => {
+        
         const addUsers = {
             id: receiptId,
             userNames: [userRef.current.value]
@@ -42,7 +43,27 @@ const AddUserModal = (props) => {
     return (
         <>
        
-        <Modal show={show} onHide={() => setShow(false)}>
+       <Dialog open={show} onClose={() => setShow(false)}>
+                    <DialogTitle>Add User</DialogTitle>
+                    <DialogContent>
+                    <TextField
+                      autoFocus
+                      required
+                      margin="dense"
+                      id="name"
+                      name="name"
+                      label="Name"
+                      variant="standard"
+                      inputRef={userRef}
+                    />
+                  </DialogContent>
+                  <DialogActions>
+                    <Button variant="text" onClick={() => setShow(false)}>Cancel</Button>
+                    <Button variant="text" onClick={() => submitAddUser()}>Submit</Button>
+                  </DialogActions>
+                </Dialog>
+
+        {/* <Modal show={show} onHide={() => setShow(false)}>
         <Modal.Header closeButton>
             <Modal.Title>Edit item</Modal.Title>
         </Modal.Header>
@@ -64,7 +85,7 @@ const AddUserModal = (props) => {
             </Form>
 
         </Modal.Body>
-    </Modal>
+    </Modal> */}
         
 
         </>

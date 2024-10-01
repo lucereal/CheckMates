@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Button, Col, Row, Container, Navbar, Spinner } from 'react-bootstrap';
+import { Button, Col, Row, Navbar, Spinner } from 'react-bootstrap';
 import NameToggles from '../NameThings/NameToggles';
 import { getClaimedTotal, getUrlId, getUserClaimedTotal } from '../HelperFunctions';
 import SummaryModal from '../Modals/SummaryModal';
@@ -11,21 +11,32 @@ import { useSignalR } from '../SignalRContext';
 import { SignalRProvider } from '../SignalRContext';
 import ReceiptItem from '../ReceiptItem/ReceiptItem';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Avatar from '@mui/material/Avatar';
-import IconButton from '@mui/material/IconButton';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import FolderIcon from '@mui/icons-material/Folder';
+import Paper from '@mui/material/Paper';
+import BottomNavigation from '@mui/material/BottomNavigation';
+import BottomNavigationAction from '@mui/material/BottomNavigationAction';
+import RestoreIcon from '@mui/icons-material/Restore';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import ArchiveIcon from '@mui/icons-material/Archive';
 import DeleteIcon from '@mui/icons-material/Delete';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import GroupIcon from '@mui/icons-material/Group';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import IosShareIcon from '@mui/icons-material/IosShare';
 import Divider from '@mui/material/Divider';
+import Box from '@mui/material/Box';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Menu from '@mui/material/Menu';
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
+import MenuItem from '@mui/material/MenuItem';
+import Container from '@mui/material/Container';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import useTheme from '@mui/material/styles/useTheme';
+import FaceIcon from '@mui/icons-material/Face';
+import ContentCut from '@mui/icons-material/ContentCut';
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
 
 /** IF ITEM ID IN THE RESPONSE STAYS IN AN ORDER, THEN THAT WILL KEEP THINGS EASY
  *  SINCE I DO NOT HAVE TO ITERATE THROUGH THINGS.
@@ -38,9 +49,12 @@ const ReceiptBreakdown = (props) => {
     const setData = props.setData;
     const hubUrl = props.chatHubUrl
     const claimedTotal = getClaimedTotal(data.items, data.tip, data.tax);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const [selectedName, setSelectedName] = useState("");
-
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
     const [itemData, setItemData] = useState(data);
     const [showModal, setShowModal] = useState(false); // Summary modal
     const [showShare, setShowShare] = useState(false); // Share modal
@@ -103,77 +117,86 @@ const ReceiptBreakdown = (props) => {
         setShowAddItem(true);
     }
   
+    const handleSelectUser = (user) => {
+        setSelectedUser(user);
+        setSelectedName(user.name);
+        setAnchorEl(null);
+    };
 
     const handleAddUser = () => {
         console.log("add user button clicked in handleAddUser")
         setShowAddUser(true);
+        setAnchorEl(null);
     }
 
-    const receiptItems = () => {
+    const handleUsersClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
 
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleDeleteUser = (user) => {
+        console.log("delete user button clicked in handleDeleteUser")
+    }
+
+    const renderUserMenu = () => (
+        <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+            
+        >
+            {data.users.map((user, index) => (
+        <Box key={index} sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'space-between',
+                flexDirection: 'row', pl:1, pr:2}}>
+             <Box sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'center',
+                                    flexDirection: 'row'}}>
+                                
+                <MenuItem key={index} onClick={() => handleSelectUser(user)} sx={{ flexGrow: 1 }}>
+                    {user.name}
+                    
+                </MenuItem>
+                <IconButton edge="end" color="inherit" onClick={() => handleDeleteUser(user)}>
+                        <CloseIcon />
+                    </IconButton>
+                </Box>
+                   
+                  
+                    
+                    </Box>
+            ))}
+            {/* <MenuItem onClick={handleAddUser}>Add New User</MenuItem> */}
+            <Divider variant="middle" orientation="horizontal" sx={{ width: '100%', m:0, borderWidth: '1px' }}/>
+            <Box sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'center',
+                        flexDirection: 'row'}}>
+                        <IconButton edge="end" color="inherit" >
+                        <PersonAddAltIcon />
+                    </IconButton>
+                    </Box>
+            
+        </Menu>
+        
+    );
+
+    const receiptItems = () => {
         return (
             <>
-
-            {/* <List dense={dense}>
-                {generate(
-                    <ListItem>
-                    <ListItemAvatar>
-                        <Avatar>
-                        <FolderIcon />
-                        </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                        primary="Single-line item"
-                        secondary={secondary ? 'Secondary text' : null}
-                    />
-                    </ListItem>,
-                )}
-            </List> */}
-                        <List id='reciept-list'>
+                <List id='reciept-list' className="w-100">
                 {
-                    itemData?.items?.map((item, index) => 
-
-                        (
-                            <>
-                             <ReceiptItem
-                    item={item}
-                    index={index}
-                    users={itemData.users}
-                    selectedName={selectedName}
-                    userSelectedItems={userSelectedItems}
-                    receiptId={itemData._id}>
-                    </ReceiptItem>
-                            {/* <ListItem>
-                               
-                    <ListItemText
-                        primary="Single-line item"
-                        secondary='Secondary text'
-                    />
-                    <IconButton edge="end" aria-label="delete">
-                                  <MoreVertIcon />
-                                </IconButton>
-                    </ListItem>
-                              <Divider variant="middle" component="li" /> */}
-                              </>
-                        ))
+                    itemData?.items?.map((item, index) => (                   
+                        <ReceiptItem
+                        item={item}
+                        index={index}
+                        users={itemData.users}
+                        selectedName={selectedName}
+                        userSelectedItems={userSelectedItems}
+                        receiptId={itemData._id}>
+                        </ReceiptItem>                   
+                    ))
                 }
-            </List>
-
-                {/* { itemData?.items?.map((item, index) => 
-                
-                (
-                  <ReceiptItem
-                    item={item}
-                    index={index}
-                    users={itemData.users}
-                    selectedName={selectedName}
-                    userSelectedItems={userSelectedItems}
-                    receiptId={itemData._id}>
-                    </ReceiptItem>
-                ))} */}
-             
-               
-
+                </List>
             </>
         )
 
@@ -203,49 +226,72 @@ const ReceiptBreakdown = (props) => {
     if (showItemBreakdown !== null && showItemBreakdown !== undefined && showItemBreakdown === true) {
         return(
             <>
-            <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
-                    <Container>
-                    <Navbar.Brand  href="/">Home</Navbar.Brand>
-                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                    <Navbar.Collapse className="justify-content-end">
-                            <Button variant="outline-light" onClick={() => handleShare()}>
-                                <FaShareSquare />
-                            </Button>
-                        </Navbar.Collapse>
+             <Box sx={{ flexGrow: 1 }}>
+                        <AppBar position="fixed" sx={{ bgcolor: 'background.paper', boxShadow: 'none' }}>
+                            <Toolbar>
+                            <Typography variant="h6" noWrap component="a" href="/" sx={{ mr: 2, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem', color: 'primary', textDecoration: 'none' }}>
+                                    CheckMates
+                                </Typography>
+                                <Box sx={{ flexGrow: 1 }} />
+
+                            <Button color="primary" variant="text"  >Login</Button>
+                            </Toolbar>
+                        </AppBar>
+                    </Box>
+
+                <Container fixed sx={{ display: 'flex',  alignItems: 'center', justifyContent: 'center',
+                        flexDirection: 'column'
+                     }}>
+                <Box id="header-box" sx={{ display: 'flex',  alignItems: 'center', justifyContent: 'center',
+                            flexDirection: 'column', position: 'sticky', top: isMobile ? 54 : 64, zIndex: 1, 
+                            bgcolor: 'background.paper', width: '100%'}}>
+                    <Typography sx={{ fontFamily: 'monospace', m: isMobile ? 1.5 : 2, fontWeight: 700, color: 'primary', textDecoration: 'none',
+                        fontSize: isMobile ? '1.25rem' : '1.5rem'
+                     }}>
+                                {"Receipt Breakdown"}
+                    </Typography>
+                    
+                </Box>
+                <Box id="summary-box" sx={{display: 'flex',  alignItems: 'center', justifyContent: 'center',
+                            flexDirection: 'row', position: 'sticky', top: isMobile ? 100 : 124, zIndex: 1, bgcolor: 'background.paper', width: '100%'}}>
+                    <Typography sx={{ fontFamily: 'monospace', fontWeight: 400, color: 'primary', textDecoration: 'none',
+                        fontSize: isMobile ? '.8rem' : '1rem', m: isMobile ? 1 : 2
+                     }}>
+                    {"Total: $" + data.total.toFixed(2)}
+                    </Typography>
+                    <Typography sx={{ fontFamily: 'monospace', fontWeight: 400, color: 'primary', textDecoration: 'none',
+                        fontSize: isMobile ? '.8rem' : '1rem', m: isMobile ? 1 : 2
+                     }}>
+                    {"Claimed: $" + claimedTotal.toFixed(2)}
+                    </Typography>
+                    {(selectedName) && (
+                    <Typography sx={{ fontFamily: 'monospace',  fontWeight: 400, color: 'primary', textDecoration: 'none',
+                        fontSize: isMobile ? '.8rem' : '1rem', m: isMobile ? 1 : 2
+                     }}>
+                    {selectedName + ": $" + userClaimedTotal.toFixed(2)}
+                    </Typography>)}
+                </Box>
+                
+                <Box sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'center',
+                            flexDirection: 'row', mt: isMobile ? '30rem' : '35rem', mb: isMobile ? '5rem' : '5rem'}}>
+                                {receiptItems()}
+                                </Box>
                     </Container>
-
-                </Navbar>
-
-
-            <Container className='d-flex justify-content-center flex-column'>
-                <SummaryModal 
-                    show={showModal}
-                    setShow={setShowModal}
-                    total={data.total}
-                    claimedTotal={claimedTotal}
-                    data={data}
+                <SummaryModal show={showModal} setShow={setShowModal} total={data.total} claimedTotal={claimedTotal} data={data} />
+                <ShareModal show={showShare} setShow={setShowShare} receiptId={receiptId} />
+                <AddNewItemModal show={showAddItem} setShow={setShowAddItem} receiptId={receiptId} />
+                <AddUserModal show={showAddUser} setShow={setShowAddUser} receiptId={receiptId} />
+                {renderUserMenu()}
                     
-                />
-                <ShareModal 
-                    show={showShare}
-                    setShow={setShowShare}
-                    receiptId={receiptId}
-                />
-    
-                <AddNewItemModal
-                    show={showAddItem}
-                    setShow={setShowAddItem}
-                    receiptId={receiptId}
-                />
-
-                <AddUserModal
-                    show={showAddUser}
-                    setShow={setShowAddUser}
-                    receiptId={receiptId}
-                />
-                <Row className="summary-row">
+            {/* <Container className='d-flex justify-content-center flex-column'>
+                <SummaryModal show={showModal} setShow={setShowModal} total={data.total} claimedTotal={claimedTotal} data={data} />
+                <ShareModal show={showShare} setShow={setShowShare} receiptId={receiptId} />
+                <AddNewItemModal show={showAddItem} setShow={setShowAddItem} receiptId={receiptId} />
+                <AddUserModal show={showAddUser} setShow={setShowAddUser} receiptId={receiptId} />
+                 */}
+                {/* <Row className="summary-row">
                
-                    
+                  
                         <Col xs={3} md={3} className="d-flex justify-content-center ">
                         <span id='total-text' className="fw-bold">{"Total: $" + data.total.toFixed(2)}</span>
                         </Col>
@@ -258,65 +304,31 @@ const ReceiptBreakdown = (props) => {
                     
                 
                 
-                </Row>
+                </Row> */}
 
-                <Row id='receipt-grid-row'>
+                {/* <Row id='receipt-grid-row'>
                 <Col id='receipt-grid' >
                 
                     {receiptItems()}
 
                 </Col>
                 </Row>
-
-                </Container>
-                <Container id="bottom-row-container" className='d-flex justify-content-center flex-column'>
-                <Row className="bottom-row">    
-                            <Col xs={3} md={3} className="bottom-row-col">
-                                <Row className='bottom-row-col-row'>
-                                    
-                                        <NameToggles 
-                                                selected={selectedName}
-                                                setSelected={setSelectedName}
-                                                names={data.users}
-                                            /> 
-                                           
-                                </Row>
-                            </Col>
-                            <Col xs={3} md={3} className="bottom-row-col">
-                                <Row className='bottom-row-col-row'>
-                                   
-                           
-                                                <Button id='add-user-button' onClick={() => handleAddUser()} >
-                                                    <FaUserPlus className='add-user-icon' />
-                                                </Button>
-                                   
-                                </Row>
-                            </Col>
-                            <Col xs={3} md={3} className="bottom-row-col">
-                                <Row className='bottom-row-col-row'>
-                                        
-                                                <Button id='summary-button' variant="success" onClick={() => setShowModal(true)}>
-                                                    Summary
-                                                </Button>
-                                            
-                                     
-                                        </Row>
-                                    </Col>
-                                <Col xs={3} md={3} className="bottom-row-col">
-                                    <Row className='bottom-row-col-row'>
-                                    
-                                                
-                                                <Button
-                                                    id="add-item-button"
-                                                    onClick={() => handleAddNewItem()}
-                                                    >
-                                                    <FaPlus />
-                                                </Button>
-                                       
-                                    </Row>
-                                </Col>
-                </Row>
-                </Container>
+                {renderUserMenu()}
+                </Container> */}
+ 
+                
+                <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
+                    <BottomNavigation
+                    showLabels
+                    >
+                    <BottomNavigationAction label={selectedName || "Users"} icon={selectedName ? <FaceIcon/> : <GroupIcon />} onClick={handleUsersClick} />
+                    <BottomNavigationAction label="Add Item" onClick={() => handleAddNewItem()} icon={<AddCircleOutlineIcon />} />
+                    <BottomNavigationAction label="Summary" onClick={() => setShowModal(true)} icon={<CheckCircleOutlineIcon />} />
+                    <BottomNavigationAction label="Share" onClick={() => handleShare()} icon={<IosShareIcon />} />
+                    
+                    IosShareIcon
+                    </BottomNavigation>
+                </Paper>
                 
             </>
         );

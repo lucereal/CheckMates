@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Modal, Form } from "react-bootstrap";
 import axios from 'axios';
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 import Button from '@mui/material/Button';
 
 const EditModal = (props) => {
@@ -13,8 +14,8 @@ const EditModal = (props) => {
     const deleteItemUrl = backendApiUrl + "/HandleReceipt/DeleteItem";
 
     
-    const submitEditItem = async (event) => {
-        event.preventDefault();
+    const submitEditItem = async () => {
+        
         const updatedItem = {
             id: receiptId,
             itemId: item.itemId,
@@ -80,51 +81,36 @@ const EditModal = (props) => {
     return (
         <>
        
-        <Modal show={show} onHide={() => setShow(false)}>
-        <Modal.Header closeButton>
-            <Modal.Title>Edit item</Modal.Title>
-        </Modal.Header>
-        <Modal.Body id="edit-body-container">
-            {item && (
-        <Form id='edit-form' onSubmit={submitEditItem}>
-                <Form.Group controlId="formItemDescription">
-                    <Form.Label>Description</Form.Label>
-                    <Form.Control
-                        type="text"
-                        defaultValue={item.description}
-                        ref={descriptionRef}
-                        required
+       <Dialog open={show} onClose={() => setShow(false)}>
+                    <DialogTitle>Edit Item</DialogTitle>
+                    <DialogContent>
+                    <TextField
+                      autoFocus
+                      required
+                      margin="dense"
+                      id="item-description"
+                      name="item-description"
+                      label="Item Description"
+                      variant="standard"
+                      inputRef={descriptionRef}
                     />
-                </Form.Group>
-     
-                <Form.Group controlId="formItemPrice">
-                    <Form.Label>Price</Form.Label>
-                    <Form.Control
-                        type="number"
-                        step="0.01"
-                        defaultValue={item.price}
-                        ref={priceRef}
-                        required
+                     <TextField
+                      autoFocus
+                      required
+                      margin="dense"
+                      id="item-price"
+                      name="item-price"
+                      label="Item Price"
+                      variant="standard"
+                      inputRef={priceRef}
                     />
-                </Form.Group>
-                {/* <Button id='submit-edit-button' type="submit">
-                    Submit
-                </Button>
-                <Button id='delete-edit-button'>
-                    Delete
-                </Button> */}
-                <Button variant="contained"  type="submit">
-                Submit
-                </Button>
-                <Button variant="outlined" color="error" onClick={() => handleDelete(item.itemId)}>
-                Delete
-                </Button>
-            </Form>
-)}
-        </Modal.Body>
-    </Modal>
-        
-
+                  </DialogContent>
+                  <DialogActions>
+                    <Button variant="text" onClick={() => setShow(false)}>Cancel</Button>
+                    <Button variant="text" onClick={() => handleDelete(item.itemId)}>Delete</Button>
+                    <Button variant="text" onClick={() => submitEditItem()}>Submit</Button>
+                  </DialogActions>
+        </Dialog>
         </>
     )
 }
