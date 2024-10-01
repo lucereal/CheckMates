@@ -9,42 +9,42 @@
   "start_url": "/",
   "icons": [
     {
-      "src": "/manifest-icons/bill_icon_001-96.png",
+      "src": "manifest-icons/bill_icon_001-96.png",
       "type": "image/png",
       "sizes": "96x96"
     },
     {
-      "src": "/manifest-icons/bill_icon_001-128.png",
+      "src": "manifest-icons/bill_icon_001-128.png",
       "type": "image/png",
       "sizes": "128x128"
     },
     {
-      "src": "/manifest-icons/bill_icon_001-144.png",
+      "src": "manifest-icons/bill_icon_001-144.png",
       "type": "image/png",
       "sizes": "144x144"
     },
     {
-      "src": "/manifest-icons/bill_icon_001-152.png",
+      "src": "manifest-icons/bill_icon_001-152.png",
       "type": "image/png",
       "sizes": "152x152"
     },
     {
-      "src": "/manifest-icons/bill_icon_001-180.png",
+      "src": "manifest-icons/bill_icon_001-180.png",
       "type": "image/png",
       "sizes": "180x180"
     },
     {
-      "src": "/manifest-icons/bill_icon_001-192.png",
+      "src": "manifest-icons/bill_icon_001-192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "/manifest-icons/bill_icon_001-256.png",
+      "src": "manifest-icons/bill_icon_001-256.png",
       "type": "image/png",
       "sizes": "256x256"
     },
     {
-      "src": "/manifest-icons/bill_icon_001-512.png",
+      "src": "manifest-icons/bill_icon_001-512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
