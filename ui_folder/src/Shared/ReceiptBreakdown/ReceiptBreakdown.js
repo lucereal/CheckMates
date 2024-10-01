@@ -311,7 +311,7 @@ const ReceiptBreakdown = (props) => {
        
  
                 
-                <Paper sx={{ position: 'fixed', display:'flex', justifyContent:'center',  bottom: 0, left: 0, right: 0, height: 80 }} elevation={3}>
+                <Paper sx={{ position: 'fixed', display:'flex', justifyContent:'center', pt:1,  bottom: 0, left: 0, right: 0, height: 75 }} elevation={3}>
                     <BottomNavigation
                     showLabels
                     sx={{height: '100%', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'start'}}
