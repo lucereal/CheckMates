@@ -281,7 +281,7 @@ const ReceiptBreakdown = (props) => {
                 </Box>
                 
                 <Box sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'center',
-                            flexDirection: 'row', mt: isMobile ? '5rem' : '5rem', mb: isMobile ? '5rem' : '5rem'}}>
+                            flexDirection: 'row', mt: isMobile ? '5rem' : '5rem', mb: isMobile ? '7rem' : '7rem'}}>
                                 {receiptItems()}
                                 </Box>
                     </Container>
@@ -294,9 +294,10 @@ const ReceiptBreakdown = (props) => {
        
  
                 
-                <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, mb:5 }} elevation={3}>
+                <Paper sx={{ position: 'fixed', display:'flex', justifyContent:'center',  bottom: 0, left: 0, right: 0, height: 80 }} elevation={3}>
                     <BottomNavigation
                     showLabels
+                    sx={{height: '100%', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'start'}}
                     >
                     <BottomNavigationAction label={selectedName || "Users"} icon={selectedName ? <FaceIcon/> : <GroupIcon />} onClick={handleUsersClick} />
                     <BottomNavigationAction label="Add Item" onClick={() => handleAddNewItem()} icon={<AddCircleOutlineIcon />} />
