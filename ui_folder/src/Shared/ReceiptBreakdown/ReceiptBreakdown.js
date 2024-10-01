@@ -41,6 +41,7 @@ import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { ListItemIcon } from '@mui/material';
+import axios from 'axios';
 /** IF ITEM ID IN THE RESPONSE STAYS IN AN ORDER, THEN THAT WILL KEEP THINGS EASY
  *  SINCE I DO NOT HAVE TO ITERATE THROUGH THINGS.
  * 
@@ -69,6 +70,9 @@ const ReceiptBreakdown = (props) => {
     const [userSelectedItems, setUserSelectedItems] = useState([]);
     
     const connection = useSignalR();
+
+    const backendApiUrl = process.env.REACT_APP_BACKEND_API_URL;
+    const deleteUsersUrl = backendApiUrl + "/HandleReceipt/DeleteUsers";
 
 
 
@@ -142,6 +146,34 @@ const ReceiptBreakdown = (props) => {
 
     const handleDeleteUser = (user) => {
         console.log("delete user button clicked in handleDeleteUser")
+        const deleteUser = {
+            id: receiptId,
+            userId: user.userId
+        };
+
+        try {
+            console.log('Calling API to delete user to receipt:', deleteUser);
+
+            axios.post(deleteUsersUrl, deleteUser).then(res => {
+                console.log('-- ReceiptBreakdown.js|109 >> res', res);
+                if (res.status == "200") {
+                    const id = res?.data?.receipt?._id;
+                    console.log("edit user item success");
+                    console.log(res.data.receipt);
+                    // setShow(false);
+                    setSelectedName("");
+                    return true;
+                }else{
+                    return false;
+                }
+            }).catch((err) => {
+                console.log('-- ERR', err);
+                return false;
+            })
+            //setShow(false);
+        } catch (error) {
+            console.error('Error updating item:', error);
+        }
     }
 
     const renderUserMenu = () => (
@@ -159,7 +191,6 @@ const ReceiptBreakdown = (props) => {
                     flexDirection: 'row', pr:2}}>
                     <Box sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'center',
                                             flexDirection: 'row'}}>
-                 
                         <MenuItem key={index} onClick={() => handleSelectUser(user)} sx={{ flexGrow: 1 }}>
                             <ListItemIcon>
                                 <FaceIcon fontSize="small" />
@@ -169,10 +200,7 @@ const ReceiptBreakdown = (props) => {
                         <IconButton edge="end" color="inherit" onClick={() => handleDeleteUser(user)}>
                             <CloseIcon />
                         </IconButton>
-                    </Box>
-                   
-                  
-                    
+                    </Box>  
                 </Box>
             ))}
             
@@ -234,18 +262,7 @@ const ReceiptBreakdown = (props) => {
     if (showItemBreakdown !== null && showItemBreakdown !== undefined && showItemBreakdown === true) {
         return(
             <>
-             {/* <Box sx={{ flexGrow: 1 }}>
-                        <AppBar position="fixed" sx={{ bgcolor: 'background.paper', boxShadow: 'none' }}>
-                            <Toolbar>
-                            <Typography variant="h6" noWrap component="a" href="/" sx={{ mr: 2, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem', color: 'primary.main', textDecoration: 'none' }}>
-                                    CheckMates
-                                </Typography>
-                                <Box sx={{ flexGrow: 1 }} />
-
-                            <Button color="primary" variant="text"  >Login</Button>
-                            </Toolbar>
-                        </AppBar>
-                    </Box> */}
+     
 
                 <Container fixed sx={{ display: 'flex',  alignItems: 'center', justifyContent: 'center',
                         flexDirection: 'column', width: '100%'

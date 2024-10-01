@@ -78,11 +78,10 @@ const ReceiptItem = (props) => {
                 key={index}
                 
                 label={name}
-                variant="outlined"
+                variant= {selectedName === name ? "" : "outlined"}
+                color="primary"
                 size="small"
-                sx={{
-                    backgroundColor: selectedName === name ? 'rgba(78, 69, 255, 0.2)' : 'inherit',
-                }}
+                
             />
         ))}
     </>
