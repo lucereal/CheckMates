@@ -8,7 +8,7 @@ ReceiptSplit is a web application that allows users to upload a picture of a rec
 
 ## How It Works
 
-- **Frontend**: The frontend application is built with React.
+- **Frontend**: The frontend application is built with React and MUI styling framework.
 - **Backend**: The backend API is developed using ASP.NET Core.
 - **Database**: The application uses a MongoDB database.
 - **Infrastructure**: All infrastructure is hosted on Azure.
@@ -18,8 +18,10 @@ ReceiptSplit is a web application that allows users to upload a picture of a rec
 ## Future Functionality
 
 - **Payment Service Integrations**: Plans to integrate with payment services such as Venmo, CashApp, Zelle, and more.
-- **Progressive Web App**: Make into progressive web app so that users can have an app on their phone.
+- **Progressive Web App Enhancements**: App is confiured as a PWA but we should implement versioning so app is updated and make sure the icon shows up. 
 - **Custom Domain**: Custom Domain
+- **Receipt Collections**: Allow users to group receipts to split all amoung friends
+- **Manual Receipt**: Allow users to create manual receipt, user adds each item. 
 
 ## Fixes Needed
 

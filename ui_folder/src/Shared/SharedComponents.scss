@@ -211,17 +211,34 @@
 
 }
 
+#bottom-row-container{
+    display: flex;
+    justify-content: center;
+    position: -webkit-sticky; /* For Safari */
+    position: sticky;
+    bottom: 0rem;
+    padding-bottom: 1rem;
+    margin-bottom: 0rem;
+    margin-top: 0rem;
+    width: 100%;
+    background-color: #ffffff; /* Optional: Set a background color */
+    // padding: 1rem; /* Optional: Add some padding */
+    // box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better visibility */
+    z-index: 1000;
+}
+
 #receipt-breakdown-container {
     display: flex;
     flex-direction: column;
     padding: 2 2;
     margin: 0rem 0rem;
+    
     .summary-row {
         display: flex;
         justify-content: space-evenly;
         align-items: center;
         width: 100%;
-        height:3rem;
+        height:5rem;
         margin: 0rem 0rem;
         margin-top: 0rem;
         margin-bottom: 0rem;
@@ -231,7 +248,7 @@
         top: 3rem;
         z-index: 1000;
         
-        background-color: #dddddd;
+        background-color: #ffffff;
         .row-container {
             display: flex;
             align-items: center;
@@ -247,17 +264,17 @@
             margin: 0.5rem 0;
             max-width: 15rem;
             width: 80%;
-            color: #020202;
+            color: #000000;
             height: 2rem;
             // width: 100%;
-            background-color: rgba(255, 255, 255, 0.4);
+            background-color: rgba(0, 0, 0, 0.2);
             border: none;
             font-size: 1rem;
             transition: transform 0.3s ease, background-color 0.3s ease; /* Smooth transition for transform and background-color */
         
             &:hover {
                 transform: scale(1.1); /* Make the button bigger */
-                background-color: rgba(255, 255, 255, 0.2); /* Change transparency */
+                background-color: rgba(0, 0, 0, 0.4); /* Change transparency */
             }
         }
         
@@ -269,17 +286,17 @@
             margin: 0.5rem 0;
             max-width: 15rem;
             
-            color: #020202;
+            color: #000000;
             height: 2rem;
             // width: 100%;
-            background-color: rgba(255, 255, 255, 0.4);
+            background-color: rgba(0, 0, 0, 0.2);
             border: none;
             font-size: 1rem;
             transition: transform 0.3s ease, background-color 0.3s ease; /* Smooth transition for transform and background-color */
         
             &:hover {
                 transform: scale(1.1); /* Make the button bigger */
-                background-color: rgba(255, 255, 255, 0.2); /* Change transparency */
+                background-color: rgba(0, 0, 0, 0.4); /* Change transparency */
             }
         }
         #name-dropdown-highlight{
@@ -331,7 +348,7 @@
         margin-bottom: 0rem;
         margin-top: 0rem;
         width: 100%;
-        background-color: #dddddd; /* Optional: Set a background color */
+        background-color: #ffffff; /* Optional: Set a background color */
         // padding: 1rem; /* Optional: Add some padding */
         // box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better visibility */
         z-index: 1000;
@@ -354,10 +371,10 @@
         .bottom-button {
             width: 80%;
             //margin: .5rem 1rem;
-            color: #020202;
+            color: #000000;
             height: 2rem;
             // width: 100%;
-            background-color: rgba(255, 255, 255, 0.4);
+            background-color: rgba(0, 0, 0, 0.4);
             border: none;
             font-size: 1rem;
             transition: transform 0.3s ease, background-color 0.3s ease; /* Smooth transition for transform and background-color */
@@ -389,7 +406,9 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-
+        #reciept-list{
+            width: 100%;
+        }
     
         .item-name {
             font-family: "Inter",sans-serif;
@@ -435,11 +454,14 @@
         // Styling for the receipt items
         .receipt-item {
             width: 100%;
-            margin: 0rem 0rem;
+            margin: .25rem 0rem;
             min-height: 4rem;
             padding: 0 .25rem;
-            // border: 2px solid ;
-            border-radius: 8px;
+            border: 1px solid ;
+            border-radius: 0px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); // Add shadow
+
+            background-color: #ffffff;
             cursor: pointer;
     
             #receipt-item-card-body{

@@ -1,20 +1,47 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Button, Col, Row, Container, Dropdown, Card, Navbar, Spinner } from 'react-bootstrap';
+import { Col, Row, Navbar, Spinner } from 'react-bootstrap';
 import NameToggles from '../NameThings/NameToggles';
 import { getClaimedTotal, getUrlId, getUserClaimedTotal } from '../HelperFunctions';
 import SummaryModal from '../Modals/SummaryModal';
 import ShareModal from '../Modals/ShareModal';
-import EditModal from '../Modals/EditModal';
 import AddNewItemModal from '../Modals/AddNewItemModal';
 import AddUserModal from '../Modals/AddUserModal';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import * as signalR from '@microsoft/signalr'
-import { FaEllipsisV, FaEdit, FaTrash, FaPlus, FaUserPlus, FaShareSquare } from 'react-icons/fa';
+import { FaPlus, FaUserPlus, FaShareSquare } from 'react-icons/fa';
 import { useSignalR } from '../SignalRContext';
 import { SignalRProvider } from '../SignalRContext';
-
-
+import ReceiptItem from '../ReceiptItem/ReceiptItem';
+import List from '@mui/material/List';
+import Paper from '@mui/material/Paper';
+import BottomNavigation from '@mui/material/BottomNavigation';
+import BottomNavigationAction from '@mui/material/BottomNavigationAction';
+import RestoreIcon from '@mui/icons-material/Restore';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import GroupIcon from '@mui/icons-material/Group';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import IosShareIcon from '@mui/icons-material/IosShare';
+import Divider from '@mui/material/Divider';
+import Box from '@mui/material/Box';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Menu from '@mui/material/Menu';
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
+import MenuItem from '@mui/material/MenuItem';
+import Container from '@mui/material/Container';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import useTheme from '@mui/material/styles/useTheme';
+import FaceIcon from '@mui/icons-material/Face';
+import Button from '@mui/material/Button';
+import ContentCut from '@mui/icons-material/ContentCut';
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
+import Avatar from '@mui/material/Avatar';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { ListItemIcon } from '@mui/material';
+import axios from 'axios';
 /** IF ITEM ID IN THE RESPONSE STAYS IN AN ORDER, THEN THAT WILL KEEP THINGS EASY
  *  SINCE I DO NOT HAVE TO ITERATE THROUGH THINGS.
  * 
@@ -26,36 +53,28 @@ const ReceiptBreakdown = (props) => {
     const setData = props.setData;
     const hubUrl = props.chatHubUrl
     const claimedTotal = getClaimedTotal(data.items, data.tip, data.tax);
-    const selectedRef = useRef();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const navigate = useNavigate();
-    const [selected, setSelected] = useState(-1);
     const [selectedName, setSelectedName] = useState("");
-    const [selectedNameId, setSelectedNameId] = useState("");
     const [selectedUser, setSelectedUser] = useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
     const [itemData, setItemData] = useState(data);
     const [showModal, setShowModal] = useState(false); // Summary modal
     const [showShare, setShowShare] = useState(false); // Share modal
-    const [showEdit, setShowEdit] = useState(false); // Edit modal
     const [showAddItem, setShowAddItem] = useState(false); // Edit modal
     const [showAddUser, setShowAddUser] = useState(false); // Add User modal
-    const [shareLoading, setShareLoading] = useState(false);
     const [receiptId, setReceiptId] = useState(getUrlId());
-    const [connectionId, setConnectionId] = useState("");
-    const [users, setUsers] = useState(data.users);
     const [showItemBreakdown, setShowItemBreakdown] = useState(false);
-    const [editItem, setEditItem] = useState(null);
     const [userClaimedTotal, setUserClaimedTotal] = useState(0);
     const [userSelectedItems, setUserSelectedItems] = useState([]);
     
     const connection = useSignalR();
 
-
     const backendApiUrl = process.env.REACT_APP_BACKEND_API_URL;
-    const chatHubUrl = backendApiUrl + "/chatHub";
-    const addUserUrl = backendApiUrl + "/HandleReceipt/AddUserItem";
-    const removeUserUrl = backendApiUrl + "/HandleReceipt/RemoveUserItem";
-    const deleteItemUrl = backendApiUrl + "/HandleReceipt/DeleteItem";
+    const deleteUsersUrl = backendApiUrl + "/HandleReceipt/DeleteUsers";
+
+
 
     useEffect(() => {
         //everytime there is a change
@@ -99,141 +118,50 @@ const ReceiptBreakdown = (props) => {
         setUserSelectedItems(userItems.map(item => item.itemId));
     }
 
-    const resetClaims = () => {
-        const tempMainData = { ...itemData}
-
-        for (let ind in tempMainData.items) {
-            tempMainData.items[ind].claims = [];
-        }
-
-        setItemData(tempMainData);
-    }
-
-    const addUserClaimToItem = (_id, userId, itemId) => {
-        const payload = {
-            "id":_id, "userId":userId,"itemId":itemId,"quantity":1
-        }
-        console.log("add user item payload: ")
-        console.log(payload);
-        axios.post(addUserUrl, payload).then(res => {
-            console.log('-- ReceiptBreakdown.js|109 >> res', res);
-            if (res.status == "200") {
-                const id = res?.data?.receipt?._id;
-                console.log("add user item success");
-                console.log(res.data.receipt);
-                //updateUserClaimsAndTotal();
-                return true;
-            }else{
-                return false;
-            }
-        }).catch((err) => {
-            console.log('-- ERR', err);
-            return false;
-        })
-    }
-
-    const removeUserClaimFromItem = (_id, userId, itemId) => {
-        const payload = {
-            "id":_id, "userId":userId,"itemId":itemId
-        }
-        console.log("add user item payload: ")
-        console.log(payload);
-
-        axios.post(removeUserUrl, payload).then(res => {
-            console.log('-- ReceiptBreakdown.js|109 >> res', res);
-            if (res.status == "200") {
-                const id = res?.data?.receipt?._id;
-                console.log("remove user item success");
-                console.log(res.data.receipt);
-                //updateUserClaimsAndTotal();
-                return true;
-            }else{
-                return false;
-            }
-        }).catch((err) => {
-            console.log('-- ERR', err);
-            return false;
-        })
-    }
-    
-    const selectItem = (index, item) => {
-        console.log("in selectItem");
-        // item is selected with a name selection.
-        if ( selectedName !== "") {
-            console.log("in conditoinal")
-            const tempItem = { ...item };
-            const tempData = [ ...itemData.items ];
-
-
-            console.log("selectedName: " + selectedName)
-            const tempMainData = { ...itemData}
-            console.log(tempMainData.users);
-            let currentUser = tempMainData.users.find(user => user.name === selectedName);
-            console.log("found current user");
-            console.log(currentUser);
-            console.log(item.claims);
-
-            
-  
-            var tempIndex = item.claims.findIndex(claim => claim.userId === currentUser.userId);
-            console.log("tempIndex: " + tempIndex);
-            if (tempIndex > -1) {
-                console.log("removing claim");
-                let removeUserClaimFromItemSuccess = removeUserClaimFromItem(tempMainData._id, currentUser.userId, tempItem.itemId)
-                
-                if(removeUserClaimFromItemSuccess){
-                    alert("Failed to remove claim from item.");
-                }
-
-            } else {
-
-                const payload = {
-                    "id":tempMainData._id, "userId":currentUser.userId,"itemId":tempItem.itemId,"quantity":1
-                }
-
-                let addUserClaimToItemSuccess = addUserClaimToItem(tempMainData._id, currentUser.userId, tempItem.itemId)
-                
-                if (addUserClaimToItemSuccess) {
-                    alert("Failed to claim item.");
-                }
-                
-            }
-
-            // Use item ID to grab that item from the array since they're just id's in chronological order
-            // This is handy because we dont have to iterate.
-            if (tempData[tempItem.id] !== undefined)
-                tempData[tempItem.id] = tempItem;
-
-            // Get a temp data to modify it with the new additions.
-            //const tempMainData = { ...itemData};
-            tempMainData.items = tempData;
-            setItemData(tempMainData);
-
-            return;
-        }
-
-        selectedRef.current = index;
-        setSelected(index);
-    }
 
     const handleAddNewItem = async () => {
         console.log("add item button clicked in handleAddNewItem")
         setShowAddItem(true);
     }
-    const handleDelete = async (itemId) => {
-        const deleteItem = {
-            id: receiptId,
-            itemId: itemId
-        };
-        try {
-            console.log('Calling API to update item:', deleteItem);
+  
+    const handleSelectUser = (user) => {
+        setSelectedUser(user);
+        setSelectedName(user.name);
+        setAnchorEl(null);
+    };
 
-            axios.post(deleteItemUrl, deleteItem).then(res => {
+    const handleAddUser = () => {
+        console.log("add user button clicked in handleAddUser")
+        setShowAddUser(true);
+        setAnchorEl(null);
+    }
+
+    const handleUsersClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleDeleteUser = (user) => {
+        console.log("delete user button clicked in handleDeleteUser")
+        const deleteUser = {
+            id: receiptId,
+            userId: user.userId
+        };
+
+        try {
+            console.log('Calling API to delete user to receipt:', deleteUser);
+
+            axios.post(deleteUsersUrl, deleteUser).then(res => {
                 console.log('-- ReceiptBreakdown.js|109 >> res', res);
                 if (res.status == "200") {
                     const id = res?.data?.receipt?._id;
-                    console.log("remove user item success");
+                    console.log("edit user item success");
                     console.log(res.data.receipt);
+                    // setShow(false);
+                    setSelectedName("");
                     return true;
                 }else{
                     return false;
@@ -246,118 +174,70 @@ const ReceiptBreakdown = (props) => {
         } catch (error) {
             console.error('Error updating item:', error);
         }
-    };
-
-    const handleEdit = (item) => {
-        console.log("edit item button clicked in handleEdit")
-        setEditItem(item);
-        setShowEdit(true);
-    };
-
-    const handleAddUser = () => {
-        console.log("add user button clicked in handleAddUser")
-        setShowAddUser(true);
     }
 
-    const receiptItems = () => {
-
-        const tempMainData = { ...itemData}
-        console.log("in receiptItems");
-        console.log("itemData:");
-        console.log(tempMainData)
-        let currentUser = tempMainData.users.find(user => user.name === selectedName);
-        console.log("selectedUser: " );
-        console.log(currentUser);
-        //setSelectedUser(currentUser);
-        console.log("userSelectedItems: ");
-        console.log(userSelectedItems);
+    const renderUserMenu = () => (
+        <Box>
+            
+        <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        >
+            {data.users.map((user, index) => (
+                <Box key={index} sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'space-between',
+                    flexDirection: 'row', pr:2}}>
+                    <Box sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'center',
+                                            flexDirection: 'row'}}>
+                        <MenuItem key={index} onClick={() => handleSelectUser(user)} sx={{ flexGrow: 1 }}>
+                            <ListItemIcon>
+                                <FaceIcon fontSize="small" />
+                            </ListItemIcon>
+                            {user.name}
+                        </MenuItem>
+                        <IconButton edge="end" color="inherit" onClick={() => handleDeleteUser(user)}>
+                            <CloseIcon />
+                        </IconButton>
+                    </Box>  
+                </Box>
+            ))}
+            
+            <MenuItem onClick={handleAddUser}>
+                <ListItemIcon>
+                    <PersonAddAltIcon fontSize="small" />
+                </ListItemIcon>
+                Add User
+            </MenuItem>
+            
+        </Menu>
+    </Box>
         
+    );
 
+    const receiptItems = () => {
         return (
             <>
-                { itemData?.items?.map((item, index) => 
-                
-                (
-                    <Card key={index} className={'receipt-item' + (userSelectedItems?.includes(item.itemId) ? " highlight" : "")} onClick={() => selectItem(index, item)}>
-                        <Card.Body id="receipt-item-card-body" className='d-flex justify-content-center'>
-                            <Row className='d-flex w-100 h-100'>
-                            <Col className='recipt-item-col-start col-10 col-sm-10 col-md-11'>
-                                <Row className="item-top-row w-100">
-                                    <Col className='item-name'>
-                                        <span className='item-text-main'>
-                                            {item.description}
-                                        </span>
-                                    </Col>
-                                    <Col className='item-price text-end'>
-                                        <span className='item-text-main'>
-                                            ${item.price}
-                                        </span>
-                                    </Col>
-                                </Row>
-                                <Row className="item-bottom-row w-100">
-                                    {/* <Col id='tap-instruction'>
-                                    <span className='item-text-instrucation text-muted'>
-                                        { selectedName !== "" ? 
-                                            (selected === index ?
-                                            (item.claims.indexOf(selectedName) >= 0 ? 
-                                            "Tap again to remove"
-                                            : "Tap again to confirm")  
-                                            : "Tap to claim")
-                                            : "Select a name"
-                                        }</span>
-                                    </Col> */}
-                                    {item.claims?.length ? 
-                                        <Col id='claimed-by' className="text-muted text-start">
-                                            <i>{"Claimed by: " + getItemClaimedList(item.claims)}</i>
-                                        </Col>
-                                        : null
-                                    }
-                                </Row>
-                            </Col>
-                            <Col className='recipt-item-col-end col-2 col-sm-2 col-md-1'>
-                                <Dropdown id='more-options-dropdown'  >
-                                    <Dropdown.Toggle id="more-options-dropdown-toggle">
-                                        <FaEllipsisV className='more-options-text' />
-                                    </Dropdown.Toggle>
-                
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item onClick={() => handleEdit(item)}>
-                                            <FaEdit className='more-options-text' /> Edit
-                                        </Dropdown.Item>
-                                        <Dropdown.Item onClick={() => handleDelete(item.itemId)}>
-                                            <FaTrash className='more-options-text'/> Delete
-                                        </Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                            </Col>
-                            </Row>
-                        </Card.Body>
-                    </Card>
-                ))}
-             
-                <EditModal
-                    show={showEdit}
-                    setShow={setShowEdit}
-                    receiptId={receiptId}
-                    item={editItem}
-                />
-
+                <List id='reciept-list' className="w-100">
+                {
+                    itemData?.items?.map((item, index) => (                   
+                        <ReceiptItem
+                        item={item}
+                        index={index}
+                        users={itemData.users}
+                        selectedName={selectedName}
+                        userSelectedItems={userSelectedItems}
+                        receiptId={itemData._id}>
+                        </ReceiptItem>                   
+                    ))
+                }
+                </List>
             </>
         )
 
     }
 
-    const getItemClaimedList = (claims) => {
-        //use the userId in the claims to get a list of the names from the data.users array
-        const tempMainData = { ...itemData}
-        const claimList = [];
-
-        for (let claim of claims) {
-            const user = tempMainData.users.find(user => user.userId === claim.userId);
-            claimList.push(user.name);
-        }
-        return claimList.join(", ");
-    }
 
     const handleShare = async () => {
         if (navigator.share) {
@@ -377,142 +257,74 @@ const ReceiptBreakdown = (props) => {
             console.log('Web Share API is not supported in this browser.');
         }
     }
-    const shareReceipt = () => {
-        console.log("Share Receipt");
-    }
+
 
     if (showItemBreakdown !== null && showItemBreakdown !== undefined && showItemBreakdown === true) {
         return(
             <>
-            <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
-                    <Container>
-                    <Navbar.Brand  href="/">Home</Navbar.Brand>
-                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                    <Navbar.Collapse className="justify-content-end">
-                            <Button variant="outline-light" onClick={() => handleShare()}>
-                                <FaShareSquare />
-                            </Button>
-                        </Navbar.Collapse>
+     
+
+                <Container fixed sx={{ display: 'flex',  alignItems: 'center', justifyContent: 'center',
+                        flexDirection: 'column', width: '100%'
+                     }}>
+                <Box id="header-box" sx={{ display: 'flex',  alignItems: 'center', justifyContent: 'center',
+                            flexDirection: 'column', position: 'sticky', top: isMobile ? 54 : 64, zIndex: 1, 
+                            bgcolor: 'background.paper', width: '100%'}}>
+                    <Typography sx={{ fontFamily: 'monospace', m: isMobile ? 1.5 : 2, fontWeight: 700, color: 'text.primary', textDecoration: 'none',
+                        fontSize: isMobile ? '1.25rem' : '1.5rem'
+                     }}>
+                                {"Receipt Breakdown"}
+                    </Typography>
+                    
+                </Box>
+                <Box id="summary-box" sx={{display: 'flex',  alignItems: 'center', justifyContent: 'center',
+                            flexDirection: 'row', position: 'sticky', top: isMobile ? 100 : 124, zIndex: 1, bgcolor: 'background.paper', width: '100%'}}>
+                    <Typography sx={{ fontFamily: 'monospace', fontWeight: 400, color: 'text.primary', textDecoration: 'none',
+                        fontSize: isMobile ? '.8rem' : '1rem', m: isMobile ? 1 : 2
+                     }}>
+                    {"Total: $" + data.total.toFixed(2)}
+                    </Typography>
+                    <Typography sx={{ fontFamily: 'monospace', fontWeight: 400, color: 'text.primary', textDecoration: 'none',
+                        fontSize: isMobile ? '.8rem' : '1rem', m: isMobile ? 1 : 2
+                     }}>
+                    {"Claimed: $" + claimedTotal.toFixed(2)}
+                    </Typography>
+                    {(selectedName) && (
+                    <Typography sx={{ fontFamily: 'monospace',  fontWeight: 400, color: 'text.primary', textDecoration: 'none',
+                        fontSize: isMobile ? '.8rem' : '1rem', m: isMobile ? 1 : 2
+                     }}>
+                    {selectedName + ": $" + userClaimedTotal.toFixed(2)}
+                    </Typography>)}
+                </Box>
+                
+                <Box sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'center',
+                            flexDirection: 'row', mt: isMobile ? '5rem' : '5rem', mb: isMobile ? '7rem' : '7rem'}}>
+                                {receiptItems()}
+                                </Box>
                     </Container>
-
-                </Navbar>
-
-
-            <Container className='d-flex justify-content-center flex-column'>
-                <SummaryModal 
-                    show={showModal}
-                    setShow={setShowModal}
-                    total={data.total}
-                    claimedTotal={claimedTotal}
-                    data={data}
+                <SummaryModal show={showModal} setShow={setShowModal} total={data.total} claimedTotal={claimedTotal} data={data} />
+                <ShareModal show={showShare} setShow={setShowShare} receiptId={receiptId} />
+                <AddNewItemModal show={showAddItem} setShow={setShowAddItem} receiptId={receiptId} />
+                <AddUserModal show={showAddUser} setShow={setShowAddUser} receiptId={receiptId} />
+                {renderUserMenu()}
                     
-                />
-                <ShareModal 
-                    show={showShare}
-                    setShow={setShowShare}
-                    receiptId={receiptId}
-                />
-    
-                <AddNewItemModal
-                    show={showAddItem}
-                    setShow={setShowAddItem}
-                    receiptId={receiptId}
-                />
-
-                <AddUserModal
-                    show={showAddUser}
-                    setShow={setShowAddUser}
-                    receiptId={receiptId}
-                />
-                <Row className="summary-row">
-               
+       
+ 
+                
+                <Paper sx={{ position: 'fixed', display:'flex', justifyContent:'center', pt:1,  bottom: 0, left: 0, right: 0, height: 75 }} elevation={3}>
+                    <BottomNavigation
+                    showLabels
+                    sx={{height: '100%', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'start'}}
+                    >
+                    <BottomNavigationAction label={selectedName || "Users"} icon={selectedName ? <FaceIcon/> : <GroupIcon />} onClick={handleUsersClick} />
+                    <BottomNavigationAction label="Add Item" onClick={() => handleAddNewItem()} icon={<AddCircleOutlineIcon />} />
+                    <BottomNavigationAction label="Summary" onClick={() => setShowModal(true)} icon={<CheckCircleOutlineIcon />} />
+                    <BottomNavigationAction label="Share" onClick={() => handleShare()} icon={<IosShareIcon />} />
                     
-                        <Col xs={3} md={3} className="d-flex justify-content-center ">
-                        <span id='total-text' className="fw-bold">{"Total: $" + data.total.toFixed(2)}</span>
-                        </Col>
-                        <Col xs={3} md={3} className="d-flex justify-content-center ">
-                        <span id='remaining-text' className="fw-bold">{"Total Claimed: $" + claimedTotal.toFixed(2)}</span>
-                        </Col>
-                        <Col xs={3} md={3} className="d-flex justify-content-center" >
-                            <span id='user-total-text' className="fw-bold">{"User Total: $" + userClaimedTotal.toFixed(2)}</span>
-                        </Col>
-                    
+                    IosShareIcon
+                    </BottomNavigation>
+                </Paper>
                 
-                
-                </Row>
-
-                <Row id='receipt-grid-row'>
-                <Col id='receipt-grid' >
-                
-                    {receiptItems()}
-
-                </Col>
-                </Row>
-                <Row className="bottom-row">
-                        
-                            {/* <Button id='share-button' className='bottom-button' variant="primary" onClick={() => setShowShare(true)}>
-                                { shareLoading ? 
-                                    <Spinner />
-                                :
-                                    "Share"
-                                }
-                            </Button> */}
-                       
-                            <Col xs={3} md={3} className="bottom-row-col">
-                                <Row className='bottom-row-col-row'>
-                                    
-                                        <NameToggles 
-                                                selected={selectedName}
-                                                setSelected={setSelectedName}
-                                                names={data.users}
-                                            /> 
-                                           
-                                </Row>
-                            </Col>
-                            <Col xs={3} md={3} className="bottom-row-col">
-                                <Row className='bottom-row-col-row'>
-                                   
-                           
-                                                <Button id='add-user-button' onClick={() => handleAddUser()} >
-                                                    <FaUserPlus className='add-user-icon' />
-                                                </Button>
-                                   
-                                </Row>
-                            </Col>
-                            <Col xs={3} md={3} className="bottom-row-col">
-                                <Row className='bottom-row-col-row'>
-                                        
-                                                <Button id='summary-button' variant="success" onClick={() => setShowModal(true)}>
-                                                    Summary
-                                                </Button>
-                                            
-                                     
-                                        </Row>
-                                    </Col>
-                                <Col xs={3} md={3} className="bottom-row-col">
-                                    <Row className='bottom-row-col-row'>
-                                    
-                                                
-                                                <Button
-                                                    id="add-item-button"
-                                                    onClick={() => handleAddNewItem()}
-                                                    >
-                                                    <FaPlus />
-                                                </Button>
-                                       
-                                    </Row>
-                                </Col>
-                            
-                </Row>
-                </Container>
-                {/* <Navbar id='nav-container' bg="dark" data-bs-theme="dark" sticky="top" >
-                    <Container>
-                    <Navbar.Brand href="/">Home</Navbar.Brand>
-                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
-
-                    </Container>
-
-                </Navbar> */}
             </>
         );
     }else{
@@ -546,4 +358,4 @@ const ReceiptBreakdownWrapper = (props) => {
     );
 };
 export default ReceiptBreakdownWrapper;
-//  <ReceiptBreakdown data={receiptData} setData={setReceiptData} />
+

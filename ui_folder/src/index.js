@@ -3,19 +3,24 @@ import ReactDOM from 'react-dom/client';
 import './index.scss';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-
-
-console.log("NODE_ENV: " + process.env.NODE_ENV);
-console.log("Secret Key: " + process.env.REACT_APP_SECRET_KEY);
-console.log("API URL: " + process.env.REACT_APP_BACKEND_API_URL);
+// import Head from 'next/head';
+import * as serviceWorker from './serviceWorkerRegistration';
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
-        <App />
+        
+            <App />
+        
     </React.StrictMode>
 );
+
+serviceWorker.register();
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

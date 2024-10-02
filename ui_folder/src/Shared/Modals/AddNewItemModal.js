@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Button, Modal, Form } from "react-bootstrap";
+
 import axios from 'axios';
+import { Button, Box, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 
 const AddNewItemModal = (props) => {
     const {show, setShow, receiptId} = props;
@@ -9,8 +10,8 @@ const AddNewItemModal = (props) => {
     const priceRef = useRef();
     const backendApiUrl = process.env.REACT_APP_BACKEND_API_URL;
     const addItemUrl = backendApiUrl + "/HandleReceipt/AddItem";
-    const submitAddNewItem = async (event) => {
-        event.preventDefault();
+    const submitAddNewItem = async () => {
+        
         
         const addItem = {
             id: receiptId,
@@ -43,53 +44,27 @@ const AddNewItemModal = (props) => {
         }
     };
 
-    
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            submitAddNewItem();
+        }
+    };
+
     return (
         <>
-       
-        <Modal show={show} onHide={() => setShow(false)}>
-        <Modal.Header closeButton>
-            <Modal.Title>Add Item</Modal.Title>
-        </Modal.Header>
-        <Modal.Body id="add-item-body-container">
-            
-        <Form id='edit-form' onSubmit={submitAddNewItem}>
-                <Form.Group controlId="formItemDescription">
-                    <Form.Label>Description</Form.Label>
-                    <Form.Control
-                        type="text"
-                        defaultValue={"Item Description"}
-                        ref={descriptionRef}
-                        required
-                    />
-                </Form.Group>
-                <Form.Group controlId="formItemQuantity">
-                    <Form.Label>Quantity</Form.Label>
-                    <Form.Control
-                        type="number"
-                        defaultValue={0}
-                        ref={quantityRef}
-                        required
-                    />
-                </Form.Group>
-                <Form.Group controlId="formItemPrice">
-                    <Form.Label>Price</Form.Label>
-                    <Form.Control
-                        type="number"
-                        step="0.01"
-                        defaultValue={0.00}
-                        ref={priceRef}
-                        required
-                    />
-                </Form.Group>
-                <Button id='submit-add-new-item-button' type="submit">
-                    Submit
-                </Button>
-            </Form>
-        </Modal.Body>
-    </Modal>
-        
-
+              <Dialog open={show} onClose={() => setShow(false)} onKeyDown={handleKeyDown}>
+                    <DialogTitle>Add Item</DialogTitle>
+                    <DialogContent>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            <TextField required margin="dense" id="description" name="description" label="Description" variant="standard" inputRef={descriptionRef} />
+                            <TextField required margin="dense" id="quantity" name="quantity" label="Quantity" variant="standard" inputRef={quantityRef} />
+                            <TextField required margin="dense" id="price" type="number" step="0.01" name="price" label="Price" variant="standard" inputRef={priceRef} />
+                        </Box></DialogContent>
+                  <DialogActions>
+                    <Button variant="text" onClick={() => setShow(false)}>Cancel</Button>
+                    <Button variant="text" onClick={() => submitAddNewItem()}>Submit</Button>
+                  </DialogActions>
+                </Dialog>
         </>
     )
 }
