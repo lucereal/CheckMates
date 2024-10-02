@@ -291,6 +291,29 @@ namespace receiptParser.Service.impl
             return ReceiptMapper.MapReceiptToReceiptDto(receipt);
         }
 
+        public async Task<ReceiptDto> DeleteUsersFromReceipt(string id, string userId)
+        {
+            Receipt receipt = await _userReceiptRepository.FindByIdAsync(id);
+
+            if (receipt == null)
+            {
+                throw new HandleReceiptException("Could not find receipt while trying to update.", HandleReceiptFailureReason.CouldNotFindReceipt);
+            }
+
+
+            receipt.users.RemoveAll(user => user.userId == userId);
+
+            foreach (var item in receipt.items)
+            {
+                item.claims.RemoveAll(claim => claim.userId == userId);
+            }
+
+            await _userReceiptRepository.ReplaceOneAsync(receipt);
+
+            await UpdateUsers(receipt);
+
+            return ReceiptMapper.MapReceiptToReceiptDto(receipt);
+        }
         private double GetTotalPrice(List<Item> items)
         {
             double total = 0;

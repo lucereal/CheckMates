@@ -1,6 +1,11 @@
+#root{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
 body {
     height:100%;
-    background-color: #dddddd; /* For browsers that do not support gradients */
+    background-color: #ffffff; /* For browsers that do not support gradients */
     
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -13,7 +18,7 @@ body {
 p, h1, label {
     font-family: "Inter",sans-serif;
     color: #020202;
-    text-align: center;
+    // text-align: center;
 }
 
 
@@ -28,3 +33,4 @@ code {
 @import './Shared/SharedComponents.scss';
 @import './Shared/InputImage/InputImage.scss';
 @import './Components/MainComponent.scss';
+@import './Shared/ReceiptItem/ReceiptItem.scss';

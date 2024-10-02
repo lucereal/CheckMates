@@ -16,15 +16,17 @@ namespace receiptParser.Controllers
     {
         private readonly IUserReceiptService _userReceiptService;
         string endpoint = "https://muonreceiptparser.cognitiveservices.azure.com/";
-        string apiKey = "de3591828f28412fa6c0ed24499a6c8e";
         
 
         private readonly ILogger<ParseReceiptController> _logger;
 
-        public ParseReceiptController(ILogger<ParseReceiptController> logger, IUserReceiptService userReceiptService)
+        private readonly IConfiguration _configuration;
+
+        public ParseReceiptController(IConfiguration configuration, ILogger<ParseReceiptController> logger, IUserReceiptService userReceiptService)
         {
             _logger = logger;
             _userReceiptService = userReceiptService;
+            _configuration = configuration;
         }
 
 
@@ -33,19 +35,25 @@ namespace receiptParser.Controllers
         public async Task<ReceiptResponse> ParseReceipt(ParseReceiptRequest request)
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
+            string? apiKey = _configuration["DocumentIntelligenceApiKey"];
 
-            var credential = new AzureKeyCredential(apiKey);
-            var client = new DocumentAnalysisClient(new Uri(endpoint), credential);
-
-            List<string> users = request.users;
 
             AnalyzeDocumentOperation? operation = null;
 
-            IFormFile file = request.file.First();
-            using (var stream = file.OpenReadStream())
+            if (apiKey != null)
             {
-                operation = await client.AnalyzeDocumentAsync(WaitUntil.Completed, "prebuilt-receipt", stream);                
+                var credential = new AzureKeyCredential(apiKey);
+                var client = new DocumentAnalysisClient(new Uri(endpoint), credential);
+
+                IFormFile file = request.file.First();
+                using (var stream = file.OpenReadStream())
+                {
+                    operation = await client.AnalyzeDocumentAsync(WaitUntil.Completed, "prebuilt-receipt", stream);
+                }
             }
+
+
+            List<string> users = request.users;
 
             ReceiptResponse responseReceipt = new ReceiptResponse();
             responseReceipt.isSuccess = true;

@@ -160,6 +160,45 @@ namespace receiptParser.Controllers
             return receiptResponse;
         }
 
+        [HttpPost(Name = "DeleteUsers")]
+        public async Task<ReceiptResponse> DeleteUsers(DeleteUserRequest req)
+        {
+            _logger.LogInformation("C# HTTP trigger function processed a request.");
+
+            HttpStatusCode resultStatusCode = HttpStatusCode.OK;
+            ReceiptResponse receiptResponse = new ReceiptResponse();
+
+            receiptResponse.isSuccess = false;
+            try
+            {
+
+                DeleteUserRequest? model = req;
+
+                if (model != null)
+                {
+                    ReceiptDto resultReceiptDto = await _userReceiptService.DeleteUsersFromReceipt(model.id, model.userId);
+                    receiptResponse.isSuccess = true;
+                    receiptResponse.message = "Users Deleted.";
+
+                    receiptResponse.receipt = resultReceiptDto;
+                }
+                else
+                {
+                    receiptResponse.isSuccess = false;
+                    receiptResponse.message = "could not parse request object";
+                    resultStatusCode = HttpStatusCode.BadRequest;
+                }
+            }
+            catch (Exception e)
+            {
+                receiptResponse.isSuccess = false;
+                resultStatusCode = HttpStatusCode.InternalServerError;
+            }
+
+
+            return receiptResponse;
+        }
+
         [HttpPost(Name = "AddUserItem")]
         public async Task<ReceiptResponse> AddUserItem(AddUserItemRequest req)
         {

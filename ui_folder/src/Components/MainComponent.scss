@@ -10,7 +10,21 @@
     color: #020202;
     &:hover {
         transform: scale(1.1); /* Make the button bigger */
-        background-color: rgba(255, 255, 255, 0.2); /* Change transparency */
+        background-color: rgba(0, 0, 0, 0.2); /* Change transparency */
     }
     
+}
+
+.menu-body-button{
+    height: 4rem;
+    //width: 100%;
+    
+    border: none;
+    font-size: 2rem;
+    transition: transform 0.3s ease, background-color 0.3s ease; /* Smooth transition for transform and background-color */
+    color: #020202;
+    &:hover {
+        transform: scale(1.1); /* Make the button bigger */
+        background-color: rgba(139, 85, 85, 0.2); /* Change transparency */
+    }
 }
