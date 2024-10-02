@@ -2,10 +2,9 @@
   "routes": [
     {
       "navigationFallback": {
-        "rewrite": "/index.html",
+        "rewrite": "index.html",
         "exclude": [
-          "/images/*.{png,jpg,gif}",
-          "/css/*"
+          "/*.{ico,js,map,css}"
         ]
       }
     }
