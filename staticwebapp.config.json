@@ -1,1 +1,9 @@
-{}
+{
+  "routes": [
+    {
+      "route": "/*",
+      "redirect": "/",
+      "statusCode": 302
+    }
+  ]
+}
