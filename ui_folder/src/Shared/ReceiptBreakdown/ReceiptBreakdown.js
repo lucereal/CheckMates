@@ -241,11 +241,11 @@ const ReceiptBreakdown = (props) => {
 
     const handleShare = async () => {
         if (navigator.share) {
-            const linkToShare = window.location.origin + "/input/?receiptId=" + receiptId;
+            const linkToShare = window.location.origin + "/?receiptId=" + receiptId;
             
             try {
                 await navigator.share({
-                    title: 'Tabman Receipt Share',
+                    title: 'CheckMates Share',
                     text: "Let's split this receipt!",
                     url: linkToShare,
                 });
@@ -311,10 +311,10 @@ const ReceiptBreakdown = (props) => {
        
  
                 
-                <Paper sx={{ position: 'fixed', display:'flex', justifyContent:'center', pt:1,  bottom: 0, left: 0, right: 0, height: 75 }} elevation={3}>
+                <Paper sx={{position: 'fixed', display:'flex', justifyContent:'center',  bottom: 0, left: 0, right: 0, height: 75 }} elevation={3}>
                     <BottomNavigation
                     showLabels
-                    sx={{height: '100%', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'start'}}
+                    sx={{height: '100%', pt:1, width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'start'}}
                     >
                     <BottomNavigationAction label={selectedName || "Users"} icon={selectedName ? <FaceIcon/> : <GroupIcon />} onClick={handleUsersClick} />
                     <BottomNavigationAction label="Add Item" onClick={() => handleAddNewItem()} icon={<AddCircleOutlineIcon />} />

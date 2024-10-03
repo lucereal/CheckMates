@@ -44,6 +44,7 @@ const App = () => {
                             <FormControlLabel
                                 control={<Switch checked={darkMode} onChange={handleThemeChange} />}
                                 label="Dark Mode"
+                                
                             />
                         </Toolbar>
                     </AppBar>
