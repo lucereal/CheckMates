@@ -10,7 +10,7 @@
     "route": "/*",
     "serve": "/index.html",
     "redirect": "/",
-    "statusCode": 302
+    "statusCode": 200
     
   }
 ],
