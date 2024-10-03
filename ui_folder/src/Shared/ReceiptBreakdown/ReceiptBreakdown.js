@@ -298,7 +298,7 @@ const ReceiptBreakdown = (props) => {
                 </Box>
                 
                 <Box sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'center',
-                            flexDirection: 'row', mt: isMobile ? '5rem' : '5rem', mb: isMobile ? '7rem' : '7rem'}}>
+                            flexDirection: 'row', mt: isMobile ? '2rem' : '2rem', mb: isMobile ? '7rem' : '7rem'}}>
                                 {receiptItems()}
                                 </Box>
                     </Container>

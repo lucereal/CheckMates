@@ -18,18 +18,6 @@ import IconButton from '@mui/material/IconButton';
 import Fab from '@mui/material/Fab';
 import { styled } from '@mui/material/styles';
 
-import MenuIcon from '@mui/icons-material/Menu';
-import AddIcon from '@mui/icons-material/Add';
-import SearchIcon from '@mui/icons-material/Search';
-import MoreIcon from '@mui/icons-material/MoreVert';
-import AdbIcon from '@mui/icons-material/Adb';
-import BottomNavigation from '@mui/material/BottomNavigation';
-import BottomNavigationAction from '@mui/material/BottomNavigationAction';
-import RestoreIcon from '@mui/icons-material/Restore';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import ArchiveIcon from '@mui/icons-material/Archive';
-import Paper from '@mui/material/Paper';
-import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import ReceiptBreakdownWrapper from '../Shared/ReceiptBreakdown/ReceiptBreakdown';
 import Dialog from '@mui/material/Dialog';
@@ -37,6 +25,10 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import SettingsIcon from '@mui/icons-material/Settings';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { FormControlLabel, Switch } from '@mui/material';
+
 
 const StyledFab = styled(Fab)({
     position: 'absolute',
@@ -47,7 +39,7 @@ const StyledFab = styled(Fab)({
     margin: '0 auto',
   });
 
-const MainContainer = () => {
+const MainContainer = ({ showSettings, setShowSettings, darkMode, setDarkMode }) => {
     const [receiptImg, setReceiptImg] = useState(null);
     const [receiptData, setReceiptData] = useState(null);
     const [receiptId, setReceiptId] = useState(null);
@@ -169,12 +161,24 @@ const MainContainer = () => {
                     <Box sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'center',
                             flexDirection: 'column', bgcolor:'background.paper'}}>
                                 
-                       
-                                    <Button variant="text" size='large' color="primary" onClick={() => { navigate(`/input`)}}  >New Receipt</Button>
-                       
-                      
+                                {!showSettings ? (
+                            <>
+                                <Button variant="text" size='large' color="primary" onClick={() => { navigate(`/input`) }}>New Receipt</Button>
                                 <Button size='large' color="primary" onClick={() => setShowJoin(true)}>Join Receipt</Button>
-                         
+                                <IconButton color="primary" onClick={() => setShowSettings(true)}>
+                                    <MoreHorizIcon />
+                                </IconButton>
+                            </>
+                        ) : (
+                            <Box sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'center',
+                                flexDirection: 'column', bgcolor:'background.paper'}}>
+                                <Button size='large' color="primary" onClick={() => navigate('/about')}>About</Button>
+                                <Button disabled size='large' color="primary" onClick={() => setShowSettings(false)}>Support</Button>
+                                <Button size='large' color="primary" onClick={() => setDarkMode(!darkMode)}>{darkMode ? 'Light Mode' : 'Dark Mode'}</Button>
+                                
+                                <Button size='large' color="primary" onClick={() => setShowSettings(false)}>Back</Button>
+                            </Box>
+                        )}
                    
                         </Box>
                         {joinReceiptModal()}
