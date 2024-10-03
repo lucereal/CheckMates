@@ -1,10 +1,10 @@
-# ReceiptSplit
+# CheckMates
 
-**Demo**: [ReceiptSplit Demo](https://lemon-tree-0c66a350f.5.azurestaticapps.net/)
+**Demo**: [CheckMates Demo](https://lemon-tree-0c66a350f.5.azurestaticapps.net/)
 
 ## Description
 
-ReceiptSplit is a web application that allows users to upload a picture of a receipt to split the tab with friends. It is particularly useful when one person pays for a meal for a group, and everyone needs to figure out how much money to send the person who paid.
+CheckMates is a web application that allows users to upload a picture of a receipt to split the tab with friends. It is particularly useful when one person pays for a meal for a group, and everyone needs to figure out how much money to send the person who paid.
 
 ## How It Works
 
@@ -25,7 +25,6 @@ ReceiptSplit is a web application that allows users to upload a picture of a rec
 
 ## Fixes Needed
 
-- **404: Not Found**: When a URL is shared I get a 404 not found sometimes
 - **Improved SignalR**: SignalR set up is basic and sometimes requires rejoining the receipt with the code in order to see the real time updates. 
 
 

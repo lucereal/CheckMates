@@ -1,9 +1,37 @@
 {
-  "routes": [
-    {
-      "route": "/*",
-      "redirect": "/",
-      "statusCode": 200
+  "routes":[
+    
+  {
+    "route": "/static/*",
+    "serve": "/static",
+    "statusCode": 200
+  },
+  {
+    "route": "/*",
+    "serve": "/index.html",
+    
+    "statusCode": 200
+    
+  }
+],
+"navigationFallback": {
+    "rewrite": "index.html",
+    "exclude": ["*.{svg,png,jpg,gif}","*.{css,scss}","*.js","/static/css/*",
+      "*.css",
+      "*.js",
+      "*.png",
+      "*.jpg",
+      "*.jpeg",
+      "*.gif",
+      "*.svg",
+      "*.woff",
+      "*.woff2",
+      "*.ttf",
+      "*.eot"]
+    
+    
+  },
+  "mimeTypes": {
+        ".json": "text/json"
     }
-  ]
 }

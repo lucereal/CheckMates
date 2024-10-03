@@ -3,13 +3,11 @@ import { createTheme, ThemeProvider, CssBaseline, Switch, FormControlLabel, Box,
 import MainContainer from './Components/MainComponent'; // Adjust the import according to your project structure
 import InputComponent from './Components/InputComponent'; // Adjust the import according to your project structure
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import AboutComponent from './Components/AboutComponent'
 
 const App = () => {
     const [darkMode, setDarkMode] = useState(false);
-
-    const handleThemeChange = () => {
-        setDarkMode(!darkMode);
-    };
+    const [showSettings, setShowSettings] = useState(false);
 
     const theme = createTheme({
         palette: {
@@ -41,17 +39,17 @@ const App = () => {
                                 CheckMates
                             </Typography>
                             <Box sx={{ flexGrow: 1 }} />
-                            <FormControlLabel
-                                control={<Switch checked={darkMode} onChange={handleThemeChange} />}
-                                label="Dark Mode"
-                            />
+                        
                         </Toolbar>
                     </AppBar>
                 </Box>
-                <div className="app-container" style={{ marginTop: '64px' }}>
+                <div className="app-container" style={{ marginTop: '64px',  }}>
                     <Routes>
-                        <Route path="/" element={<MainContainer />} />
+                        <Route path="/" element={<MainContainer showSettings={showSettings} setShowSettings={setShowSettings} darkMode={darkMode} setDarkMode={setDarkMode} />} />
                         <Route path="/input" element={<InputComponent />} />
+                    
+                        <Route path="/about" element={<AboutComponent setShowSettings={setShowSettings} />} />
+
                         <Route path="/receipt" element={<div><h1>NEW</h1></div>} />
                     </Routes>
                 </div>
