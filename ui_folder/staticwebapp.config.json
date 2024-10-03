@@ -5,6 +5,12 @@
     "serve": "/index.html",
     "redirect": "/",
     "statusCode": 302
+    
+  },
+  {
+    "route": "/static/*",
+    "serve": "/static",
+    "statusCode": 200
   }
 ],
 "navigationFallback": {
