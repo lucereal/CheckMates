@@ -12,5 +12,8 @@
     "exclude": ["*.{svg,png,jpg,gif}","*.{css,scss}","*.js","/static/css/*"]
     
     
-  }
+  },
+  "mimeTypes": {
+        ".json": "text/json"
+    }
 }
