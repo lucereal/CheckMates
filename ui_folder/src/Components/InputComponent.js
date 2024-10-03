@@ -192,7 +192,7 @@ const InputComponent = () => {
                     console.log(res.data);
                     console.log("setting receipt data");
                     setReceiptData(res?.data?.receipt);
-                    navigate("/input/?receiptId=" + id);
+                    navigate("/?receiptId=" + id);
                 }
             }).catch((err) => {
                 console.log('-- ERR', err);

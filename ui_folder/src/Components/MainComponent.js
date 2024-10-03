@@ -50,6 +50,7 @@ const StyledFab = styled(Fab)({
 const MainContainer = () => {
     const [receiptImg, setReceiptImg] = useState(null);
     const [receiptData, setReceiptData] = useState(null);
+    const [receiptId, setReceiptId] = useState(null);
     const [participants, setParticipants] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
@@ -91,7 +92,7 @@ const MainContainer = () => {
                 //setReceiptLoading(false);
             })
         }
-    }, []);
+    }, [receiptId]);
 
     React.useEffect(() => {
         console.log("ref: ", ref);
@@ -102,7 +103,9 @@ const MainContainer = () => {
     const joinReceiptInitiate = (inputRef) => {
         console.log("inputRef: ", inputRef.current.value);
         const receiptId = inputRef.current.value;
-        navigate(`/input/?receiptId=${receiptId}`);
+        setReceiptId(receiptId);
+        setShowJoin(false);
+        navigate(`/?receiptId=${receiptId}`);
     }
     const joinReceiptModal = () => {
         if(showJoin){
@@ -160,23 +163,7 @@ const MainContainer = () => {
         } else {
             return (
                 <>
-                    {/* <Box sx={{ flexGrow: 1 }}>
-                        <AppBar position="fixed" sx={{ bgcolor: 'background.paper', boxShadow: 'none' }}>
-                            <Toolbar>
-                            <Typography variant="h6" noWrap component="a" href="/" sx={{ mr: 2, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem', color: 'primary.main', textDecoration: 'none' }}>
-                                    CheckMates
-                                </Typography>
-                                <Box sx={{ flexGrow: 1 }} />
-
-                            <Button color="primary"  >Login</Button>
-                            </Toolbar>
-                        </AppBar>
-                    </Box> */}
-                
-                    {/* <Container fixed>
-
-                <Button size="large" className='menu-body-button'  >New Receipt</Button>
-                </Container> */}
+                  
                 <div id="menu-container" className="d-flex flex-column align-items-center justify-content-center vh-100">
                     
                     <Box sx={{ display: 'flex', width: '100%',  alignItems: 'center', justifyContent: 'center',
