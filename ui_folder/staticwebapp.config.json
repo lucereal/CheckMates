@@ -15,7 +15,18 @@
 ],
 "navigationFallback": {
     "rewrite": "index.html",
-    "exclude": ["*.{svg,png,jpg,gif}","*.{css,scss}","*.js","/static/css/*"]
+    "exclude": ["*.{svg,png,jpg,gif}","*.{css,scss}","*.js","/static/css/*",
+  "*.css",
+      "*.js",
+      "*.png",
+      "*.jpg",
+      "*.jpeg",
+      "*.gif",
+      "*.svg",
+      "*.woff",
+      "*.woff2",
+      "*.ttf",
+      "*.eot"]
     
     
   },
