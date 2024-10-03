@@ -1,22 +1,23 @@
 {
   "routes":[
+    
+  {
+    "route": "/static/*",
+    "serve": "/static",
+    "statusCode": 200
+  },
   {
     "route": "/*",
     "serve": "/index.html",
     "redirect": "/",
     "statusCode": 302
     
-  },
-  {
-    "route": "/static/*",
-    "serve": "/static",
-    "statusCode": 200
   }
 ],
 "navigationFallback": {
     "rewrite": "index.html",
     "exclude": ["*.{svg,png,jpg,gif}","*.{css,scss}","*.js","/static/css/*",
-  "*.css",
+      "*.css",
       "*.js",
       "*.png",
       "*.jpg",
