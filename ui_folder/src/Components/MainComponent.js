@@ -31,6 +31,7 @@ import ArchiveIcon from '@mui/icons-material/Archive';
 import Paper from '@mui/material/Paper';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
+import ReceiptBreakdownWrapper from '../Shared/ReceiptBreakdown/ReceiptBreakdown';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -52,12 +53,45 @@ const MainContainer = () => {
     const [participants, setParticipants] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+    const backendApiUrl = process.env.REACT_APP_BACKEND_API_URL;
+    const chatHubUrl = backendApiUrl + "/chatHub";
     const [receiptLoading, setReceiptLoading] = useState(false);
     const [existingReceiptId, setExistingReceiptId] = useState(getUrlId());
     const inputRef = useRef();
     const [showJoin, setShowJoin] = useState(false); // Share modal
     const [value, setValue] = React.useState(0);
     const ref = React.useRef(null);
+
+   
+    useEffect(() => {
+
+        console.log("here in useEffect for loading existing receipt");
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('receiptId');
+        setExistingReceiptId(id);
+
+        console.log("id: " + id);
+        console.log(existingReceiptId)
+
+        if (id) {
+            
+            //const url = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/GetReceipt/" +id;
+            //const urlLocal = "https://localhost:7196/HandleReceipt/GetReceipt/" +id;
+            const getReceiptUrl = backendApiUrl + "/HandleReceipt/GetReceipt/" +id;
+            console.log("makeing get request for existing receipt");
+            //setReceiptLoading(true);
+            axios.get(getReceiptUrl).then(res => {
+                console.log("got response for existing receipt");
+                setReceiptData(res?.data?.receipt);
+
+                //setReceiptLoading(false);
+            }).catch(e => {
+                console.log('-- ERR', e);
+                //setReceiptLoading(false);
+            })
+        }
+    }, []);
 
     React.useEffect(() => {
         console.log("ref: ", ref);
@@ -99,6 +133,7 @@ const MainContainer = () => {
 
     }
 
+
     if (receiptLoading) {
         return (
             <div id='loading-receipt-spinner'>
@@ -107,10 +142,19 @@ const MainContainer = () => {
         )
     } else {
         if (receiptData !== null && receiptData !== undefined) {
-            console.log('-- MainContainer.js|79 >> ', receiptData);
+            console.log("receiptData: ");
+            console.log(receiptData);
+            console.log("creating receipt breakdown");
             return (
                 <div id="receipt-breakdown-container">
-                    <ReceiptBreakdown data={receiptData} />
+                    {/* <ReceiptBreakdown data={receiptData} setData={setReceiptData} />
+                     */}
+                     <ReceiptBreakdownWrapper data={receiptData} 
+                        setData={setReceiptData}
+                        chatHubUrl={chatHubUrl}
+                        receiptId={receiptData._id}
+                        />
+                    
                 </div>
             )
         } else {

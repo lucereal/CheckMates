@@ -59,34 +59,34 @@ const InputComponent = () => {
         
         return urlParams.get('receiptId'); // Assuming the ID is passed as a query parameter
     };
-    useEffect(() => {
+    // useEffect(() => {
 
-        console.log("here in useEffect for loading existing receipt");
+    //     console.log("here in useEffect for loading existing receipt");
         
-        const id = getUrlId();
-        setExistingReceiptId(id);
+    //     const id = getUrlId();
+    //     setExistingReceiptId(id);
 
-        console.log("id: " + id);
-        console.log(existingReceiptId)
+    //     console.log("id: " + id);
+    //     console.log(existingReceiptId)
 
-        if (id) {
+    //     if (id) {
             
-            //const url = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/GetReceipt/" +id;
-            //const urlLocal = "https://localhost:7196/HandleReceipt/GetReceipt/" +id;
-            const getReceiptUrl = backendApiUrl + "/HandleReceipt/GetReceipt/" +id;
-            console.log("makeing get request for existing receipt");
-            //setReceiptLoading(true);
-            axios.get(getReceiptUrl).then(res => {
-                console.log("got response for existing receipt");
-                setReceiptData(res?.data?.receipt);
+    //         //const url = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/GetReceipt/" +id;
+    //         //const urlLocal = "https://localhost:7196/HandleReceipt/GetReceipt/" +id;
+    //         const getReceiptUrl = backendApiUrl + "/HandleReceipt/GetReceipt/" +id;
+    //         console.log("makeing get request for existing receipt");
+    //         //setReceiptLoading(true);
+    //         axios.get(getReceiptUrl).then(res => {
+    //             console.log("got response for existing receipt");
+    //             setReceiptData(res?.data?.receipt);
 
-                //setReceiptLoading(false);
-            }).catch(e => {
-                console.log('-- ERR', e);
-                //setReceiptLoading(false);
-            })
-        }
-    }, []);
+    //             //setReceiptLoading(false);
+    //         }).catch(e => {
+    //             console.log('-- ERR', e);
+    //             //setReceiptLoading(false);
+    //         })
+    //     }
+    // }, []);
 
     const getParticipantChips = () => {
 
