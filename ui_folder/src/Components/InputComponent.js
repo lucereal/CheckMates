@@ -22,6 +22,7 @@ import { TextField } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
+import CircularProgress from '@mui/material/CircularProgress';
 import FaceIcon from '@mui/icons-material/Face';
 
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -41,7 +42,7 @@ const InputComponent = () => {
     const [receiptImg, setReceiptImg] = useState(null);
     const [receiptData, setReceiptData] = useState(null);
     const [participants, setParticipants] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [receiptId, setReceiptId] = useState(null);
     const navigate = useNavigate(); 
     const [existingReceiptId, setExistingReceiptId] = useState(null); 
@@ -100,6 +101,11 @@ const InputComponent = () => {
             setFileName(file.name);
         }
     };
+    const handleBackClick = () => {
+        console.log("in handleBackClick")
+        
+        navigate('/');         // Navigate to the main page ("/")
+    };
 
     const handleManualEntry = () => {
         setIsManualEntry(true);
@@ -117,7 +123,7 @@ const InputComponent = () => {
     const sendReceipt = () => {
         console.log("in send receipt")
         if(isManualEntry) {
-            setIsLoading(true);
+            setLoading(true);
             const payload = {
                 "users": participants
             }
@@ -132,20 +138,20 @@ const InputComponent = () => {
                     console.log(res.data);
                     console.log("setting receipt data");
                     setReceiptData(res?.data?.receipt);
+                    setLoading(false);
                     navigate("/?receiptId=" + id);
                 }
             }).catch((err) => {
                 console.log('-- ERR', err);
+                setLoading(false);
             })
 
-            
-            setIsLoading(false);
         }else{
             if (receiptImg === null || receiptImg === undefined) {
                 console.log("-- no image selected"); // TODO SHOW VISUAL ERROR OR DISABLE IT
                 return;
             }
-            setIsLoading(true);
+            setLoading(true);
             
             console.log("participants: " + participants);
     
@@ -177,17 +183,19 @@ const InputComponent = () => {
                         console.log(res.data);
                         console.log("setting receipt data");
                         setReceiptData(res?.data?.receipt);
+                        setLoading(false);
                         navigate("/?receiptId=" + id);
                     }
                 }).catch((err) => {
                     console.log('-- ERR', err);
+                    setLoading(false);
                 })
     
                 
-                setIsLoading(false);
+                
             }).catch((err) => {
                 console.log("-- ERR: ", err)
-                setIsLoading(false);
+                setLoading(false);
             })
         }
 
@@ -269,16 +277,24 @@ const InputComponent = () => {
 
 
                         </Box>
-                        {showSubmitButton && (
+                        
+                        
                         <Divider variant="middle" orientation="horizontal" sx={{ width: '100%', my: 2, borderWidth: '2px' }}/>
 
-                        )}
+                        
 
-                        {showSubmitButton && (
-                            <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={() => sendReceipt()}>
+                            <Box sx={{ display: 'flex',  alignItems: 'center', justifyContent: 'center',
+                            flexDirection: 'row', mb:2}}>
+                            <Button variant="contained" color="primary" onClick={() => handleBackClick()} sx={{ mt: 2, mr:1, ml:1}}>
+                                Back
+                            </Button>
+                            {showSubmitButton && (
+                            <Button variant="contained" color="primary" sx={{ mt: 2,  mr:1, ml:1 }} onClick={() => sendReceipt()}>
                                 Submit
                             </Button>
-                        )}
+                            )}
+                            </Box>
+                            {loading && <CircularProgress />}
                     </Container>
                    
                 </>

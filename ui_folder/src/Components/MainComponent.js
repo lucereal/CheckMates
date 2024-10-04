@@ -28,7 +28,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import SettingsIcon from '@mui/icons-material/Settings';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { FormControlLabel, Switch } from '@mui/material';
-
+import CircularProgress from '@mui/material/CircularProgress';
 
 const StyledFab = styled(Fab)({
     position: 'absolute',
@@ -44,7 +44,7 @@ const MainContainer = ({ showSettings, setShowSettings, darkMode, setDarkMode })
     const [receiptData, setReceiptData] = useState(null);
     const [receiptId, setReceiptId] = useState(null);
     const [participants, setParticipants] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [loading, setLoading] = useState(false); // Add loading state
     const navigate = useNavigate();
     const backendApiUrl = process.env.REACT_APP_BACKEND_API_URL;
     const chatHubUrl = backendApiUrl + "/chatHub";
@@ -92,26 +92,28 @@ const MainContainer = ({ showSettings, setShowSettings, darkMode, setDarkMode })
 
     const handleExampleReceipt = () => {
         console.log("loading example receipt");
+        setLoading(true);
         const getReceiptUrl = backendApiUrl + "/HandleReceipt/GetReceiptExample"
             console.log("makeing get request for existing receipt");
             //setReceiptLoading(true);
             axios.get(getReceiptUrl).then(res => {
                 console.log("got response for existing receipt");
                 setReceiptData(res?.data?.receipt);
-
-                //setReceiptLoading(false);
+                setLoading(false);
             }).catch(e => {
                 console.log('-- ERR', e);
-                //setReceiptLoading(false);
+                setLoading(false);
             })
 
     }
     const joinReceiptInitiate = (inputRef) => {
         console.log("inputRef: ", inputRef.current.value);
+        setLoading(true);
         const receiptId = inputRef.current.value;
         setReceiptId(receiptId);
         setShowJoin(false);
         navigate(`/?receiptId=${receiptId}`);
+        setLoading(false);
     }
     const joinReceiptModal = () => {
         if(showJoin){
@@ -197,6 +199,7 @@ const MainContainer = ({ showSettings, setShowSettings, darkMode, setDarkMode })
                         )}
                    
                         </Box>
+                        {loading && <CircularProgress />}
                         {joinReceiptModal()}
                         
                 </div>
