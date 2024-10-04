@@ -79,7 +79,7 @@ const ReceiptBreakdown = (props) => {
     useEffect(() => {
         //everytime there is a change
         if(data !== null && data !== undefined){
-            if(data.items !== null && data.items !== undefined && data.items.length > 0){
+            if(data.items !== null && data.items !== undefined){
                 setShowItemBreakdown(true);
             }
         }
@@ -303,7 +303,6 @@ const ReceiptBreakdown = (props) => {
                                 </Box>
                     </Container>
                 <SummaryModal show={showModal} setShow={setShowModal} total={data.total} claimedTotal={claimedTotal} data={data} />
-                <ShareModal show={showShare} setShow={setShowShare} receiptId={receiptId} />
                 <AddNewItemModal show={showAddItem} setShow={setShowAddItem} receiptId={receiptId} />
                 <AddUserModal show={showAddUser} setShow={setShowAddUser} receiptId={receiptId} />
                 {renderUserMenu()}

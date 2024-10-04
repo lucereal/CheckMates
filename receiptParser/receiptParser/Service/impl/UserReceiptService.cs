@@ -17,6 +17,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Text.Json;
+using System.IO;
 
 namespace receiptParser.Service.impl
 {
@@ -33,12 +35,15 @@ namespace receiptParser.Service.impl
 
         private readonly IHubContext<ChatHub> _hubContext;
 
-        public UserReceiptService(ILoggerFactory loggerFactory, IMongoRepository<Receipt> userReceiptRepository, IMongoRepository<Connection> userConnectionRepository, IHubContext<ChatHub> hubContext)
+        private readonly IConfiguration _configuration;
+
+        public UserReceiptService(IConfiguration configuration,ILoggerFactory loggerFactory, IMongoRepository<Receipt> userReceiptRepository, IMongoRepository<Connection> userConnectionRepository, IHubContext<ChatHub> hubContext)
         {
             _logger = loggerFactory.CreateLogger<UserReceiptService>();        
             _userReceiptRepository = userReceiptRepository;
             _userConnectionRepository = userConnectionRepository;
             _hubContext = hubContext;
+            _configuration = configuration;
         }
 
         public async Task<ReceiptDto> UpdateUserClaim(string id, string userId, int itemId, int quantity)
@@ -324,6 +329,37 @@ namespace receiptParser.Service.impl
             return total;
         }
 
+        public async Task<ReceiptDto> GetReceiptExample()
+        {
+
+            var filePath = Path.Combine(AppContext.BaseDirectory, "ExampleReceipt.json");
+
+            // Read the JSON file
+            var json = System.IO.File.ReadAllText(filePath);
+
+            // Deserialize the JSON into a ReceiptDto object
+            var receiptRequest = JsonSerializer.Deserialize<ReceiptRequest>(json);
+
+
+            if (receiptRequest == null || receiptRequest.receipt == null) throw new HandleReceiptException("Could read ExampleReceipt.json in UserReceiptService.GetReceiptExample " , HandleReceiptFailureReason.CouldNotFindReceipt);
+           
+            return await CreateReceipt(receiptRequest.receipt);
+        }
+        public async Task<ReceiptDto> CreateEmptyReceipt(List<string> users)
+        {
+            List<UserDto> userDtos = ReceiptMapper.MapUserNamesToUserDtos(users);
+
+            ReceiptDto receiptDto = new ReceiptDto();
+            receiptDto.users = userDtos;
+
+            Receipt receipt = ReceiptMapper.MapReceiptDtoToReceipt(receiptDto);
+            receipt.originalReceipt = receipt.createCopy();
+
+            await _userReceiptRepository.InsertOneAsync(receipt);
+
+
+            return ReceiptMapper.MapReceiptToReceiptDto(receipt);
+        }
         public async Task<ReceiptDto> CreateReceipt(ReceiptDto receiptDto)
         {
             Receipt receipt = ReceiptMapper.MapReceiptDtoToReceipt(receiptDto);
