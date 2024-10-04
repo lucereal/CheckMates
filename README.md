@@ -1,6 +1,6 @@
 # CheckMates
 
-**Demo**: [CheckMates Demo](https://lemon-tree-0c66a350f.5.azurestaticapps.net/)
+**Demo**: [CheckMates Demo](https://checkmates.us/)
 
 ## Description
 
