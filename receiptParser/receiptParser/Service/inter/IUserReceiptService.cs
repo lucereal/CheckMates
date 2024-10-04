@@ -30,6 +30,8 @@ namespace receiptParser.Service.inter
         
         Task<ReceiptDto> DeleteUsersFromReceipt(string id, string userId);
 
+        Task<ReceiptDto> CreateEmptyReceipt(List<string> users);
+        Task<ReceiptDto> GetReceiptExample();
         Task<ReceiptDto> RemoveUserClaim(string id, string userId, int itemId);
         Task<ReceiptDto> UpdateUsers(ReceiptDto receiptDto);
 

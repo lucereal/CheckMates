@@ -69,8 +69,6 @@ const MainContainer = ({ showSettings, setShowSettings, darkMode, setDarkMode })
 
         if (id) {
             
-            //const url = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/GetReceipt/" +id;
-            //const urlLocal = "https://localhost:7196/HandleReceipt/GetReceipt/" +id;
             const getReceiptUrl = backendApiUrl + "/HandleReceipt/GetReceipt/" +id;
             console.log("makeing get request for existing receipt");
             //setReceiptLoading(true);
@@ -92,6 +90,22 @@ const MainContainer = ({ showSettings, setShowSettings, darkMode, setDarkMode })
         //setMessages(refreshMessages());
       }, [value]);
 
+    const handleExampleReceipt = () => {
+        console.log("loading example receipt");
+        const getReceiptUrl = backendApiUrl + "/HandleReceipt/GetReceiptExample"
+            console.log("makeing get request for existing receipt");
+            //setReceiptLoading(true);
+            axios.get(getReceiptUrl).then(res => {
+                console.log("got response for existing receipt");
+                setReceiptData(res?.data?.receipt);
+
+                //setReceiptLoading(false);
+            }).catch(e => {
+                console.log('-- ERR', e);
+                //setReceiptLoading(false);
+            })
+
+    }
     const joinReceiptInitiate = (inputRef) => {
         console.log("inputRef: ", inputRef.current.value);
         const receiptId = inputRef.current.value;
@@ -165,6 +179,8 @@ const MainContainer = ({ showSettings, setShowSettings, darkMode, setDarkMode })
                             <>
                                 <Button variant="text" size='large' color="primary" onClick={() => { navigate(`/input`) }}>New Receipt</Button>
                                 <Button size='large' color="primary" onClick={() => setShowJoin(true)}>Join Receipt</Button>
+                                {/* <Button size='large' color="primary" onClick={() => handleExampleReceipt()}>Load Example Receipt</Button> */}
+                                <Button size='large' color="primary" onClick={handleExampleReceipt}>Demo Receipt</Button>
                                 <IconButton color="primary" onClick={() => setShowSettings(true)}>
                                     <MoreHorizIcon />
                                 </IconButton>

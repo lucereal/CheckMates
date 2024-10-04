@@ -54,39 +54,6 @@ const InputComponent = () => {
     const [isManualEntry, setIsManualEntry] = useState(false);
     const [isImageEntry, setIsImageEntry] = useState(false);
 
-    const getUrlId = () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        return urlParams.get('receiptId'); // Assuming the ID is passed as a query parameter
-    };
-    // useEffect(() => {
-
-    //     console.log("here in useEffect for loading existing receipt");
-        
-    //     const id = getUrlId();
-    //     setExistingReceiptId(id);
-
-    //     console.log("id: " + id);
-    //     console.log(existingReceiptId)
-
-    //     if (id) {
-            
-    //         //const url = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/GetReceipt/" +id;
-    //         //const urlLocal = "https://localhost:7196/HandleReceipt/GetReceipt/" +id;
-    //         const getReceiptUrl = backendApiUrl + "/HandleReceipt/GetReceipt/" +id;
-    //         console.log("makeing get request for existing receipt");
-    //         //setReceiptLoading(true);
-    //         axios.get(getReceiptUrl).then(res => {
-    //             console.log("got response for existing receipt");
-    //             setReceiptData(res?.data?.receipt);
-
-    //             //setReceiptLoading(false);
-    //         }).catch(e => {
-    //             console.log('-- ERR', e);
-    //             //setReceiptLoading(false);
-    //         })
-    //     }
-    // }, []);
 
     const getParticipantChips = () => {
 
@@ -149,40 +116,13 @@ const InputComponent = () => {
     }
     const sendReceipt = () => {
         console.log("in send receipt")
-        if (receiptImg === null || receiptImg === undefined) {
-            console.log("-- no image selected"); // TODO SHOW VISUAL ERROR OR DISABLE IT
-            return;
-        }
-        setIsLoading(true);
-        
-        console.log("participants: " + participants);
-
-        
-        var formData = new FormData();
-        formData.append('file', receiptImg);
-        participants.forEach(p => {
-            formData.append('users', p);
-        })
-        //formData.append('users', names);
-
-        console.log("API URL: " + process.env.REACT_APP_BACKEND_API_URL);
-        //const url = 'https://receiptparserservices20230928182301.azurewebsites.net/api/ParseReceipt?name=Functions';
-        // const url = 'https://receiptparserdevelop001.azurewebsites.net/ParseReceipt/ParseReceipt';
-        // const urlLocal = 'https://localhost:7196/ParseReceipt/ParseReceipt';
-        const parseReceiptUrl = backendApiUrl + '/ParseReceipt/ParseReceipt';
-        axios.post(parseReceiptUrl, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-        }).then((res) => {
-            console.log("-- RES: ", res);
+        if(isManualEntry) {
+            setIsLoading(true);
             const payload = {
-                "receipt": res.data.receipt
+                "users": participants
             }
-      
-            // const createReceiptUrlDev = "https://receiptparserdevelop001.azurewebsites.net/HandleReceipt/CreateReceipt";
-            // const createReceiptUrlLocal = "https://localhost:7196/HandleReceipt/CreateReceipt";
-            const createReceiptUrl = backendApiUrl + "/HandleReceipt/CreateReceipt";
+
+            const createReceiptUrl = backendApiUrl + "/HandleReceipt/CreateEmptyReceipt";
             axios.post(createReceiptUrl, payload).then(res => {
                 console.log('-- ReceiptBreakdown.js|109 >> res', res);
                 
@@ -200,10 +140,57 @@ const InputComponent = () => {
 
             
             setIsLoading(false);
-        }).catch((err) => {
-            console.log("-- ERR: ", err)
-            setIsLoading(false);
-        })
+        }else{
+            if (receiptImg === null || receiptImg === undefined) {
+                console.log("-- no image selected"); // TODO SHOW VISUAL ERROR OR DISABLE IT
+                return;
+            }
+            setIsLoading(true);
+            
+            console.log("participants: " + participants);
+    
+            
+            var formData = new FormData();
+            formData.append('file', receiptImg);
+            participants.forEach(p => {
+                formData.append('users', p);
+            })
+    
+            const parseReceiptUrl = backendApiUrl + '/ParseReceipt/ParseReceipt';
+            axios.post(parseReceiptUrl, formData, {
+                headers: {
+                  'Content-Type': 'multipart/form-data'
+                }
+            }).then((res) => {
+                console.log("-- RES: ", res);
+                const payload = {
+                    "receipt": res.data.receipt
+                }
+    
+                const createReceiptUrl = backendApiUrl + "/HandleReceipt/CreateReceipt";
+                axios.post(createReceiptUrl, payload).then(res => {
+                    console.log('-- ReceiptBreakdown.js|109 >> res', res);
+                    
+                    if (res.status == "200") {
+                        const id = res?.data?.receipt?._id;
+                        console.log("both call success");
+                        console.log(res.data);
+                        console.log("setting receipt data");
+                        setReceiptData(res?.data?.receipt);
+                        navigate("/?receiptId=" + id);
+                    }
+                }).catch((err) => {
+                    console.log('-- ERR', err);
+                })
+    
+                
+                setIsLoading(false);
+            }).catch((err) => {
+                console.log("-- ERR: ", err)
+                setIsLoading(false);
+            })
+        }
+
     }
 
 
@@ -233,7 +220,7 @@ const InputComponent = () => {
                         <Box sx={{ display: 'flex',  alignItems: 'center', justifyContent: 'center',
                             flexDirection: { xs: 'column', xm: 'column', md: 'row' }}}>
                             
-                            <Button disabled
+                            <Button
                             color="primary"
                                 variant={isManualEntry ? "contained" : "outlined"}
                                 onClick={() => handleManualEntry()}
