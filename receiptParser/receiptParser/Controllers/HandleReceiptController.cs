@@ -24,6 +24,88 @@ namespace receiptParser.Controllers
             _userReceiptService = userReceiptService;
         }
 
+        [HttpGet()]
+        public async Task<ReceiptResponse> GetReceiptExample()
+        {
+            _logger.LogInformation("C# HTTP trigger function processed a request.");
+
+            HttpStatusCode resultStatusCode = HttpStatusCode.OK;
+            ReceiptResponse receiptResponse = new ReceiptResponse();
+            receiptResponse.isSuccess = false;
+            try
+            {
+
+                ReceiptDto receiptDto = await _userReceiptService.GetReceiptExample();
+                receiptResponse.isSuccess = true;
+                receiptResponse.message = "Receipt fetched.";
+                receiptResponse.receipt = receiptDto;
+               
+            }
+            catch (HandleReceiptException e)
+            {
+                receiptResponse.isSuccess = false;
+                receiptResponse.failureReason = e.failureReason;
+                receiptResponse.message = e.Message;
+            }
+            catch (Exception e)
+            {
+                receiptResponse.isSuccess = false;
+                receiptResponse.message = e.Message;
+                receiptResponse.failureReason = HandleReceiptFailureReason.Unknown;
+
+            }
+
+            return receiptResponse;
+        }
+
+        [HttpPost(Name = "CreateEmptyReceipt")]
+        public async Task<ReceiptResponse> CreateEmptyReceipt(CreateEmptyReceiptRequest req)
+        {
+            _logger.LogInformation("C# HTTP trigger function processed a request.");
+
+            ReceiptResponse receiptResponse = new ReceiptResponse();
+            receiptResponse.isSuccess = false;
+            try
+            {
+
+                CreateEmptyReceiptRequest? model = req;/*await req.ReadFromJsonAsync<ReceiptRequest>();*/
+
+
+                if (model != null)
+                {
+
+                    ReceiptDto resultReceiptDto = await _userReceiptService.CreateEmptyReceipt(model.users);
+
+                    receiptResponse.isSuccess = true;
+                    receiptResponse.message = "Receipt created.";
+                    receiptResponse.receipt = resultReceiptDto;
+                }
+                else
+                {
+                    receiptResponse.isSuccess = false;
+                    receiptResponse.failureReason = HandleReceiptFailureReason.ModelParsingIssue;
+                    receiptResponse.message = "";
+
+                }
+            }
+            catch (HandleReceiptException e)
+            {
+                receiptResponse.isSuccess = false;
+                receiptResponse.failureReason = e.failureReason;
+                receiptResponse.message = e.Message;
+            }
+            catch (Exception e)
+            {
+                receiptResponse.isSuccess = false;
+                receiptResponse.message = e.Message;
+                receiptResponse.failureReason = HandleReceiptFailureReason.Unknown;
+
+            }
+
+
+            return receiptResponse;
+        }
+
 
         [HttpPost(Name = "CreateReceipt")]
         public async Task<ReceiptResponse> CreateReceipt(ReceiptRequest req)

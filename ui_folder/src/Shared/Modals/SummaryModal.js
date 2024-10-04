@@ -103,6 +103,7 @@ const SummaryModal = (props) => {
 
     return (
         <>
+        {show && (
                <Dialog open={show} onClose={() => setShow(false)}
                  fullWidth={true}
                  maxWidth={'sm'}
@@ -135,6 +136,7 @@ const SummaryModal = (props) => {
                 
                   </DialogActions>
         </Dialog>
+        )}
 
       </>
     );
