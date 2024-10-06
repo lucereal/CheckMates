@@ -98,7 +98,14 @@ const MainContainer = ({ showSettings, setShowSettings, darkMode, setDarkMode })
             //setReceiptLoading(true);
             axios.get(getReceiptUrl).then(res => {
                 console.log("got response for existing receipt");
-                setReceiptData(res?.data?.receipt);
+                //setReceiptData(res?.data?.receipt);  
+                console.log("setting receipt data");
+                if (res.status == "200") {
+                    const id = res?.data?.receipt?._id;
+                    setReceiptData(res?.data?.receipt);
+                    navigate("/?receiptId=" + id);
+                }
+                
                 setLoading(false);
             }).catch(e => {
                 console.log('-- ERR', e);
