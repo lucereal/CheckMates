@@ -246,7 +246,7 @@ const ReceiptBreakdown = (props) => {
             try {
                 await navigator.share({
                     title: 'CheckMates Share',
-                    text: "Let's split this receipt!",
+                    text: "Let's split this receipt! Share code: " + receiptId,
                     url: linkToShare,
                 });
                 console.log('Content shared successfully');
